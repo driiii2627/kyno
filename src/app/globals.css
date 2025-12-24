@@ -26,7 +26,10 @@ body {
   overflow-x: hidden;
   color: var(--text-primary);
   font-family: var(--font-inter);
-  background: linear-gradient(180deg, #0F2027 0%, #162c36 100%);
+  background: linear-gradient(180deg,
+      #0F2027 0%,
+      #13262F 50%,
+      #162c36 100%);
   background-attachment: fixed;
   min-height: 100vh;
 }
