@@ -1,0 +1,146 @@
+/* Main transparent header container */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 1rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    /* Always transparent */
+    transition: padding 0.3s ease;
+}
+
+.scrolled {
+    /* No background change on scroll for the main container anymore */
+    padding: 1rem 4rem;
+}
+
+/* Logo - Pure Text, no background */
+.brand {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.logo span {
+    color: #4FB6D8;
+    text-shadow: 0 0 10px rgba(79, 182, 216, 0.6);
+}
+
+/* Navigation Links - Centered Glass Pill Styling */
+.navLinks {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(15, 32, 39, 0.95);
+    /* Opaque glass dark theme */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 0.5rem 0.6rem;
+    border-radius: 9999px;
+    /* Pill shape */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Subtle border */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.link {
+    color: #ccc;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+}
+
+.link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Active Link - White Pill Button Style */
+.active {
+    background-color: #fff;
+    color: #000 !important;
+    /* Force black text for contrast */
+    font-weight: 600;
+    text-shadow: none;
+    /* Remove glow from active text */
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Remove the old underline effect */
+.active::after {
+    display: none;
+}
+
+/* Actions Section */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.iconBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    /* Circle shape */
+    background: rgba(15, 32, 39, 0.6);
+    /* Slightly dark background to match */
+    color: #ddd;
+    transition: all 0.2s;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.iconBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+
+    .navbar,
+    .scrolled {
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .navbar,
+    .scrolled {
+        padding: 1rem 1.5rem;
+    }
+
+    .navLinks {
+        display: none;
+        /* Hide links on mobile for now */
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .actions {
+        gap: 0.5rem;
+    }
+}
