@@ -1,5 +1,5 @@
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-const API_KEY = 'e407e3f55ac924320df3192273006442';
+const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL || 'https://api.themoviedb.org/3';
+const API_KEY = process.env.TMDB_API_KEY || 'e407e3f55ac924320df3192273006442'; // Fallback for safety, but env var takes precedence
 
 export interface Movie {
   id: number;
