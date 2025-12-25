@@ -60,10 +60,15 @@ export default function MovieRow({ title, movies }: MovieRowProps) {
                                 />
                                 {/* Overlay on Hover */}
                                 <div className={styles.overlay}>
-                                    <h3 className={styles.movieTitle}>{movie.title || movie.name}</h3> {/* Changed to h3 and class name */}
-                                    <div className={styles.rating}> {/* New rating div */}
-                                        <Star size={14} fill="#fbbf24" stroke="#fbbf24" />
-                                        <span>{movie.vote_average.toFixed(1)}</span>
+                                    <h3 className={styles.movieTitle}>{movie.title || movie.name}</h3>
+                                    <div className={styles.metaRow}>
+                                        <div className={styles.rating}>
+                                            <Star size={12} fill="#fbbf24" stroke="#fbbf24" />
+                                            <span>{movie.vote_average.toFixed(1)}</span>
+                                        </div>
+                                        <span className={styles.year}>
+                                            {new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear()}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
