@@ -1,0 +1,297 @@
+.container {
+    position: relative;
+    min-height: 100vh;
+    background-color: #000;
+    color: #fff;
+    overflow-x: hidden;
+    font-family: var(--font-inter, sans-serif);
+}
+
+/* Background Hero Section */
+.heroBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70vh;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.heroImage {
+    object-fit: cover;
+    opacity: 0.35;
+    /* Darken the image significantly so text pops */
+    width: 100%;
+    height: 100%;
+}
+
+/* Gradients for Blending */
+.gradientOverlayBottom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
+}
+
+.gradientOverlaySide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+}
+
+/* Back Button */
+.backButton {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    transition: background 0.2s;
+}
+
+.backButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Content Layout */
+.content {
+    position: relative;
+    z-index: 10;
+    padding: 0 2rem;
+    padding-top: 25vh;
+    /* Standardize visible area */
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+@media (min-width: 768px) {
+    .content {
+        flex-direction: row;
+        padding-top: 20vh;
+    }
+}
+
+/* Poster */
+.posterWrapper {
+    flex-shrink: 0;
+    width: 200px;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
+    /* Hide on small mobile by default, typical app behavior */
+}
+
+@media (min-width: 768px) {
+    .posterWrapper {
+        display: block;
+        width: 280px;
+        height: 420px;
+    }
+}
+
+.posterImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Info Column */
+.infoColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 768px) {
+    .title {
+        font-size: 4rem;
+    }
+}
+
+.metadata {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #46d369;
+    /* Netflix Match Green */
+    font-weight: 700;
+}
+
+.tag {
+    padding: 0.1rem 0.4rem;
+    border: 1px solid #64748b;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+/* Actions Row */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.playButton {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 2rem;
+    background-color: #fff;
+    color: #000;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.playButton:hover {
+    background-color: #e2e2e2;
+    transform: scale(1.02);
+}
+
+.actionIconBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #64748b;
+    color: #94a3b8;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+}
+
+.actionIconBtn:hover {
+    border-color: #fff;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.overview {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e2e8f0;
+    max-width: 700px;
+    margin-top: 0.5rem;
+}
+
+/* Cast Section */
+.castSection {
+    margin-top: 2rem;
+    border-top: 1px solid #333;
+    padding-top: 1.5rem;
+}
+
+.castTitle {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.castList {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    /* Hide Scrollbar */
+    scrollbar-width: none;
+}
+
+.castList::-webkit-scrollbar {
+    display: none;
+}
+
+.castItem {
+    flex-shrink: 0;
+    width: 100px;
+    /* Fixed width prevents giant faces */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.castAvatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #333;
+    background-color: #1a1a1a;
+}
+
+.castAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.actorName {
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.characterName {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
