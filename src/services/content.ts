@@ -55,29 +55,29 @@ export const contentService = {
     /**
      * Get a single movie by UUID (Lightweight lookup for Player)
      */
-    async getMovieById(uuid: string): Promise<{ tmdb_id: number } | null> {
+    async getMovieById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null } | null> {
         const { data, error } = await supabase
             .from('movies')
-            .select('tmdb_id')
+            .select('tmdb_id, video_url')
             .eq('id', uuid)
             .single();
 
         if (error || !data) return null;
-        return { tmdb_id: data.tmdb_id };
+        return { tmdb_id: data.tmdb_id, video_url: data.video_url };
     },
 
     /**
      * Get a single series by UUID
      */
-    async getSeriesById(uuid: string): Promise<{ tmdb_id: number } | null> {
+    async getSeriesById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null } | null> {
         const { data, error } = await supabase
             .from('series')
-            .select('tmdb_id')
+            .select('tmdb_id, video_url')
             .eq('id', uuid)
             .single();
 
         if (error || !data) return null;
-        return { tmdb_id: data.tmdb_id };
+        return { tmdb_id: data.tmdb_id, video_url: data.video_url };
     },
 
     /**
@@ -89,6 +89,8 @@ export const contentService = {
 
         try {
             const adminClient = getServiceSupabase();
+            const baseUrl = await this.getAppConfig('superflix_base_url', 'https://superflixapi.buzz');
+
             const payload = movies.map(m => {
                 let year = 2025;
                 const dateStr = m.release_date || m.first_air_date;
@@ -100,10 +102,11 @@ export const contentService = {
                 const details = m as MovieDetails;
                 const genreStr = details.genres ? details.genres.map(g => g.name).join(', ') : '';
                 const duration = details.runtime || 0;
+                const generatedUrl = `${baseUrl}/filme/${m.id}`;
 
                 return {
                     tmdb_id: m.id,
-                    video_url: '',
+                    video_url: generatedUrl,
                     title: m.title || m.name || 'Sem Título',
                     description: m.overview || '',
                     poster_url: m.poster_path || '',
@@ -134,6 +137,8 @@ export const contentService = {
 
         try {
             const adminClient = getServiceSupabase();
+            const baseUrl = await this.getAppConfig('superflix_base_url', 'https://superflixapi.buzz');
+
             const payload = series.map(s => {
                 let year = 2025;
                 const dateStr = s.first_air_date || s.release_date;
@@ -144,10 +149,11 @@ export const contentService = {
 
                 const details = s as MovieDetails;
                 const genreStr = details.genres ? details.genres.map(g => g.name).join(', ') : '';
+                const generatedUrl = `${baseUrl}/serie/${s.id}`;
 
                 return {
                     tmdb_id: s.id,
-                    video_url: '',
+                    video_url: generatedUrl,
                     title: s.name || s.title || 'Sem Título',
                     description: s.overview || '',
                     poster_url: s.poster_path || '',
