@@ -26,10 +26,19 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     }
 
     // 2. Fetch Data
-    const [details, credits] = await Promise.all([
-        tmdb.getDetails(item.tmdb_id, item.type),
-        tmdb.getCredits(item.tmdb_id, item.type)
-    ]);
+    const detailsPromise = tmdb.getDetails(item.tmdb_id, item.type);
+    const creditsPromise = tmdb.getCredits(item.tmdb_id, item.type);
+
+    const [details, credits] = await Promise.all([detailsPromise, creditsPromise]);
+
+    // If Series, fetch first season
+    let initialSeasonData = null;
+    if (item.type === 'tv' && 'seasons' in details && details.seasons?.length) {
+        const firstSeason = details.seasons.find(s => s.season_number > 0) || details.seasons[0];
+        if (firstSeason) {
+            initialSeasonData = await tmdb.getSeasonDetails(item.tmdb_id, firstSeason.season_number);
+        }
+    }
 
     // Format Data
     const backdropUrl = details.backdrop_path
@@ -126,13 +135,24 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         {details.overview}
                     </p>
 
-                    {/* Cast Section */}
-                    {credits.cast && credits.cast.length > 0 && (
+                    {/* Series: Episodes Browser */}
+                    {item.type === 'tv' && initialSeasonData && 'seasons' in details && (
+                        <SeasonBrowser
+                            tmdbId={item.tmdb_id}
+                            uuid={uuid}
+                            seasons={details.seasons || []}
+                            initialSeasonData={initialSeasonData}
+                        />
+                    )}
+
+                    {/* Movies: Cast Section (Only show if movie) */}
+                    {item.type === 'movie' && credits.cast && credits.cast.length > 0 && (
                         <div className={styles.castSection}>
                             <h3 className={styles.castTitle}>Elenco Principal</h3>
                             <div className={styles.castList}>
                                 {credits.cast.slice(0, 10).map(actor => (
                                     <div key={actor.id} className={styles.castItem}>
+                                        {/* ... cast rendering ... */}
                                         <div className={styles.castAvatar}>
                                             {actor.profile_path ? (
                                                 <Image
@@ -155,6 +175,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                             </div>
                         </div>
                     )}
+
                 </div>
             </div>
 

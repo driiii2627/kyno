@@ -56,6 +56,37 @@ export interface MovieDetails extends Movie {
   runtime?: number;
   episode_run_time?: number[];
   number_of_seasons?: number;
+  seasons?: {
+    air_date: string;
+    episode_count: number;
+    id: number;
+    name: string;
+    overview: string;
+    poster_path: string;
+    season_number: number;
+    vote_average: number;
+  }[];
+}
+
+export interface Episode {
+  id: number;
+  name: string;
+  overview: string;
+  still_path: string | null;
+  episode_number: number;
+  season_number: number;
+  runtime?: number;
+}
+
+export interface SeasonDetails {
+  _id: string;
+  air_date: string;
+  episodes: Episode[];
+  name: string;
+  overview: string;
+  id: number;
+  poster_path: string | null;
+  season_number: number;
 }
 
 export const tmdb = {
@@ -76,6 +107,9 @@ export const tmdb = {
   },
   getCredits: async (id: number, type: 'movie' | 'tv') => {
     return fetchFromTMDB<Credits>(`/${type}/${id}/credits`);
+  },
+  getSeasonDetails: async (tvId: number, seasonNumber: number) => {
+    return fetchFromTMDB<SeasonDetails>(`/tv/${tvId}/season/${seasonNumber}`);
   }
 };
 
