@@ -54,8 +54,8 @@
 /* Back Button - Minimalist (No bubble) & Moved Down */
 .backButton {
     position: absolute;
-    top: 5rem;
-    /* moved further down */
+    top: 2.5rem;
+    /* Moved back up as requested */
     left: 2rem;
     z-index: 50;
     display: flex;
@@ -186,7 +186,8 @@
     border: 1px solid #64748b;
     border-radius: 4px;
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: #fff;
+    border-color: #fff;
 }
 
 /* Actions Row */

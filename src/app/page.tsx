@@ -64,8 +64,8 @@ export default async function Home() {
   }
   const heroMovies = shuffled.slice(0, 10);
 
-  // Mixed "Trending" Row (Recent adds from both)
-  const mixedTrending = shuffled.slice(0, 20);
+  // Mixed "Trending" Row (Recent adds from both) - Start AFTER Hero to avoid duplicates
+  const mixedTrending = shuffled.slice(10, 30);
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
