@@ -108,27 +108,30 @@
     }
 }
 
-/* Grid */
+/* Horizontal Scroll (Carousel) */
 .grid {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
     gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 2rem;
+    /* Space for scrollbar or hover effects */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
 }
 
-@media (min-width: 768px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.grid::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
 }
 
-@media (min-width: 1024px) {
-    .grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-/* Episode Card */
+/* Ensure cards have fixed width in carousel */
 .card {
+    min-width: 280px;
+    max-width: 280px;
+    flex-shrink: 0;
+
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
