@@ -1,14 +1,13 @@
 .container {
-    margin-top: 3rem;
-    border-top: 1px solid #27272a;
-    padding-top: 2rem;
+    margin-top: 0.5rem;
+    padding-top: 0;
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .dropdownContainer {

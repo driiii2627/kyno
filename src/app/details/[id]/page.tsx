@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
 import styles from './Details.module.css';
 import SeasonBrowser from '@/components/details/SeasonBrowser';
+import DetailsTabs from '@/components/details/DetailsTabs';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,8 +60,42 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     const playerRoute = item.type === 'movie' ? `/filme/${uuid}` : `/serie/${uuid}`;
 
     return (
+        // 3. Fetch Recommendations & Collection (Sequels)
+        let recommendations = await tmdb.getRecommendations(item.tmdb_id, item.type);
+
+    // Prioritize Sequels (Collection) if Movie
+    if (item.type === 'movie' && (details as any).belongs_to_collection) {
+        const collection = await tmdb.getCollectionDetails((details as any).belongs_to_collection.id);
+        if (collection && collection.parts) {
+            // Filter out current movie and sort by release date (optional, but good for sequels)
+            const parts = collection.parts
+                .filter(p => p.id !== item.tmdb_id)
+                .sort((a, b) => new Date(a.release_date).getTime() - new Date(b.release_date).getTime());
+
+            // Prepend collection parts to recommendations
+            recommendations = [...parts, ...recommendations];
+
+            // Deduplicate just in case
+            recommendations = Array.from(new Map(recommendations.map(m => [m.id, m])).values());
+        }
+    }
+
+    // Prepare Season Browser Node
+    let seasonBrowserNode = null;
+    if (item.type === 'tv' && initialSeasonData && 'seasons' in details) {
+        seasonBrowserNode = (
+            <SeasonBrowser
+                tmdbId={item.tmdb_id}
+                uuid={uuid}
+                seasons={details.seasons || []}
+                initialSeasonData={initialSeasonData}
+            />
+        );
+    }
+
+    return (
         <div className={styles.container}>
-            {/* Background Hero */}
+            {/* ... (Hero kept same) ... */}
             <div className={styles.heroBackground}>
                 {backdropUrl && (
                     <Image
@@ -72,22 +107,15 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         unoptimized
                     />
                 )}
-                {/* CSS Gradients */}
                 <div className={styles.gradientOverlayBottom} />
                 <div className={styles.gradientOverlaySide} />
             </div>
 
-            {/* Back Button */}
             <Link href="/" className={styles.backButton}>
                 <ArrowLeft size={18} /> Voltar
             </Link>
 
-            {/* Main Content */}
             <div className={styles.content}>
-
-
-
-                {/* Info */}
                 <div className={styles.infoColumn}>
                     <h1 className={styles.title}>{title}</h1>
 
@@ -124,31 +152,29 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         {details.overview}
                     </p>
 
-                    {/* Tabs / Navigation (Visual only for now matching reference) */}
-                    <div className={styles.tabs}>
-                        <button className={`${styles.tabButton} ${styles.activeTab}`}>Episódios</button>
-                        <button className={styles.tabButton}>Similares</button>
-                        <button className={styles.tabButton}>Detalhes</button>
-                    </div>
+                    {/* Interactive Details Tabs (Episodes / Recommendations) */}
+                    <DetailsTabs
+                        seasonBrowser={seasonBrowserNode}
+                        recommendations={recommendations}
+                        uuid={uuid}
+                    />
 
-                    {/* Series: Episodes Browser */}
-                    {item.type === 'tv' && initialSeasonData && 'seasons' in details && (
-                        <SeasonBrowser
-                            tmdbId={item.tmdb_id}
-                            uuid={uuid}
-                            seasons={details.seasons || []}
-                            initialSeasonData={initialSeasonData}
-                        />
-                    )}
-
-                    {/* Movies: Cast Section (Only show if movie) */}
+                    {/* Movies: Cast Section (Only show if movie and active tab? No, usually cast is below or separate) */}
+                    {/* User asked to hide cast for series, which is handled by !seasonBrowserNode logic loosely, 
+                        but actually 'seasonBrowserNode' is user for TV. 
+                        For movies, we show Cast? User didn't strictly say remove cast for movies, just "Remove Cast Section: Eliminate the cast display for series."
+                        However, with the new Tabs (Episodes | Recommendations), where does Cast go?
+                        The user said "tire o simalres, detalhes... deixe só episodios, recomendações".
+                        So for Movies, maybe Tabs are "Sobre/Cast" and "Recomendações"?
+                        For now, I will keep Cast below for movies as previously requested, or hide it if it conflicts.
+                        The user loved the "eps format" for recommendations.
+                        I'll leave Cast for movies below the Tabs for now. */}
                     {item.type === 'movie' && credits.cast && credits.cast.length > 0 && (
                         <div className={styles.castSection}>
                             <h3 className={styles.castTitle}>Elenco Principal</h3>
                             <div className={styles.castList}>
                                 {credits.cast.slice(0, 10).map(actor => (
                                     <div key={actor.id} className={styles.castItem}>
-                                        {/* ... cast rendering ... */}
                                         <div className={styles.castAvatar}>
                                             {actor.profile_path ? (
                                                 <Image
@@ -171,7 +197,6 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                             </div>
                         </div>
                     )}
-
                 </div>
             </div>
 

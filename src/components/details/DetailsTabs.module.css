@@ -1,0 +1,59 @@
+.container {
+    margin-top: 1rem;
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
+}
+
+.tabButton {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tabButton:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.activeTab {
+    color: #000;
+    background: #fff;
+    font-weight: 700;
+}
+
+.activeTab:hover {
+    background: #e2e2e2;
+    color: #000;
+}
+
+.contentArea {
+    min-height: 200px;
+}
+
+.tabContent {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
