@@ -73,5 +73,6 @@ export default function MovieRow({ title, movies }: MovieRowProps) {
                     ))}
                 </div>
             </div>
-            );
+        </div>
+    );
 }
