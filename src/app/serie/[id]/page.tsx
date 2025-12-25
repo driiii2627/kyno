@@ -43,14 +43,18 @@ export default async function SeriesPlayerPage({ params }: PageProps) {
                 </Link>
             </div>
 
-            <div className="flex-1 w-full h-full">
+            <div className="absolute top-0 left-0 w-full h-full z-0">
                 <iframe
                     src={playerUrl}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                    }}
                     allowFullScreen
-                    className="w-full h-full border-0"
                     title={`Player Série ${tmdb_id}`}
                 />
             </div>

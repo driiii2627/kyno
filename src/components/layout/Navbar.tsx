@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { Search, Bookmark, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
+    const pathname = usePathname();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -15,6 +17,11 @@ export default function Navbar() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Hide Navbar on player routes (filme and serie)
+    if (pathname?.startsWith('/filme/') || pathname?.startsWith('/serie/')) {
+        return null; // Don't render navbar on player pages
+    }
 
     return (
         <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
