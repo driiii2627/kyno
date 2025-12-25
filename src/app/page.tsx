@@ -1,6 +1,7 @@
 import Hero from '@/components/home/Hero';
 import MovieRow from '@/components/home/MovieRow';
 import { tmdb } from '@/services/tmdb';
+import { contentService } from '@/services/content';
 
 export default async function Home() {
   // Fetch real data in parallel
@@ -10,17 +11,25 @@ export default async function Home() {
   let topRatedMovies: { results: import('@/services/tmdb').Movie[] } = { results: [] };
   let trendingSeries: { results: import('@/services/tmdb').Movie[] } = { results: [] };
 
+  let catalogMovies: import('@/services/content').CatalogItem[] = [];
+  let catalogSeries: import('@/services/content').CatalogItem[] = [];
+
+  // ...
   try {
     [
       trendingMovies,
       popularMovies,
       topRatedMovies,
-      trendingSeries
+      trendingSeries,
+      catalogMovies,
+      catalogSeries
     ] = await Promise.all([
       tmdb.getTrending('movie'),
       tmdb.getPopular('movie'),
       tmdb.getTopRated('movie'),
-      tmdb.getTrending('tv')
+      tmdb.getTrending('tv'),
+      contentService.getCatalogMovies(),
+      contentService.getCatalogSeries()
     ]);
   } catch (error) {
     console.error("Failed to fetch TMDB data:", error);
@@ -39,6 +48,15 @@ export default async function Home() {
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>
         <MovieRow title="Tendências de Hoje" movies={trendingMovies.results} priority={true} />
+
+        {/* Supabase Catalog Rows - Render only if we have data */}
+        {catalogMovies.length > 0 && (
+          <MovieRow title="Filmes Recém-Adicionados" movies={catalogMovies} />
+        )}
+        {catalogSeries.length > 0 && (
+          <MovieRow title="Séries Recém-Adicionadas" movies={catalogSeries} />
+        )}
+
         <MovieRow title="Séries em Alta" movies={trendingSeries.results} />
         <MovieRow title="Populares da Semana" movies={popularMovies.results} />
         <MovieRow title="Melhores Avaliados" movies={topRatedMovies.results} />
