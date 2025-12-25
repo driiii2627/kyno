@@ -13,30 +13,32 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 85vh;
-    /* Increased height to cover more */
+    height: 100vh;
+    /* Full screen height as requested */
     z-index: 0;
     pointer-events: none;
 }
 
 .heroImage {
     object-fit: cover;
-    opacity: 0.7;
-    /* Even brighter */
+    opacity: 0.8;
+    /* Very visible */
     width: 100%;
     height: 100%;
-    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    /* Gradient mask that lets image show almost until the end */
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
 }
 
-/* Gradients for Blending - Much softer now */
+/* Gradients for Blending - Minimal black */
 .gradientOverlayBottom {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.4) 15%, transparent 80%);
+    /* Only darkens at the very bottom for text readability */
+    background: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.5) 10%, transparent 60%);
 }
 
 .gradientOverlaySide {
@@ -45,56 +47,59 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.2) 30%, transparent 100%);
+    /* subtle side gradient */
+    background: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.3) 20%, transparent 80%);
 }
 
-/* Back Button - Moved down */
+/* Back Button - Minimalist (No bubble) & Moved Down */
 .backButton {
     position: absolute;
-    top: 3rem;
-    /* Moved down */
-    left: 1.5rem;
+    top: 5rem;
+    /* moved further down */
+    left: 2rem;
     z-index: 50;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    /* Larger touch target */
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    border-radius: 9999px;
-    font-size: 0.95rem;
+    padding: 0.5rem;
+    /* Removed background/border bubbles */
+    background: transparent;
+    border: none;
+    font-size: 1rem;
     font-weight: 500;
     color: #fff;
-    transition: background 0.2s;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    /* Shadow for readability */
+    transition: opacity 0.2s, transform 0.2s;
+    opacity: 0.8;
 }
 
 .backButton:hover {
-    background: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+    transform: translateX(-5px);
+    background: transparent;
 }
 
 /* Content Layout */
 .content {
     position: relative;
     z-index: 10;
-    padding: 0 1.5rem;
-    /* Slightly reduced horizontal padding on mobile for more space */
-    padding-top: 40vh;
-    /* Push content down to let image breathe on mobile */
+    padding: 0 2rem;
+    /* Moved UP significantly */
+    padding-top: 20vh;
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    /* Reduced gap for better mobile flow */
 }
 
 @media (min-width: 768px) {
     .content {
         flex-direction: row;
-        padding: 0 3rem;
-        padding-top: 35vh;
+        padding: 0 4rem;
+        /* Moved UP on desktop too */
+        padding-top: 15vh;
         gap: 3rem;
     }
 }
@@ -132,12 +137,12 @@
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
-    margin-top: 0.5rem;
+    /* Removed extra margin-top to keep it tight */
+    margin-top: 0;
 }
 
 .title {
-    font-size: 2rem;
-    /* Smaller on mobile to fit */
+    font-size: 2.2rem;
     font-weight: 800;
     line-height: 1.1;
     color: #fff;
@@ -146,8 +151,10 @@
 
 @media (min-width: 768px) {
     .title {
-        font-size: 4rem;
+        font-size: 4.5rem;
         margin-top: 0;
+        margin-bottom: 0.5rem;
+        /* slight breathing room */
     }
 }
 
@@ -156,10 +163,11 @@
     flex-wrap: wrap;
     align-items: center;
     /* Ensures vertical centering */
-    gap: 0.8rem;
-    font-size: 0.9rem;
+    gap: 1rem;
+    font-size: 1rem;
     color: #cbd5e1;
     font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .rating {
