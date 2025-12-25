@@ -124,6 +124,13 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         {details.overview}
                     </p>
 
+                    {/* Tabs / Navigation (Visual only for now matching reference) */}
+                    <div className={styles.tabs}>
+                        <button className={`${styles.tabButton} ${styles.activeTab}`}>Episódios</button>
+                        <button className={styles.tabButton}>Similares</button>
+                        <button className={styles.tabButton}>Detalhes</button>
+                    </div>
+
                     {/* Series: Episodes Browser */}
                     {item.type === 'tv' && initialSeasonData && 'seasons' in details && (
                         <SeasonBrowser
