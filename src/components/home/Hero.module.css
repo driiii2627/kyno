@@ -49,9 +49,9 @@
        Center: Transparent (show image)
        Edges: Very subtle blue-ish dark tint (User request)
     */
-    background: radial-gradient(circle at 60% 50%,
-            transparent 40%,
-            rgba(10, 25, 40, 0.4) 80%,
+    background: radial-gradient(circle at 50% 50%,
+            transparent 55%,
+            rgba(10, 25, 40, 0.4) 90%,
             rgba(15, 32, 45, 0.8) 100%);
     z-index: 1;
 }
@@ -76,10 +76,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 180px;
+    height: 120px;
+    /* Reduced for "total banner highlight" */
     /* CLEAN NEUTRAL FADE - No blue here anymore, just blending to body */
     background: linear-gradient(to top,
-            #0F2027 20%,
+            #0F2027 15%,
             transparent 100%);
     z-index: 2;
     pointer-events: none;
