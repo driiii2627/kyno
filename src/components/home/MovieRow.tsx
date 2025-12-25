@@ -53,10 +53,9 @@ export default function MovieRow({ title, movies, priority = false }: MovieRowPr
                 <div className={styles.listContainer} ref={listRef}>
                     {movies.map((movie, index) => {
                         const item = movie as CatalogItem;
-                        const isTv = !!item.first_air_date;
-                        const linkHref = isTv
-                            ? `/serie/${item.supabase_id}`
-                            : `/filme/${item.supabase_id}`;
+                        // const isTv = !!item.first_air_date;
+                        // We redirect everything to the details page now
+                        const linkHref = `/details/${item.supabase_id}`;
 
                         return (
                             <Link key={movie.id} href={linkHref} className={styles.card}>
