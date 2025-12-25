@@ -98,8 +98,15 @@
 
 .listContainer {
     display: flex;
-    gap: 1.2rem;
+    overflow-y: hidden;
     overflow-x: auto;
+    scroll-behavior: smooth;
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
 
     /* Move left padding INSIDE the scroll container.
        This allows the first item (scaled) to use this padding area instead of being clipped.
