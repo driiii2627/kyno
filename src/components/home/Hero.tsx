@@ -26,9 +26,10 @@ export default function Hero({ movie }: HeroProps) {
             <div className={styles.heroBackground}>
                 <div
                     className={styles.heroImage}
-                    style={{ backgroundImage: `url('${getImageUrl(movie.backdrop_path, 'original')}')` }}
-                />
-                <div className={styles.gradientOverlay} />
+                    style={{
+                        backgroundImage: `url(${getImageUrl(movie?.backdrop_path || '', 'original')})`
+                    }}
+                />    <div className={styles.gradientOverlay} />
                 <div className={styles.leftVignette} />
                 <div className={styles.bottomVignette} />
             </div>
