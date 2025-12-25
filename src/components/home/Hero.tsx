@@ -18,10 +18,10 @@ export default function Hero({ movies }: HeroProps) {
     // Auto-rotation
     useEffect(() => {
         const interval = setInterval(() => {
-            handleNext();
+            setCurrentIndex((prev) => (prev + 1) % movies.length);
         }, 8000); // 8 seconds per slide
         return () => clearInterval(interval);
-    }, [currentIndex, movies.length]); // Added movies.length to dependencies
+    }, [movies.length]);
 
     // Fetch details when movie changes
     useEffect(() => {
