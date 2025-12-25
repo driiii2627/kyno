@@ -51,14 +51,12 @@ export default function MovieRow({ title, movies }: MovieRowProps) {
                     {movies.map((movie) => (
                         <div key={movie.id} className={styles.card}>
                             <div className={styles.imageWrapper}>
-                                {/* Image */}
                                 <Image
                                     src={getImageUrl(movie.poster_path, 'w500')}
                                     alt={movie.title || movie.name || 'Movie'}
                                     fill
                                     className={styles.image} {/* Changed class name */}
                                     sizes="(max-width: 768px) 150px, 200px" {/* Added sizes */}
-                                // unoptimized removed
                                 />
 
                                 {/* Overlay on Hover */}
