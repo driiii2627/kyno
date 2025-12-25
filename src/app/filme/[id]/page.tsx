@@ -14,16 +14,18 @@ export default async function MoviePlayerPage({ params }: PageProps) {
     const { id: uuid } = await params;
 
     // 1. Fetch Config and Movie Data in Parallel for Speed
+    // Note: getMovieById now returns video_url
     const [baseUrl, movieData] = await Promise.all([
         contentService.getAppConfig('superflix_base_url', 'https://superflixapi.buzz'),
         contentService.getMovieById(uuid)
     ]);
 
-    // 2. Resolve TMDB ID
-    if (!movieData) {
+    // 2. Validate Data and Video URL
+    if (!movieData || !movieData.video_url) {
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-black text-white">
-                <h1 className="text-2xl font-bold mb-4">Filme não encontrado</h1>
+                <h1 className="text-2xl font-bold mb-4">Filme não encontrado ou indisponível</h1>
+                <p className="text-zinc-500 mb-6">A URL do vídeo não foi sincronizada.</p>
                 <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
                     <ArrowLeft size={20} /> Voltar para o início
                 </Link>
@@ -31,8 +33,9 @@ export default async function MoviePlayerPage({ params }: PageProps) {
         );
     }
 
-    const { tmdb_id } = movieData;
-    const playerUrl = `${baseUrl}/filme/${tmdb_id}`;
+    const { tmdb_id, video_url } = movieData;
+    // We use the DB video_url as the source of truth
+    const playerUrl = video_url;
 
     return (
         <div className="relative w-full h-screen bg-black overflow-hidden flex flex-col">
