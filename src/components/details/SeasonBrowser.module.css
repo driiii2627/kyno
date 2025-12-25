@@ -113,6 +113,8 @@
     gap: 1.5rem;
     overflow-x: auto;
     padding-bottom: 2rem;
+    padding-right: 4rem;
+    /* Prevent cut-off feel at edge */
     /* Space for scrollbar or hover effects */
     scrollbar-width: none;
     /* Firefox */
@@ -159,6 +161,8 @@
 
 .thumbnailImage {
     object-fit: cover;
+    object-position: center top;
+    /* Prevent decapitating posters */
     width: 100%;
     height: 100%;
     transition: transform 0.5s;

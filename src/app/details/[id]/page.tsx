@@ -162,44 +162,44 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                     <p className={styles.overview}>
                         {details.overview}
                     </p>
-
-                    {/* Interactive Details Tabs (Episodes / Recommendations) */}
-                    <DetailsTabs
-                        seasonBrowser={seasonBrowserNode}
-                        recommendations={recommendations}
-                        uuid={uuid}
-                    />
-
-                    {/* Movies: Cast Section (Only show if movie) */}
-                    {item.type === 'movie' && credits.cast && credits.cast.length > 0 && (
-                        <div className={styles.castSection}>
-                            <h3 className={styles.castTitle}>Elenco Principal</h3>
-                            <div className={styles.castList}>
-                                {credits.cast.slice(0, 10).map(actor => (
-                                    <div key={actor.id} className={styles.castItem}>
-                                        <div className={styles.castAvatar}>
-                                            {actor.profile_path ? (
-                                                <Image
-                                                    src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
-                                                    alt={actor.name}
-                                                    fill
-                                                    style={{ objectFit: 'cover' }}
-                                                    unoptimized
-                                                />
-                                            ) : (
-                                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
-                                                    <Users size={24} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className={styles.actorName}>{actor.name}</div>
-                                        <div className={styles.characterName}>{actor.character}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
+
+                {/* Interactive Details Tabs (Episodes / Recommendations) - Full Width */}
+                <DetailsTabs
+                    seasonBrowser={seasonBrowserNode}
+                    recommendations={recommendations}
+                    uuid={uuid}
+                />
+
+                {/* Movies: Cast Section (Only show if movie) */}
+                {item.type === 'movie' && credits.cast && credits.cast.length > 0 && (
+                    <div className={styles.castSection}>
+                        <h3 className={styles.castTitle}>Elenco Principal</h3>
+                        <div className={styles.castList}>
+                            {credits.cast.slice(0, 10).map(actor => (
+                                <div key={actor.id} className={styles.castItem}>
+                                    <div className={styles.castAvatar}>
+                                        {actor.profile_path ? (
+                                            <Image
+                                                src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
+                                                alt={actor.name}
+                                                fill
+                                                style={{ objectFit: 'cover' }}
+                                                unoptimized
+                                            />
+                                        ) : (
+                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
+                                                <Users size={24} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className={styles.actorName}>{actor.name}</div>
+                                    <div className={styles.characterName}>{actor.character}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div style={{ height: '100px' }} />
