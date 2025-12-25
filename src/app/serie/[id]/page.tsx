@@ -2,6 +2,7 @@
 import { contentService } from '@/services/content';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import styles from './Player.module.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,7 @@ export default async function SeriesPlayerPage({ params, searchParams }: PagePro
         playerUrl = `${base}/${s}/${e}`;
     }
 
-    import styles from './Player.module.css';
+
 
     // ...
 
