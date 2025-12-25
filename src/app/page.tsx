@@ -49,43 +49,39 @@ export default async function Home() {
     console.error("Failed to fetch TMDB data:", error);
   }
 
-  // Combine and Randomize for Hero
-  // We want a mix of movies and series from the DB
+  // Combine and Randomize for Hero and Trending
   const allCatalog = [...catalogMovies, ...catalogSeries];
 
-  // Fisher-Yates Shuffle
-  for (let i = allCatalog.length - 1; i > 0; i--) {
+  // Fisher-Yates Shuffle for Hero (Random 10)
+  const shuffled = [...allCatalog];
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [allCatalog[i], allCatalog[j]] = [allCatalog[j], allCatalog[i]];
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
+  const heroMovies = shuffled.slice(0, 10);
 
-  // Fallback to trending if DB is empty, otherwise use shuffled DB content
-  // Note: we slice 10 items
-  const heroMovies = allCatalog.length > 0
-    ? allCatalog.slice(0, 10)
-    : [...trendingMovies.results, ...trendingSeries.results].sort(() => 0.5 - Math.random()).slice(0, 10);
+  // Mixed "Trending" Row (Recent adds from both)
+  // We use the raw combined list (roughly strictly ordered by when we fetched/id, or random if we use shuffled)
+  const mixedTrending = shuffled.slice(0, 20);
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
-      {/* Pass top 10 movies/series for the carousel from CATALOG */}
-      <Hero movies={heroMovies} />
+      {/* STRICT: Only show Hero if we have DB content. If empty, show nothing (or placeholder) */}
+      {heroMovies.length > 0 && <Hero movies={heroMovies} />}
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>
 
-        {catalogMovies.length > 0 ? (
-          <>
-            <MovieRow title="Filmes no Catálogo" movies={catalogMovies} priority={true} />
-            {/* Future: We can slice/differentiate if we had genres */}
-          </>
-        ) : (
-          /* Fallback if DB is empty (first load before sync finishes or error) */
-          <MovieRow title="Tendências de Hoje" movies={trendingMovies.results} priority={true} />
+        {/* STRICT: Only show rows if we have data. No fallbacks to TMDB direct lists. */}
+        {mixedTrending.length > 0 && (
+          <MovieRow title="Destaques do Catálogo" movies={mixedTrending} priority={true} />
         )}
 
-        {catalogSeries.length > 0 ? (
-          <MovieRow title="Séries no Catálogo" movies={catalogSeries} />
-        ) : (
-          <MovieRow title="Séries em Alta" movies={trendingSeries.results} />
+        {catalogMovies.length > 0 && (
+          <MovieRow title="Filmes" movies={catalogMovies} />
+        )}
+
+        {catalogSeries.length > 0 && (
+          <MovieRow title="Séries" movies={catalogSeries} />
         )}
       </div>
     </div>
