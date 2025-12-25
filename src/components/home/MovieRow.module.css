@@ -93,7 +93,8 @@
 
 .card:hover .imageWrapper {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-    border-color: rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+    /* Much subtler border (was 0.4) */
 }
 
 .cardImage {
