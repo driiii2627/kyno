@@ -40,9 +40,11 @@ export default function Hero({ movie }: HeroProps) {
                 <h1 className={styles.title}>{title}</h1>
 
                 <div className={styles.meta}>
-                    <span className={styles.newBadge}>New</span>
-                    <span>{year}</span>
-                    <span className={styles.rating}>★ {rating}</span>
+                    <span className={styles.year}>{year}</span>
+                    <div className={styles.separator}>•</div>
+                    <span className={styles.rating}>
+                        <span className={styles.star}>★</span> {rating}
+                    </span>
                 </div>
 
                 <div className={styles.buttons}>
@@ -64,11 +66,6 @@ export default function Hero({ movie }: HeroProps) {
 
                 <div className={styles.description}>
                     {displayText}
-                </div>
-
-                <div className={styles.genres}>
-                    {/* Mock genres for now */}
-                    Filmes • Séries
                 </div>
             </div>
         </section>
