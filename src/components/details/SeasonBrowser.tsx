@@ -85,54 +85,76 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
                     <div className={styles.spinner}></div>
                 </div>
             ) : (
-                <div className={styles.grid}>
-                    {episodes.map(ep => (
-                        <Link
-                            key={ep.id}
-                            href={`/serie/${uuid}?s=${ep.season_number}&e=${ep.episode_number}`}
-                            className={styles.card}
-                        >
-                            {/* Thumbnail */}
-                            <div className={styles.thumbnailWrapper}>
-                                {ep.still_path ? (
-                                    <Image
-                                        src={`https://image.tmdb.org/t/p/w500${ep.still_path}`}
-                                        alt={ep.name}
-                                        fill
-                                        className={styles.thumbnailImage}
-                                        unoptimized
-                                    />
-                                ) : (
-                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>
-                                        <Clock size={32} />
-                                    </div>
-                                )}
+                <div className={styles.scrollContainer}>
+                    <button
+                        className={`${styles.navButton} ${styles.navLeft}`}
+                        onClick={() => {
+                            const container = document.getElementById('episodes-grid');
+                            if (container) container.scrollBy({ left: -600, behavior: 'smooth' });
+                        }}
+                    >
+                        <ChevronDown className={styles.chevronRotated} style={{ transform: 'rotate(90deg)' }} size={24} />
+                    </button>
 
-                                <div className={styles.playOverlay}>
-                                    <div className={styles.playIcon}>
-                                        <Play fill="currentColor" size={20} />
+                    <div id="episodes-grid" className={styles.grid}>
+                        {episodes.map(ep => (
+                            <Link
+                                key={ep.id}
+                                href={`/serie/${uuid}?s=${ep.season_number}&e=${ep.episode_number}`}
+                                className={styles.card}
+                            >
+                                {/* Thumbnail */}
+                                <div className={styles.thumbnailWrapper}>
+                                    {ep.still_path ? (
+                                        <Image
+                                            src={`https://image.tmdb.org/t/p/w500${ep.still_path}`}
+                                            alt={ep.name}
+                                            fill
+                                            className={styles.thumbnailImage}
+                                            unoptimized
+                                        />
+                                    ) : (
+                                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>
+                                            <Clock size={32} />
+                                        </div>
+                                    )}
+
+                                    <div className={styles.playOverlay}>
+                                        <div className={styles.playIcon}>
+                                            <Play fill="currentColor" size={20} />
+                                        </div>
                                     </div>
+
+                                    <span className={styles.episodeBadge}>
+                                        E{ep.episode_number}
+                                    </span>
                                 </div>
 
-                                <span className={styles.episodeBadge}>
-                                    E{ep.episode_number}
-                                </span>
-                            </div>
-
-                            {/* Info */}
-                            <div className={styles.cardInfo}>
-                                <div className={styles.cardHeader}>
-                                    <h4 className={styles.episodeTitle}>
-                                        {ep.episode_number}. {ep.name}
-                                    </h4>
-                                    <span className={styles.duration}>{ep.runtime ? `${ep.runtime}m` : ''}</span>
+                                {/* Info */}
+                                <div className={styles.cardInfo}>
+                                    <div className={styles.cardHeader}>
+                                        <h4 className={styles.episodeTitle}>
+                                            {ep.episode_number}. {ep.name}
+                                        </h4>
+                                        <span className={styles.duration}>{ep.runtime ? `${ep.runtime}m` : ''}</span>
+                                    </div>
+                                    <p className={styles.overview}>
+                                        {ep.overview}
+                                    </p>
                                 </div>
-                                <p className={styles.overview}>
-                                    {ep.overview}
-                                </p>
-                            </div>
-                        </Link>
-                    ))}
+                            </Link>
+                        ))}
+                    </div>
+
+                    <button
+                        className={`${styles.navButton} ${styles.navRight}`}
+                        onClick={() => {
+                            const container = document.getElementById('episodes-grid');
+                            if (container) container.scrollBy({ left: 600, behavior: 'smooth' });
+                        }}
+                    >
+                        <ChevronDown style={{ transform: 'rotate(-90deg)' }} size={24} />
+                    </button>
                 </div>
             )}
         </div>
