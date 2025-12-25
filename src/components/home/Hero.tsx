@@ -54,7 +54,7 @@ export default function Hero({ movies }: HeroProps) {
 
     const year = new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear();
     const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
-    const title = movie.title || movie.name;
+    const title = movie.title || movie.name || '';
 
     // Meta Logic
     const genres = movieDetails?.genres?.slice(0, 2).map(g => g.name).join(', ') || 'Variados';
