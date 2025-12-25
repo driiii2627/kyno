@@ -80,65 +80,36 @@
     background: transparent;
 }
 
-/* Content Layout */
+/* Content Layout - Text focused (No poster) */
 .content {
     position: relative;
     z-index: 10;
-    padding: 0 2rem;
-    /* Moved UP significantly */
-    padding-top: 20vh;
-    max-width: 1400px;
+    padding: 0 5%;
+    /* Percentage padding for responsiveness */
+    padding-top: 25vh;
+    max-width: 1600px;
+    /* Wider content area */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
 }
 
 @media (min-width: 768px) {
     .content {
-        flex-direction: row;
-        padding: 0 4rem;
-        /* Moved UP on desktop too */
-        padding-top: 15vh;
-        gap: 3rem;
+        padding-top: 20vh;
+        padding-left: 4rem;
+        /* Specific desktop padding */
     }
-}
-
-/* Poster */
-.posterWrapper {
-    flex-shrink: 0;
-    width: 200px;
-    height: 300px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: none;
-    /* Hide on small mobile by default, typical app behavior */
-}
-
-@media (min-width: 768px) {
-    .posterWrapper {
-        display: block;
-        width: 280px;
-        height: 420px;
-    }
-}
-
-.posterImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
 /* Info Column */
 .infoColumn {
-    flex: 1;
+    width: 100%;
+    max-width: 700px;
+    /* Limit text width for readability */
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
-    /* Removed extra margin-top to keep it tight */
-    margin-top: 0;
 }
 
 .title {

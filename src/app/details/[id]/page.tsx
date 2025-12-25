@@ -85,19 +85,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             {/* Main Content */}
             <div className={styles.content}>
 
-                {/* Poster */}
-                <div className={styles.posterWrapper}>
-                    {posterUrl && (
-                        <Image
-                            src={posterUrl}
-                            alt={title || 'Poster'}
-                            width={300} // Width/Height required for intrinsics if fill not used appropriately, or use fill + parent size
-                            height={450}
-                            className={styles.posterImage}
-                            unoptimized
-                        />
-                    )}
-                </div>
+
 
                 {/* Info */}
                 <div className={styles.infoColumn}>
