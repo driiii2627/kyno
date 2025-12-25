@@ -1,4 +1,3 @@
-```
 'use client';
 
 import { Play, Plus, Tv } from 'lucide-react';
@@ -32,7 +31,7 @@ export default function Hero({ movies }: HeroProps) {
         const fetchDetails = async () => {
             try {
                 // Determine type based on properties (fallback logic)
-                const isTv = !!movie.first_air_date; 
+                const isTv = !!movie.first_air_date;
                 const type = isTv ? 'tv' : 'movie';
                 const details = await tmdb.getDetails(movie.id, type);
                 setMovieDetails(details);
@@ -60,14 +59,14 @@ export default function Hero({ movies }: HeroProps) {
 
     // Meta Logic
     const genres = movieDetails?.genres?.slice(0, 2).map(g => g.name).join(', ') || 'Variados';
-    
+
     let duration = '';
     if (movieDetails?.runtime) {
         const h = Math.floor(movieDetails.runtime / 60);
         const m = movieDetails.runtime % 60;
-        duration = `${ h }h ${ m } m`;
+        duration = `${h}h ${m} m`;
     } else if (movieDetails?.episode_run_time && movieDetails.episode_run_time.length > 0) {
-        duration = `${ movieDetails.episode_run_time[0] } m(Ep)`;
+        duration = `${movieDetails.episode_run_time[0]} m(Ep)`;
     }
 
     // Truncate logic
@@ -78,11 +77,11 @@ export default function Hero({ movies }: HeroProps) {
     return (
         <section className={styles.hero}>
             {/* Background with Vignette */}
-            <div className={`${ styles.heroBackground } ${ isAnimating ? styles.fadeOut : styles.fadeIn } `}>
-                <div 
-                    className={styles.heroImage} 
-                    style={{ 
-                        backgroundImage: `url(${ getImageUrl(movie?.backdrop_path || '', 'original')})` 
+            <div className={`${styles.heroBackground} ${isAnimating ? styles.fadeOut : styles.fadeIn} `}>
+                <div
+                    className={styles.heroImage}
+                    style={{
+                        backgroundImage: `url(${getImageUrl(movie?.backdrop_path || '', 'original')})`
                     }}
                 />
                 <div className={styles.gradientOverlay} />
@@ -90,7 +89,7 @@ export default function Hero({ movies }: HeroProps) {
                 <div className={styles.bottomVignette} />
             </div>
 
-            <div className={`${ styles.content } ${ isAnimating ? styles.fadeOutContent : styles.fadeInContent } `}>
+            <div className={`${styles.content} ${isAnimating ? styles.fadeOutContent : styles.fadeInContent} `}>
                 <div className={styles.originalLabel}>Kyno+ Destaques</div>
 
                 <h1 className={styles.title}>{title}</h1>
