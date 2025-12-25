@@ -148,6 +148,12 @@
     color: #fff;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     max-width: 900px;
+    transition: font-size 0.3s ease;
+}
+
+.titleLong {
+    font-size: 3.5rem;
+    line-height: 1.1;
 }
 
 .meta {

@@ -96,7 +96,9 @@ export default function Hero({ movies }: HeroProps) {
             <div className={styles.content}>
                 <div className={styles.originalLabel}>Kyno+ Destaques</div>
 
-                <h1 className={styles.title}>{title}</h1>
+                <h1 className={`${styles.title} ${title.length > 25 ? styles.titleLong : ''}`}>
+                    {title}
+                </h1>
 
                 <div className={styles.meta}>
                     <span className={styles.year}>{year}</span>
