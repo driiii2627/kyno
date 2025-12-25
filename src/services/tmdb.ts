@@ -108,15 +108,16 @@ export const tmdb = {
   getCredits: async (id: number, type: 'movie' | 'tv') => {
     return fetchFromTMDB<Credits>(`/${type}/${id}/credits`);
   },
-  return fetchFromTMDB<SeasonDetails>(`/tv/${tvId}/season/${seasonNumber}`);
-},
+  getSeasonDetails: async (tvId: number, seasonNumber: number) => {
+    return fetchFromTMDB<SeasonDetails>(`/tv/${tvId}/season/${seasonNumber}`);
+  },
   getRecommendations: async (id: number, type: 'movie' | 'tv') => {
     const response = await fetchFromTMDB<{ results: Movie[] }>(`/${type}/${id}/recommendations`);
     return response.results || [];
   },
-    getCollectionDetails: async (collectionId: number) => {
-      return fetchFromTMDB<{ parts: Movie[] }>(`/collection/${collectionId}`);
-    }
+  getCollectionDetails: async (collectionId: number) => {
+    return fetchFromTMDB<{ parts: Movie[] }>(`/collection/${collectionId}`);
+  }
 };
 
 export interface Cast {
