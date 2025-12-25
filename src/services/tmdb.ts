@@ -46,6 +46,18 @@ export const fetchFromTMDB = async <T>(endpoint: string, params: Record<string, 
   }
 };
 
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+export interface MovieDetails extends Movie {
+  genres: Genre[];
+  runtime?: number;
+  episode_run_time?: number[];
+  number_of_seasons?: number;
+}
+
 export const tmdb = {
   getTrending: async (type: 'movie' | 'tv' = 'movie') => {
     return fetchFromTMDB<{ results: Movie[] }>(`/trending/${type}/week`);
@@ -58,5 +70,8 @@ export const tmdb = {
   },
   getByGenre: async (genreId: number, type: 'movie' | 'tv' = 'movie') => {
     return fetchFromTMDB<{ results: Movie[] }>(`/discover/${type}`, { with_genres: genreId.toString() });
+  },
+  getDetails: async (id: number, type: 'movie' | 'tv') => {
+    return fetchFromTMDB<MovieDetails>(`/${type}/${id}`);
   }
 };

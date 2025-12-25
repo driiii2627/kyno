@@ -34,7 +34,8 @@ export default async function Home() {
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
-      {heroMovie && <Hero movie={heroMovie} />}
+      {/* Pass top 10 movies/series for the carousel */}
+      <Hero movies={[...trendingMovies.results, ...trendingSeries.results].slice(0, 10)} />
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>
         <MovieRow title="Tendências de Hoje" movies={trendingMovies.results} />
