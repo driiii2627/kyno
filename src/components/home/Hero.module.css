@@ -41,27 +41,32 @@
     /* Subtle zoom while active */
 }
 
-/* Cleaner, less intrusive overlay */
+/* Cleaner, less intrusive overlay with SUBTLE BLUE hint at edges */
 .gradientOverlay {
     position: absolute;
     inset: 0;
-    /* VERY subtle gradient, mostly transparent to show the image */
-    background: radial-gradient(circle at 70% 20%, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+    /* 
+       Center: Transparent (show image)
+       Edges: Very subtle blue-ish dark tint (User request)
+    */
+    background: radial-gradient(circle at 60% 50%,
+            transparent 40%,
+            rgba(10, 25, 40, 0.4) 80%,
+            rgba(15, 32, 45, 0.8) 100%);
     z-index: 1;
 }
 
-/* Restored Overlay for Text Legibility (Neutral Black) */
 .leftVignette {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
     width: 65%;
-    /* Extended width to cover text properly */
+    /* Neutral black for text readability, blending into the subtle blue of the overlay */
     background: linear-gradient(90deg,
             rgba(0, 0, 0, 0.95) 0%,
             rgba(0, 0, 0, 0.8) 40%,
-            rgba(0, 0, 0, 0.4) 70%,
+            rgba(5, 15, 25, 0.3) 70%,
             transparent 100%);
     z-index: 2;
 }
@@ -71,17 +76,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 250px;
-    /* Slightly taller for the blend */
-    /* The requested "Light Blue" blend */
+    height: 180px;
+    /* CLEAN NEUTRAL FADE - No blue here anymore, just blending to body */
     background: linear-gradient(to top,
-            #0F2027 10%,
-            /* Matches body dark */
-            rgba(32, 58, 67, 0.6) 50%,
-            /* The "Blue" touch (Teal/Blueish) */
-            rgba(44, 83, 100, 0.0) 100%
-            /* Fade to clear */
-        );
+            #0F2027 20%,
+            transparent 100%);
     z-index: 2;
     pointer-events: none;
 }
