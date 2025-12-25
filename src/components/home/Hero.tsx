@@ -12,7 +12,6 @@ interface HeroProps {
 export default function Hero({ movies }: HeroProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
-    const [isAnimating, setIsAnimating] = useState(false);
 
     const movie = movies[currentIndex];
 
@@ -43,13 +42,13 @@ export default function Hero({ movies }: HeroProps) {
         fetchDetails();
     }, [movie]);
 
-    const handleNext = () => {
-        setIsAnimating(true);
-        setTimeout(() => {
+    // Auto-rotation
+    useEffect(() => {
+        const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % movies.length);
-            setIsAnimating(false);
-        }, 500); // Match CSS transition
-    };
+        }, 8000); // 8 seconds per slide
+        return () => clearInterval(interval);
+    }, [currentIndex, movies.length]);
 
     if (!movie) return null;
 
@@ -77,19 +76,24 @@ export default function Hero({ movies }: HeroProps) {
     return (
         <section className={styles.hero}>
             {/* Background with Vignette */}
-            <div className={`${styles.heroBackground} ${isAnimating ? styles.fadeOut : styles.fadeIn} `}>
-                <div
-                    className={styles.heroImage}
-                    style={{
-                        backgroundImage: `url(${getImageUrl(movie?.backdrop_path || '', 'original')})`
-                    }}
-                />
+            {/* Background with Crossfade Images */}
+            <div className={styles.heroBackground}>
+                {movies.map((m, index) => (
+                    <div
+                        key={m.id}
+                        className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
+                        style={{
+                            backgroundImage: `url(${getImageUrl(m.backdrop_path || '', 'original')})`,
+                            zIndex: index === currentIndex ? 1 : 0
+                        }}
+                    />
+                ))}
                 <div className={styles.gradientOverlay} />
                 <div className={styles.leftVignette} />
                 <div className={styles.bottomVignette} />
             </div>
 
-            <div className={`${styles.content} ${isAnimating ? styles.fadeOutContent : styles.fadeInContent} `}>
+            <div className={styles.content}>
                 <div className={styles.originalLabel}>Kyno+ Destaques</div>
 
                 <h1 className={styles.title}>{title}</h1>
