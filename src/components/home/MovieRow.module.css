@@ -190,7 +190,7 @@
     opacity: 1;
 }
 
-.cardTitle {
+.movieTitle {
     font-size: 1rem;
     font-weight: 700;
     color: #fff;
@@ -199,10 +199,14 @@
     line-height: 1.2;
 }
 
-.cardMeta {
-    font-size: 0.8rem;
-    color: #ccc;
-    font-weight: 500;
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    color: #ddd;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .newBadge {
