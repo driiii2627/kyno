@@ -5,7 +5,31 @@ import { contentService } from '@/services/content';
 import { redirect } from 'next/navigation';
 
 export async function getSeason(tvId: number, seasonNumber: number) {
-    return tmdb.getSeasonDetails(tvId, seasonNumber);
+    const seasonData = await tmdb.getSeasonDetails(tvId, seasonNumber);
+
+    // Filter episodes available on Superflix
+    const filteredEpisodes = await Promise.all(
+        seasonData.episodes.map(async (ep) => {
+            try {
+                // Check if episode exists on Superflix
+                // Use default domain or config. For speed, hardcoding the check domain as per documentation is safest for now,
+                // or we could use the Base URL from content service if we needed to be dynamic.
+                // The user specifically pointed to superflixapi.buzz
+                const url = `https://superflixapi.buzz/serie/${tvId}/${seasonNumber}/${ep.episode_number}`;
+                const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+                return res.ok ? ep : null;
+            } catch (e) {
+                // If check fails, assume safe or exclude? 
+                // To be safe and avoid "empty players", strict filtering is better.
+                return null;
+            }
+        })
+    );
+
+    return {
+        ...seasonData,
+        episodes: filteredEpisodes.filter(ep => ep !== null)
+    };
 }
 
 /**
