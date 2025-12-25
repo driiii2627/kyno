@@ -24,9 +24,7 @@ html,
 body {
   color: var(--foreground);
   background: #02040a;
-  /* Very dark blue/almost black */
-  background: transparent;
-  /* Allow html background + pseudo-elements to show */
+  /* Force Solid Dark Background - NO TRANSPARENCY */
   font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
   position: relative;
@@ -46,25 +44,26 @@ button {
   color: inherit;
 }
 
-body::before {
+/* Aurora Effect - Overlay Approach (Safe) */
+body::after {
   content: '';
   position: fixed;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  /* Boosted visibility: Brighter Blue + Purple/Teal hints */
+  /* Aurora Colors: Deep Blue/Purple glow */
   background: radial-gradient(circle at center,
-      rgba(30, 60, 100, 0.25) 0%,
-      /* Rich Blue */
-      rgba(80, 40, 100, 0.1) 25%,
-      /* Subtle Purple */
-      rgba(20, 100, 100, 0.05) 50%,
-      /* Faint Teal */
-      transparent 80%);
-  z-index: -1;
-  animation: drift 20s ease-in-out infinite alternate;
+      rgba(30, 60, 150, 0.15) 0%,
+      rgba(50, 20, 80, 0.1) 30%,
+      transparent 70%);
+  z-index: 9999;
+  /* Float on top */
   pointer-events: none;
+  /* Click-through */
+  mix-blend-mode: screen;
+  /* Blend nicely with dark bg */
+  animation: drift 20s ease-in-out infinite alternate;
 }
 
 @keyframes drift {
