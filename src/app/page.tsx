@@ -38,7 +38,7 @@ export default async function Home() {
       <Hero movies={[...trendingMovies.results, ...trendingSeries.results].slice(0, 10)} />
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>
-        <MovieRow title="Tendências de Hoje" movies={trendingMovies.results} />
+        <MovieRow title="Tendências de Hoje" movies={trendingMovies.results} priority={true} />
         <MovieRow title="Séries em Alta" movies={trendingSeries.results} />
         <MovieRow title="Populares da Semana" movies={popularMovies.results} />
         <MovieRow title="Melhores Avaliados" movies={topRatedMovies.results} />

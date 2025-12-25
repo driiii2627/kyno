@@ -10,9 +10,10 @@ import { Movie, getImageUrl } from '@/services/tmdb';
 interface MovieRowProps {
     title: string;
     movies: Movie[];
+    priority?: boolean;
 }
 
-export default function MovieRow({ title, movies }: MovieRowProps) {
+export default function MovieRow({ title, movies, priority = false }: MovieRowProps) {
     const listRef = useRef<HTMLDivElement>(null); // Added useRef
 
     // If no movies, don't render the row
@@ -48,7 +49,7 @@ export default function MovieRow({ title, movies }: MovieRowProps) {
                 </div>
 
                 <div className={styles.listContainer} ref={listRef}> {/* Added ref */}
-                    {movies.map((movie) => (
+                    {movies.map((movie, index) => (
                         <div key={movie.id} className={styles.card}>
                             <div className={styles.imageWrapper}>
                                 <Image
@@ -57,6 +58,7 @@ export default function MovieRow({ title, movies }: MovieRowProps) {
                                     fill
                                     className={styles.image}
                                     sizes="(max-width: 768px) 150px, 200px"
+                                    priority={priority && index < 6}
                                 />
                                 {/* Overlay on Hover */}
                                 <div className={styles.overlay}>
