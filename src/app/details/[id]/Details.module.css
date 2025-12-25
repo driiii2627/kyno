@@ -20,8 +20,8 @@
 
 .heroImage {
     object-fit: cover;
-    opacity: 0.35;
-    /* Darken the image significantly so text pops */
+    opacity: 0.6;
+    /* Increased opacity to show more banner (less black) */
     width: 100%;
     height: 100%;
 }
@@ -33,7 +33,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
+    background: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 20%, transparent 100%);
 }
 
 .gradientOverlaySide {
@@ -42,7 +42,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+    background: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.4) 40%, transparent 100%);
 }
 
 /* Back Button */
@@ -143,6 +143,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    /* Ensures vertical centering */
     gap: 1rem;
     font-size: 0.95rem;
     color: #cbd5e1;
@@ -152,9 +153,11 @@
 .rating {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    color: #46d369;
-    /* Netflix Match Green */
+    gap: 0.35rem;
+    padding-bottom: 2px;
+    /* Micro adjustment for optical alignment with text */
+    color: #fbbf24;
+    /* Yellow */
     font-weight: 700;
 }
 
