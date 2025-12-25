@@ -43,29 +43,26 @@ export default async function SeriesPlayerPage({ params, searchParams }: PagePro
         playerUrl = `${base}/${s}/${e}`;
     }
 
+    import styles from './Player.module.css';
+
+    // ...
+
     return (
-        <div className="relative w-full h-screen bg-black overflow-hidden flex flex-col">
-            <div className="absolute top-0 left-0 w-full p-4 z-50 pointer-events-none">
+        <div className={styles.playerContainer}>
+            <div className={styles.backButtonWrapper}>
                 <Link
                     href="/"
-                    className="pointer-events-auto inline-flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-all group"
+                    className={styles.backButton}
                 >
-                    <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium">Voltar</span>
+                    <ArrowLeft size={20} className={styles.arrowIcon} />
+                    <span className={styles.backText}>Voltar</span>
                 </Link>
             </div>
 
-            <div className="absolute top-0 left-0 w-full h-full z-0">
+            <div className={styles.iframeWrapper}>
                 <iframe
                     src={playerUrl}
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
-                    }}
+                    className={styles.iframe}
                     allowFullScreen
                     title={`Player Série ${tmdb_id}`}
                 />
