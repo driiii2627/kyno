@@ -81,6 +81,22 @@ export const contentService = {
     },
 
     /**
+     * Generic lookup to find item by UUID in either table
+     */
+    async getItemByUuid(uuid: string): Promise<{ type: 'movie' | 'tv'; tmdb_id: number; video_url: string | null } | null> {
+        // Run both checks in parallel
+        const [movie, series] = await Promise.all([
+            this.getMovieById(uuid),
+            this.getSeriesById(uuid)
+        ]);
+
+        if (movie) return { type: 'movie', ...movie };
+        if (series) return { type: 'tv', ...series };
+
+        return null;
+    },
+
+    /**
      * Syncs a list of TMDB movies to Supabase
      * Uses Service Role to bypass RLS for inserts
      */

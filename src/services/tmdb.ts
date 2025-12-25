@@ -73,5 +73,21 @@ export const tmdb = {
   },
   getDetails: async (id: number, type: 'movie' | 'tv') => {
     return fetchFromTMDB<MovieDetails>(`/${type}/${id}`);
+  },
+  getCredits: async (id: number, type: 'movie' | 'tv') => {
+    return fetchFromTMDB<Credits>(`/${type}/${id}/credits`);
   }
 };
+
+export interface Cast {
+  id: number;
+  name: string;
+  character: string;
+  profile_path: string | null;
+}
+
+export interface Credits {
+  id: number;
+  cast: Cast[];
+  crew: any[];
+}
