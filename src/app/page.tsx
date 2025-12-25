@@ -1,8 +1,11 @@
 import Hero from '@/components/home/Hero';
 import MovieRow from '@/components/home/MovieRow';
-import SyncButton from '@/components/dev/SyncButton';
 import { tmdb } from '@/services/tmdb';
 import { contentService } from '@/services/content';
+
+// Force dynamic rendering to ensure randomization happens on every request
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function Home() {
   // Fetch real data in parallel
@@ -83,8 +86,6 @@ export default async function Home() {
           <MovieRow title="Séries" movies={catalogSeries} />
         )}
       </div>
-
-      <SyncButton />
     </div>
   );
 }
