@@ -80,7 +80,7 @@
     /* Reduced for "total banner highlight" */
     /* CLEAN NEUTRAL FADE - No blue here anymore, just blending to body */
     background: linear-gradient(to top,
-            #0F2027 15%,
+            #02040a 15%,
             transparent 100%);
     z-index: 2;
     pointer-events: none;
