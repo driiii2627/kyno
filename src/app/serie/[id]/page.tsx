@@ -7,10 +7,12 @@ export const dynamic = 'force-dynamic';
 
 interface PageProps {
     params: Promise<{ id: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function SeriesPlayerPage({ params }: PageProps) {
+export default async function SeriesPlayerPage({ params, searchParams }: PageProps) {
     const { id: uuid } = await params;
+    const { s, e } = await searchParams;
 
     const [baseUrl, seriesData] = await Promise.all([
         contentService.getAppConfig('superflix_base_url', 'https://superflixapi.buzz'),
@@ -30,7 +32,16 @@ export default async function SeriesPlayerPage({ params }: PageProps) {
     }
 
     const { tmdb_id, video_url } = seriesData;
-    const playerUrl = video_url;
+    let playerUrl = video_url;
+
+    // If season and episode params exist, append them for deep linking
+    // Base video_url is usually ".../serie/[tmdb_id]"
+    // We want ".../serie/[tmdb_id]/[season]/[episode]"
+    if (s && e) {
+        // Strip trailing slash if present
+        const base = playerUrl.endsWith('/') ? playerUrl.slice(0, -1) : playerUrl;
+        playerUrl = `${base}/${s}/${e}`;
+    }
 
     return (
         <div className="relative w-full h-screen bg-black overflow-hidden flex flex-col">

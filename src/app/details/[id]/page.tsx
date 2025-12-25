@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
 import styles from './Details.module.css';
+import SeasonBrowser from '@/components/details/SeasonBrowser';
 
 export const dynamic = 'force-dynamic';
 
