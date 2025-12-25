@@ -35,7 +35,8 @@ export const contentService = {
         try {
             const adminClient = getServiceSupabase();
             const payload = movies.map(m => {
-                let year = new Date().getFullYear();
+                // Defensive coding: Ensure NO undefined values reach Supabase
+                let year = 2025; // Default fallback
                 const dateStr = m.release_date || m.first_air_date;
                 if (dateStr) {
                     const parsed = new Date(dateStr);
@@ -45,12 +46,12 @@ export const contentService = {
                 return {
                     tmdb_id: m.id,
                     video_url: '',
-                    title: m.title || m.name,
+                    title: m.title || m.name || 'Sem Título',
                     description: m.overview || '',
-                    poster_url: m.poster_path,
-                    backdrop_url: m.backdrop_path,
+                    poster_url: m.poster_path || '',
+                    backdrop_url: m.backdrop_path || '',
                     release_year: year,
-                    rating: m.vote_average,
+                    rating: typeof m.vote_average === 'number' ? m.vote_average : 0,
                     type: 'movie'
                 };
             });
@@ -74,7 +75,7 @@ export const contentService = {
         try {
             const adminClient = getServiceSupabase();
             const payload = series.map(s => {
-                let year = new Date().getFullYear();
+                let year = 2025;
                 const dateStr = s.first_air_date || s.release_date;
                 if (dateStr) {
                     const parsed = new Date(dateStr);
@@ -84,12 +85,12 @@ export const contentService = {
                 return {
                     tmdb_id: s.id,
                     video_url: '',
-                    title: s.name || s.title,
+                    title: s.name || s.title || 'Sem Título',
                     description: s.overview || '',
-                    poster_url: s.poster_path,
-                    backdrop_url: s.backdrop_path,
+                    poster_url: s.poster_path || '',
+                    backdrop_url: s.backdrop_path || '',
                     release_year: year,
-                    rating: s.vote_average
+                    rating: typeof s.vote_average === 'number' ? s.vote_average : 0
                 };
             });
 
