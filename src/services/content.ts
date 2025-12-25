@@ -1,17 +1,17 @@
 import { supabase, getServiceSupabase } from '@/lib/supabase';
 import { tmdb, Movie, MovieDetails } from './tmdb';
 
-// Interface matching the Supabase table structure
+// Interface matching the ACTUAL Supabase table structure (Database Schema)
 export interface SupabaseContent {
     id: string;
     tmdb_id: number;
     video_url: string;
     title?: string;
-    overview?: string;
-    poster_path?: string;
-    backdrop_path?: string;
-    release_date?: string;
-    vote_average?: number;
+    description?: string; // DB column is description, not overview
+    poster_url?: string;  // DB column is poster_url
+    backdrop_url?: string; // DB column is backdrop_url
+    release_year?: number; // DB column is release_year
+    rating?: number;       // DB column is rating
     genre?: string;
     duration?: number;
     created_at: string;
@@ -46,7 +46,6 @@ export const contentService = {
                     if (!isNaN(parsed.getTime())) year = parsed.getFullYear();
                 }
 
-                // Cast to MovieDetails to check for extra fields
                 const details = m as MovieDetails;
                 const genreStr = details.genres ? details.genres.map(g => g.name).join(', ') : '';
                 const duration = details.runtime || 0;
@@ -154,14 +153,14 @@ export const contentService = {
                     return {
                         id: dbMovie.tmdb_id,
                         title: dbMovie.title,
-                        poster_path: dbMovie.poster_path || dbMovie.poster_url, // Handle fallback
-                        backdrop_path: dbMovie.backdrop_path || dbMovie.backdrop_url,
-                        overview: dbMovie.overview || dbMovie.description,
-                        vote_average: dbMovie.vote_average || dbMovie.rating || 0,
-                        release_date: dbMovie.release_date,
+                        poster_path: dbMovie.poster_url,  // Correct property mapping
+                        backdrop_path: dbMovie.backdrop_url, // Correct property mapping
+                        overview: dbMovie.description,    // Correct property mapping
+                        vote_average: dbMovie.rating || 0, // Correct property mapping
+                        release_date: dbMovie.release_year?.toString(),
                         video_url: dbMovie.video_url,
                         supabase_id: dbMovie.id,
-                        // Fix for genre mapping if needed later
+                        genre_ids: [], // Fallback
                     } as CatalogItem;
 
                 } catch (e) {
@@ -208,13 +207,14 @@ export const contentService = {
                         id: dbSeriesItem.tmdb_id,
                         name: dbSeriesItem.title,
                         title: dbSeriesItem.title,
-                        poster_path: dbSeriesItem.poster_path || dbSeriesItem.poster_url,
-                        backdrop_path: dbSeriesItem.backdrop_path || dbSeriesItem.backdrop_url,
-                        overview: dbSeriesItem.overview || dbSeriesItem.description,
-                        vote_average: dbSeriesItem.vote_average || dbSeriesItem.rating,
-                        first_air_date: dbSeriesItem.release_date,
+                        poster_path: dbSeriesItem.poster_url,
+                        backdrop_path: dbSeriesItem.backdrop_url,
+                        overview: dbSeriesItem.description,
+                        vote_average: dbSeriesItem.rating || 0,
+                        first_air_date: dbSeriesItem.release_year?.toString(),
                         video_url: dbSeriesItem.video_url,
-                        supabase_id: dbSeriesItem.id
+                        supabase_id: dbSeriesItem.id,
+                        genre_ids: [], // Fallback
                     } as CatalogItem;
                 } catch (e) {
                     return null;
