@@ -29,6 +29,57 @@ export interface CatalogItem extends Movie {
  * Service to manage content from Supabase Catalog
  */
 export const contentService = {
+
+    /**
+     * Get a config value from app_config table
+     */
+    async getAppConfig(key: string, defaultValue: string): Promise<string> {
+        try {
+            const { data, error } = await supabase
+                .from('app_config')
+                .select('value')
+                .eq('key', key)
+                .single();
+
+            if (error || !data) {
+                // Return default if not found or error
+                return defaultValue;
+            }
+            return data.value;
+        } catch (e) {
+            console.error(`Failed to fetch config for ${key}`, e);
+            return defaultValue;
+        }
+    },
+
+    /**
+     * Get a single movie by UUID (Lightweight lookup for Player)
+     */
+    async getMovieById(uuid: string): Promise<{ tmdb_id: number } | null> {
+        const { data, error } = await supabase
+            .from('movies')
+            .select('tmdb_id')
+            .eq('id', uuid)
+            .single();
+
+        if (error || !data) return null;
+        return { tmdb_id: data.tmdb_id };
+    },
+
+    /**
+     * Get a single series by UUID
+     */
+    async getSeriesById(uuid: string): Promise<{ tmdb_id: number } | null> {
+        const { data, error } = await supabase
+            .from('series')
+            .select('tmdb_id')
+            .eq('id', uuid)
+            .single();
+
+        if (error || !data) return null;
+        return { tmdb_id: data.tmdb_id };
+    },
+
     /**
      * Syncs a list of TMDB movies to Supabase
      * Uses Service Role to bypass RLS for inserts
