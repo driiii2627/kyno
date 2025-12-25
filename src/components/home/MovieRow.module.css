@@ -164,7 +164,7 @@
     /* Much subtler border (was 0.4) */
 }
 
-.cardImage {
+.image {
     width: 100%;
     height: 100%;
     object-fit: cover;
