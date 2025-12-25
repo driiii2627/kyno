@@ -49,14 +49,26 @@ export default async function Home() {
     console.error("Failed to fetch TMDB data:", error);
   }
 
-  // Select a random movie from the CATALOG to show on Hero
-  // This ensures we only show what we have in DB
-  const heroMovies = catalogMovies.slice(0, 10);
+  // Combine and Randomize for Hero
+  // We want a mix of movies and series from the DB
+  const allCatalog = [...catalogMovies, ...catalogSeries];
+
+  // Fisher-Yates Shuffle
+  for (let i = allCatalog.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allCatalog[i], allCatalog[j]] = [allCatalog[j], allCatalog[i]];
+  }
+
+  // Fallback to trending if DB is empty, otherwise use shuffled DB content
+  // Note: we slice 10 items
+  const heroMovies = allCatalog.length > 0
+    ? allCatalog.slice(0, 10)
+    : [...trendingMovies.results, ...trendingSeries.results].sort(() => 0.5 - Math.random()).slice(0, 10);
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
       {/* Pass top 10 movies/series for the carousel from CATALOG */}
-      <Hero movies={heroMovies.length > 0 ? heroMovies : trendingMovies.results.slice(0, 10)} />
+      <Hero movies={heroMovies} />
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>
 
