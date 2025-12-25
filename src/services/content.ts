@@ -12,6 +12,8 @@ export interface SupabaseContent {
     backdrop_path?: string;
     release_date?: string;
     vote_average?: number;
+    genre?: string;
+    duration?: number;
     created_at: string;
 }
 
@@ -19,6 +21,8 @@ export interface SupabaseContent {
 export interface CatalogItem extends Movie {
     video_url: string;
     supabase_id: string;
+    genre?: string;
+    duration?: number;
 }
 
 /**
@@ -35,13 +39,17 @@ export const contentService = {
         try {
             const adminClient = getServiceSupabase();
             const payload = movies.map(m => {
-                // Defensive coding: Ensure NO undefined values reach Supabase
-                let year = 2025; // Default fallback
+                let year = 2025;
                 const dateStr = m.release_date || m.first_air_date;
                 if (dateStr) {
                     const parsed = new Date(dateStr);
                     if (!isNaN(parsed.getTime())) year = parsed.getFullYear();
                 }
+
+                // Cast to MovieDetails to check for extra fields
+                const details = m as MovieDetails;
+                const genreStr = details.genres ? details.genres.map(g => g.name).join(', ') : '';
+                const duration = details.runtime || 0;
 
                 return {
                     tmdb_id: m.id,
@@ -52,6 +60,8 @@ export const contentService = {
                     backdrop_url: m.backdrop_path || '',
                     release_year: year,
                     rating: typeof m.vote_average === 'number' ? m.vote_average : 0,
+                    genre: genreStr,
+                    duration: duration,
                     type: 'movie'
                 };
             });
@@ -82,6 +92,9 @@ export const contentService = {
                     if (!isNaN(parsed.getTime())) year = parsed.getFullYear();
                 }
 
+                const details = s as MovieDetails;
+                const genreStr = details.genres ? details.genres.map(g => g.name).join(', ') : '';
+
                 return {
                     tmdb_id: s.id,
                     video_url: '',
@@ -90,7 +103,8 @@ export const contentService = {
                     poster_url: s.poster_path || '',
                     backdrop_url: s.backdrop_path || '',
                     release_year: year,
-                    rating: typeof s.vote_average === 'number' ? s.vote_average : 0
+                    rating: typeof s.vote_average === 'number' ? s.vote_average : 0,
+                    genre: genreStr
                 };
             });
 
@@ -121,7 +135,7 @@ export const contentService = {
         if (!dbMovies || dbMovies.length === 0) return [];
 
         const hydratedMovies = await Promise.all(
-            dbMovies.map(async (dbMovie: any) => {
+            dbMovies.map(async (dbMovie: SupabaseContent) => {
                 try {
                     // Try to fetch fresh from TMDB, fallback to DB if fail
                     const tmdbDetails = await tmdb.getDetails(dbMovie.tmdb_id, 'movie').catch(() => null);
@@ -131,24 +145,27 @@ export const contentService = {
                             ...tmdbDetails,
                             video_url: dbMovie.video_url,
                             supabase_id: dbMovie.id,
-                            id: dbMovie.tmdb_id
+                            id: dbMovie.tmdb_id,
+                            // Ideally, keep DB ID/URL logic
                         } as CatalogItem;
                     }
 
-                    // Fallback using stored backup data if TMDB fails
+                    // Fallback using stored backup data
                     return {
                         id: dbMovie.tmdb_id,
                         title: dbMovie.title,
-                        poster_path: dbMovie.poster_url,
-                        backdrop_path: dbMovie.backdrop_url,
-                        overview: dbMovie.description,
-                        vote_average: dbMovie.rating,
-                        release_date: dbMovie.release_year?.toString(),
+                        poster_path: dbMovie.poster_path || dbMovie.poster_url, // Handle fallback
+                        backdrop_path: dbMovie.backdrop_path || dbMovie.backdrop_url,
+                        overview: dbMovie.overview || dbMovie.description,
+                        vote_average: dbMovie.vote_average || dbMovie.rating || 0,
+                        release_date: dbMovie.release_date,
                         video_url: dbMovie.video_url,
-                        supabase_id: dbMovie.id
+                        supabase_id: dbMovie.id,
+                        // Fix for genre mapping if needed later
                     } as CatalogItem;
 
                 } catch (e) {
+                    console.error("Hydration failed for", dbMovie.tmdb_id);
                     return null;
                 }
             })
@@ -174,7 +191,7 @@ export const contentService = {
         if (!dbSeries || dbSeries.length === 0) return [];
 
         const hydratedSeries = await Promise.all(
-            dbSeries.map(async (dbSeriesItem: any) => {
+            dbSeries.map(async (dbSeriesItem: SupabaseContent) => {
                 try {
                     const tmdbDetails = await tmdb.getDetails(dbSeriesItem.tmdb_id, 'tv').catch(() => null);
 
@@ -191,11 +208,11 @@ export const contentService = {
                         id: dbSeriesItem.tmdb_id,
                         name: dbSeriesItem.title,
                         title: dbSeriesItem.title,
-                        poster_path: dbSeriesItem.poster_url,
-                        backdrop_path: dbSeriesItem.backdrop_url,
-                        overview: dbSeriesItem.description,
-                        vote_average: dbSeriesItem.rating,
-                        first_air_date: dbSeriesItem.release_year?.toString(),
+                        poster_path: dbSeriesItem.poster_path || dbSeriesItem.poster_url,
+                        backdrop_path: dbSeriesItem.backdrop_path || dbSeriesItem.backdrop_url,
+                        overview: dbSeriesItem.overview || dbSeriesItem.description,
+                        vote_average: dbSeriesItem.vote_average || dbSeriesItem.rating,
+                        first_air_date: dbSeriesItem.release_date,
                         video_url: dbSeriesItem.video_url,
                         supabase_id: dbSeriesItem.id
                     } as CatalogItem;
