@@ -55,10 +55,9 @@ export default function MovieRow({ title, movies }: MovieRowProps) {
                                     src={getImageUrl(movie.poster_path, 'w500')}
                                     alt={movie.title || movie.name || 'Movie'}
                                     fill
-                                    className={styles.image} {/* Changed class name */}
-                                    sizes="(max-width: 768px) 150px, 200px" {/* Added sizes */}
+                                    className={styles.image}
+                                    sizes="(max-width: 768px) 150px, 200px"
                                 />
-
                                 {/* Overlay on Hover */}
                                 <div className={styles.overlay}>
                                     <h3 className={styles.movieTitle}>{movie.title || movie.name}</h3> {/* Changed to h3 and class name */}
