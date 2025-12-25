@@ -34,17 +34,26 @@ export const contentService = {
 
         try {
             const adminClient = getServiceSupabase();
-            const payload = movies.map(m => ({
-                tmdb_id: m.id,
-                video_url: '', // Empty for now as requested
-                title: m.title || m.name,
-                description: m.overview,
-                poster_url: m.poster_path, // Backup
-                backdrop_url: m.backdrop_path, // Backup
-                release_year: new Date(m.release_date || m.first_air_date || Date.now()).getFullYear(),
-                rating: m.vote_average,
-                type: 'movie'
-            }));
+            const payload = movies.map(m => {
+                let year = new Date().getFullYear();
+                const dateStr = m.release_date || m.first_air_date;
+                if (dateStr) {
+                    const parsed = new Date(dateStr);
+                    if (!isNaN(parsed.getTime())) year = parsed.getFullYear();
+                }
+
+                return {
+                    tmdb_id: m.id,
+                    video_url: '',
+                    title: m.title || m.name,
+                    description: m.overview || '',
+                    poster_url: m.poster_path,
+                    backdrop_url: m.backdrop_path,
+                    release_year: year,
+                    rating: m.vote_average,
+                    type: 'movie'
+                };
+            });
 
             const { error } = await adminClient
                 .from('movies')
@@ -64,16 +73,25 @@ export const contentService = {
 
         try {
             const adminClient = getServiceSupabase();
-            const payload = series.map(s => ({
-                tmdb_id: s.id,
-                video_url: '',
-                title: s.name || s.title,
-                description: s.overview,
-                poster_url: s.poster_path,
-                backdrop_url: s.backdrop_path,
-                release_year: new Date(s.first_air_date || s.release_date || Date.now()).getFullYear(),
-                rating: s.vote_average
-            }));
+            const payload = series.map(s => {
+                let year = new Date().getFullYear();
+                const dateStr = s.first_air_date || s.release_date;
+                if (dateStr) {
+                    const parsed = new Date(dateStr);
+                    if (!isNaN(parsed.getTime())) year = parsed.getFullYear();
+                }
+
+                return {
+                    tmdb_id: s.id,
+                    video_url: '',
+                    title: s.name || s.title,
+                    description: s.overview || '',
+                    poster_url: s.poster_path,
+                    backdrop_url: s.backdrop_path,
+                    release_year: year,
+                    rating: s.vote_average
+                };
+            });
 
             const { error } = await adminClient
                 .from('series')
