@@ -2,16 +2,76 @@
     margin-bottom: 3.5rem;
     /* Remove padding from parent, push it to children for correct overflow handling */
     padding-left: 0;
+    position: relative;
+    /* Context for absolute buttons */
+}
+
+/* Wrapper for list + buttons */
+.container {
+    position: relative;
+    /* Ensure shadows don't get cut off vertically, but handle horizontal scroll */
+}
+
+/* Navigation Buttons - Premium Hover Zones */
+.navBtn {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    /* Wider hit area */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s ease;
+    /* Create a vignette effect specifically for the button area */
+    background: linear-gradient(90deg, #02040a 0%, transparent 100%);
+    color: #fff;
+}
+
+.leftBtn {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 1.5rem;
+}
+
+.rightBtn {
+    right: 0;
+    background: linear-gradient(-90deg, #02040a 0%, transparent 100%);
+    justify-content: flex-end;
+    /* Push icon slightly to edge */
+    padding-right: 1.5rem;
+    /* Center visually */
+}
+
+/* Show buttons on hover of the entire row */
+.row:hover .navBtn {
+    opacity: 1;
+}
+
+/* Icon Styling */
+.navBtn svg {
+    transform: scale(0.8);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.navBtn:hover svg {
+    transform: scale(1.2);
+    stroke-width: 3px;
+    color: #4FB6D8;
+    /* Brand highlight color */
 }
 
 .header {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 1.2rem;
-    /* Add left padding here to align with page */
-    padding-left: 4rem;
-    padding-right: 4rem;
+    margin-bottom: 1rem;
+    padding: 0 4rem;
+    /* Match global padding */
 }
 
 .title {
