@@ -8,22 +8,34 @@ import styles from './DetailsTabs.module.css';
 import { Movie } from '@/services/tmdb';
 import seasonStyles from './SeasonBrowser.module.css'; // Reusing card styles
 
+import { useRouter } from 'next/navigation';
+import { resolveTmdbContent } from '@/app/actions';
+
 interface DetailsTabsProps {
     seasonBrowser?: React.ReactNode;
     recommendations: Movie[];
-    uuid: string; // Current item UUID (to avoid linking to self if needed, though usually not an issue)
+    uuid: string; // Current item UUID
 }
 
 export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: DetailsTabsProps) {
     // If seasonBrowser is provided, default to 'episodes', else 'recommendations'
     const [activeTab, setActiveTab] = useState<'episodes' | 'recommendations'>(seasonBrowser ? 'episodes' : 'recommendations');
     const scrollRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
             const { current } = scrollRef;
             const scrollAmount = direction === 'left' ? -600 : 600;
             current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    };
+
+    const handleRecommendationClick = async (rec: Movie) => {
+        // Optimistic UI could prevent double clicks here if needed
+        const newUuid = await resolveTmdbContent(rec.id, !!rec.title ? 'movie' : 'tv');
+        if (newUuid) {
+            router.push(`/details/${newUuid}`);
         }
     };
 
@@ -68,10 +80,11 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
 
                                 <div ref={scrollRef} className={seasonStyles.grid}>
                                     {recommendations.map(rec => (
-                                        <Link
+                                        <div
                                             key={rec.id}
-                                            href={'#'}
+                                            onClick={() => handleRecommendationClick(rec)}
                                             className={seasonStyles.card}
+                                            style={{ cursor: 'pointer' }}
                                         >
                                             <div className={seasonStyles.thumbnailWrapper}>
                                                 <Image
@@ -101,7 +114,7 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
                                                     {rec.overview || 'Sem descrição.'}
                                                 </p>
                                             </div>
-                                        </Link>
+                                        </div>
                                     ))}
                                 </div>
 

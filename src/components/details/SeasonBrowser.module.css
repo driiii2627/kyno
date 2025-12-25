@@ -164,8 +164,8 @@
 
 .navButton {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50% - 1rem);
+    top: 35%;
+    transform: translateY(-50%);
     /* Center considering standard padding */
     z-index: 20;
     background: rgba(0, 0, 0, 0.7);

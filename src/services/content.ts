@@ -97,6 +97,21 @@ export const contentService = {
     },
 
     /**
+    * Find item by TMDB ID
+    */
+    async getItemByTmdbId(tmdbId: number, type: 'movie' | 'tv'): Promise<{ data: { id: string } | null, error: any }> {
+        const table = type === 'movie' ? 'movies' : 'series';
+
+        const { data, error } = await supabase
+            .from(table)
+            .select('id')
+            .eq('tmdb_id', tmdbId)
+            .single();
+
+        return { data, error };
+    },
+
+    /**
      * Syncs a list of TMDB movies to Supabase
      * Uses Service Role to bypass RLS for inserts
      */
