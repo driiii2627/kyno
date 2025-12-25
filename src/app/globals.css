@@ -41,3 +41,29 @@ button {
   font-family: inherit;
   color: inherit;
 }
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center,
+      rgba(15, 32, 60, 0.15) 0%,
+      rgba(20, 10, 40, 0.05) 30%,
+      transparent 70%);
+  z-index: -1;
+  animation: drift 25s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(10%, 10%) rotate(5deg);
+  }
+}
