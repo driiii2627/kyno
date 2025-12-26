@@ -2,7 +2,8 @@
 
 import { Play, Plus, Tv } from 'lucide-react';
 import styles from './Hero.module.css';
-import Image from 'next/image';
+
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Movie, MovieDetails, getImageUrl, tmdb } from '@/services/tmdb';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -92,15 +93,13 @@ export default function Hero({ movies }: HeroProps) {
                         key={m.id}
                         className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
                     >
-                        <Image
+                        <OptimizedImage
                             src={getImageUrl(m.backdrop_path || '', 'original')}
+                            tinySrc={getImageUrl(m.backdrop_path || '', 'w92')}
                             alt={m.title || m.name || 'Hero Background'}
                             fill
                             className={styles.image}
                             priority={index === 0} // Only prioritize the first one
-                            loading={index === 0 ? 'eager' : 'lazy'}
-                            unoptimized={true} // Bypass Vercel optimization completely for MAX quality
-                            quality={100} // Request highest JPG quality if processed
                             sizes="100vw"
                             style={{ objectFit: 'cover' }}
                         />

@@ -2,7 +2,8 @@
 
 import { ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
-import Image from 'next/image';
+
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { ChevronLeft, Star } from 'lucide-react';
 import styles from './MovieRow.module.css';
 import { Movie, getImageUrl } from '@/services/tmdb';
@@ -79,9 +80,9 @@ export default function MovieRow({ title, movies, priority = false, variant = 'd
                                 {isTop10 && <RankNumber rank={index + 1} />}
 
                                 <div className={styles.imageWrapper}>
-                                    <Image
+                                    <OptimizedImage
                                         src={getImageUrl(movie.poster_path, 'w780')}
-                                        unoptimized={true}
+                                        tinySrc={getImageUrl(movie.poster_path, 'w92')}
                                         alt={movie.title || movie.name || 'Movie'}
                                         fill
                                         className={styles.image}
