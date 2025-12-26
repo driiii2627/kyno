@@ -7,12 +7,12 @@ export default function tmdbLoader({ src, width, quality }: ImageLoaderProps) {
     // We map the requested width (from Next.js sizes/srcset) to the nearest TMDB size
     // Available: w92, w154, w185, w342, w500, w780, w1280, original
 
-    if (!src) return '/placeholder.png'; // Fallback
+    if (!src || src === '/') return 'https://placehold.co/600x400?text=No+Image'; // Reliable fallback
 
     // If src is already a full URL (e.g. from a different source), return it
     if (src.startsWith('http')) return src;
 
-    // Ensure src starts with /
+    // Ensure src starts with / and remove double slashes if any
     const path = src.startsWith('/') ? src : `/${src}`;
 
     let tmdbSize = 'original';
