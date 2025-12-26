@@ -17,16 +17,15 @@ export default function OptimizedImage({ src, tinySrc, alt, className, loader, .
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
             {/* Tiny Placeholder (Blur) */}
+            objectFit: props.style?.objectFit || 'cover',
             {tinySrc && (
                 <Image
                     {...props}
                     src={tinySrc}
-                    alt={alt || ''}
-                    fill
-                    quality={10} // Extremely low quality for smallest size
-                    priority={props.priority} // Load placeholder fast if main is priority
-                    className={`${className || ''}`}
+                    alt={`${alt || ''} (placeholder)`}
+                    className={className}
                     style={{
+                        ...props.style,
                         objectFit: props.style?.objectFit || 'cover',
                         filter: 'blur(20px)',
                         transform: 'scale(1.1)', // Prevent blur edges showing white
@@ -35,7 +34,7 @@ export default function OptimizedImage({ src, tinySrc, alt, className, loader, .
                         position: 'absolute',
                         zIndex: 1
                     }}
-                    unoptimized={true} // Keep distinct from main image cache if needed, or false to use Vercel (user said no vercel usage)
+                    unoptimized={true}
                 />
             )}
 

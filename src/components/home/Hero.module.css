@@ -123,7 +123,9 @@
     margin: 0 auto;
     padding: 0 4rem;
     padding-bottom: 8rem;
-    margin-top: 0;
+    padding-bottom: 8rem;
+    margin-top: 6rem;
+    /* Push content down to avoid overlap with fixed navbar */
 }
 
 .originalLabel {
