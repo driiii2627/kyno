@@ -9,14 +9,18 @@ import { Movie, getImageUrl } from '@/services/tmdb';
 import Link from 'next/link';
 import { CatalogItem } from '@/services/content';
 
+import RankNumber from './RankNumber';
+
 interface MovieRowProps {
     title: string;
     movies: Movie[];
     priority?: boolean;
+    variant?: 'default' | 'top10';
 }
 
-export default function MovieRow({ title, movies, priority = false }: MovieRowProps) {
+export default function MovieRow({ title, movies, priority = false, variant = 'default' }: MovieRowProps) {
     const listRef = useRef<HTMLDivElement>(null);
+    const isTop10 = variant === 'top10';
 
     // If no movies, don't render the row
     if (!movies || movies.length === 0) return null;
@@ -37,7 +41,10 @@ export default function MovieRow({ title, movies, priority = false }: MovieRowPr
     return (
         <div className={styles.row}>
             <div className={styles.header}>
-                <h2 className={styles.title}>{title}</h2>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {isTop10 && <span className={styles.top10Badge}>TOP 10</span>}
+                    <h2 className={styles.title}>{title}</h2>
+                </div>
                 <a href="#" className={styles.viewAll}>Ver todos <ChevronRight size={16} /></a>
             </div>
 
@@ -50,15 +57,22 @@ export default function MovieRow({ title, movies, priority = false }: MovieRowPr
                     <ChevronRight size={32} />
                 </div>
 
-                <div className={styles.listContainer} ref={listRef}>
+                <div
+                    className={`${styles.listContainer} ${isTop10 ? styles.top10List : ''}`}
+                    ref={listRef}
+                >
                     {movies.map((movie, index) => {
                         const item = movie as CatalogItem;
-                        // const isTv = !!item.first_air_date;
-                        // We redirect everything to the details page now
-                        const linkHref = `/details/${item.supabase_id}`;
+                        const linkHref = `/details/${item.supabase_id || item.id}`; // Simple fallback
 
                         return (
-                            <Link key={movie.id} href={linkHref} className={styles.card}>
+                            <Link
+                                key={movie.id}
+                                href={linkHref}
+                                className={`${styles.card} ${isTop10 ? styles.top10Card : ''}`}
+                            >
+                                {isTop10 && <RankNumber rank={index + 1} />}
+
                                 <div className={styles.imageWrapper}>
                                     <Image
                                         src={getImageUrl(movie.poster_path, 'w500')}
@@ -74,7 +88,7 @@ export default function MovieRow({ title, movies, priority = false }: MovieRowPr
                                         <div className={styles.metaRow}>
                                             <div className={styles.rating}>
                                                 <Star size={12} fill="#fbbf24" stroke="#fbbf24" />
-                                                <span>{movie.vote_average.toFixed(1)}</span>
+                                                <span>{movie.vote_average?.toFixed(1) || '0.0'}</span>
                                             </div>
                                             <span className={styles.year}>
                                                 {new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear()}

@@ -248,6 +248,46 @@
     display: none;
 }
 
+/* Top 10 Variant Overrides */
+
+.top10List {
+    gap: 5rem;
+    /* More space for numbers */
+}
+
+.top10Card {
+    /* Push card to make room for number */
+    margin-left: 1.5rem;
+    overflow: visible !important;
+    /* Allow numbering SVG to hang out */
+}
+
+/* Ensure image wrapper stays on top of the number when static */
+.top10Card .imageWrapper {
+    z-index: 2;
+}
+
+/* When hovering Top 10 card, ensure number stays valid visually */
+.top10Card:hover .imageWrapper {
+    z-index: 100 !important;
+}
+
+/* Top 10 Badge in Header */
+.top10Badge {
+    background-color: #dc2626;
+    /* Red-600 */
+    color: white;
+    font-weight: 800;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 0.8rem;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    display: inline-block;
+    vertical-align: middle;
+}
+
 /* Responsiveness */
 @media (max-width: 1024px) {
 
@@ -271,6 +311,11 @@
 
     .card {
         width: 140px;
+    }
+
+    .top10List {
+        gap: 3.5rem;
+        /* Smaller gap on mobile */
     }
 
     .title {
