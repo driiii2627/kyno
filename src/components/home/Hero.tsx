@@ -2,6 +2,7 @@
 
 import { Play, Plus, Tv } from 'lucide-react';
 import styles from './Hero.module.css';
+import Image from 'next/image';
 import { Movie, MovieDetails, getImageUrl, tmdb } from '@/services/tmdb';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -82,11 +83,19 @@ export default function Hero({ movies }: HeroProps) {
                     <div
                         key={m.id}
                         className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
-                        style={{
-                            backgroundImage: `url(${getImageUrl(m.backdrop_path || '', 'original')})`,
-                            zIndex: index === currentIndex ? 1 : 0
-                        }}
-                    />
+                    >
+                        <Image
+                            src={getImageUrl(m.backdrop_path || '', 'w1280')}
+                            alt={m.title || m.name || 'Hero Background'}
+                            fill
+                            className={styles.image}
+                            priority={index === 0} // Only prioritize the first one
+                            loading={index === 0 ? 'eager' : 'lazy'}
+                            // "unoptimized" is global in next.config.ts, but explicit here doesn't hurt if we want to be sure
+                            sizes="100vw"
+                            style={{ objectFit: 'cover' }}
+                        />
+                    </div>
                 ))}
                 <div className={styles.gradientOverlay} />
                 <div className={styles.leftVignette} />
