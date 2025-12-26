@@ -26,8 +26,10 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
             const { current } = scrollRef;
-            const scrollAmount = direction === 'left' ? -600 : 600;
-            current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            // Scroll by one full page
+            const scrollAmount = current.clientWidth;
+            const directionMultiplier = direction === 'left' ? -1 : 1;
+            current.scrollBy({ left: scrollAmount * directionMultiplier, behavior: 'smooth' });
         }
     };
 

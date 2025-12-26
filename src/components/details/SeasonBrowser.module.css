@@ -110,7 +110,7 @@
 /* Horizontal Scroll (Carousel) */
 .grid {
     display: flex;
-    gap: 1.5rem;
+    gap: 2rem;
     overflow-x: auto;
     padding-bottom: 2rem;
     padding-right: 4rem;
@@ -134,8 +134,17 @@
 
 /* Ensure cards have fixed width in carousel */
 .card {
-    min-width: 280px;
-    max-width: 280px;
+    /* 
+       Calc logic for 4 items:
+       100% width
+       minus 3 gaps of 2rem (6rem total for internal gaps)
+       divide by 4
+       
+       We also have right padding on the container, so let's be careful.
+       Actually, standard flex basis works best here.
+    */
+    min-width: calc((100% - 6rem) / 4);
+    max-width: calc((100% - 6rem) / 4);
     flex-shrink: 0;
     scroll-snap-align: start;
     /* Snap to start */
