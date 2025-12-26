@@ -26,21 +26,38 @@ export default async function Home() {
 
   try {
     // 1. Fetch Source Data from TMDB
-    [
+    // We fetch genres too to ensure they are seeded in Supabase
+    const [
       trendingMovies,
       popularMovies,
       topRatedMovies,
-      trendingSeries
+      trendingSeries,
+      actionMoviesSrc,
+      comedyMoviesSrc,
+      horrorMoviesSrc
     ] = await Promise.all([
       tmdb.getTrending('movie'),
       tmdb.getPopular('movie'),
       tmdb.getTopRated('movie'),
-      tmdb.getTrending('tv')
+      tmdb.getTrending('tv'),
+      tmdb.getByGenre(28, 'movie'), // Action
+      tmdb.getByGenre(35, 'movie'), // Comedy
+      tmdb.getByGenre(27, 'movie')  // Horror
     ]);
 
     // 2. Sync fetched content to Supabase (Auto-register)
+    // We combine all movie sources for sync
+    const allMoviesToSync = [
+      ...trendingMovies.results,
+      ...popularMovies.results,
+      ...topRatedMovies.results,
+      ...actionMoviesSrc.results,
+      ...comedyMoviesSrc.results,
+      ...horrorMoviesSrc.results
+    ];
+
     await Promise.allSettled([
-      contentService.syncMovies([...trendingMovies.results, ...popularMovies.results, ...topRatedMovies.results]),
+      contentService.syncMovies(allMoviesToSync),
       contentService.syncSeries(trendingSeries.results)
     ]);
 
@@ -103,6 +120,13 @@ export default async function Home() {
   const top10SeriesSeed = getTimeSeed(168, 'top10series');
   const top10Series = hashedSort(topSeriesSource, top10SeriesSeed).slice(0, 10);
 
+  // 6. Genres Filtering (From DB Data)
+  // We look for the string in 'genre' field since Supabase stores it as "Action, Adventure..."
+  const actionMovies = catalogMovies.filter(m => m.genre?.toLowerCase().includes('ação') || m.genre?.toLowerCase().includes('action')).slice(0, 15);
+  const comedyMovies = catalogMovies.filter(m => m.genre?.toLowerCase().includes('comédia') || m.genre?.toLowerCase().includes('comedy')).slice(0, 15);
+  // Horror often translated as 'Terror'
+  const horrorMovies = catalogMovies.filter(m => m.genre?.toLowerCase().includes('terror') || m.genre?.toLowerCase().includes('horror')).slice(0, 15);
+
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
@@ -147,6 +171,19 @@ export default async function Home() {
             movies={dynamicSeries.slice(0, 15)}
             viewAllLink="/category/series"
           />
+        )}
+
+        {/* Genres */}
+        {actionMovies.length > 0 && (
+          <MovieRow title="Ação e Aventura" movies={actionMovies} viewAllLink="/category/acao" />
+        )}
+
+        {comedyMovies.length > 0 && (
+          <MovieRow title="Comédia" movies={comedyMovies} viewAllLink="/category/comedia" />
+        )}
+
+        {horrorMovies.length > 0 && (
+          <MovieRow title="Terror" movies={horrorMovies} viewAllLink="/category/terror" />
         )}
       </div>
     </div>

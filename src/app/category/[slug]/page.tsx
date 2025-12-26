@@ -20,6 +20,18 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         } else if (slug === 'series' || slug === 'tv') {
             title = 'Todas as Séries';
             items = await contentService.getCatalogSeries();
+        } else if (slug === 'acao') {
+            title = 'Filmes de Ação';
+            const allMovies = await contentService.getCatalogMovies();
+            items = allMovies.filter(m => m.genre?.toLowerCase().includes('ação') || m.genre?.toLowerCase().includes('action'));
+        } else if (slug === 'comedia') {
+            title = 'Comédia';
+            const allMovies = await contentService.getCatalogMovies();
+            items = allMovies.filter(m => m.genre?.toLowerCase().includes('comédia') || m.genre?.toLowerCase().includes('comedy'));
+        } else if (slug === 'terror') {
+            title = 'Terror';
+            const allMovies = await contentService.getCatalogMovies();
+            items = allMovies.filter(m => m.genre?.toLowerCase().includes('terror') || m.genre?.toLowerCase().includes('horror'));
         } else {
             return notFound();
         }
