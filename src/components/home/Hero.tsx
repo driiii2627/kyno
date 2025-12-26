@@ -35,13 +35,57 @@ export default function Hero({ movies }: HeroProps) {
         return () => clearTimeout(timeoutId);
     }, [movies.length]);
 
-    // ... (rest of details fetching)
+    // Fetch details when movie changes
+    useEffect(() => {
+        if (!movie) return;
 
-    // ... (rest of variable definitions)
+        const fetchDetails = async () => {
+            try {
+                // Determine type based on properties (fallback logic)
+                const isTv = !!movie.first_air_date;
+                const type = isTv ? 'tv' : 'movie';
+                const details = await tmdb.getDetails(movie.id, type);
+                setMovieDetails(details);
+            } catch (error) {
+                console.error("Failed to fetch details", error);
+            }
+        };
+
+        fetchDetails();
+    }, [movie]);
+
+    if (!movie) return null;
+
+    const year = new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear();
+    const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
+    const title = movie.title || movie.name || '';
+
+    // Meta Logic
+    const genres = movieDetails?.genres?.slice(0, 2).map(g => g.name).join(', ') || 'Variados';
+
+    let duration = '';
+    if (movieDetails?.runtime) {
+        const h = Math.floor(movieDetails.runtime / 60);
+        const m = movieDetails.runtime % 60;
+        duration = `${h}h ${m} m`;
+    } else if (movieDetails?.episode_run_time && movieDetails.episode_run_time.length > 0) {
+        duration = `${movieDetails.episode_run_time[0]} m(Ep)`;
+    }
+
+    // Truncate logic
+    const MAX_LENGTH = 200;
+    const text = movie.overview || '';
+    const displayText = text.length > MAX_LENGTH ? text.slice(0, MAX_LENGTH) + '...' : text;
+
+    // Link Logic
+    const isTv = !!movie.first_air_date;
+    const linkHref = isTv
+        ? `/serie/${movie.supabase_id}`
+        : `/filme/${movie.supabase_id}`;
 
     return (
         <section className={styles.hero}>
-            {/* ... (backgrounds remain unchanged) ... */}
+            {/* Background with Crossfade Images */}
             <div className={styles.heroBackground}>
                 {movies.map((m, index) => (
                     <div
@@ -53,10 +97,10 @@ export default function Hero({ movies }: HeroProps) {
                             alt={m.title || m.name || 'Hero Background'}
                             fill
                             className={styles.image}
-                            priority={index === 0}
+                            priority={index === 0} // Only prioritize the first one
                             loading={index === 0 ? 'eager' : 'lazy'}
-                            unoptimized={true}
-                            quality={100}
+                            unoptimized={true} // Bypass Vercel optimization completely for MAX quality
+                            quality={100} // Request highest JPG quality if processed
                             sizes="100vw"
                             style={{ objectFit: 'cover' }}
                         />
@@ -89,7 +133,6 @@ export default function Hero({ movies }: HeroProps) {
                     {title}
                 </h1>
 
-                {/* ... (rest of content) ... */}
                 <div className={styles.meta}>
                     <span className={styles.year}>{year}</span>
                     <div className={styles.separator}>•</div>
