@@ -67,7 +67,7 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                         >
                             {/* Image */}
                             <Image
-                                src={getImageUrl(item.poster_path, 'w342')}
+                                src={getImageUrl(item.poster_path, 'w500')}
                                 alt={item.title || item.name || 'Cover'}
                                 fill
                                 className={styles.image}
