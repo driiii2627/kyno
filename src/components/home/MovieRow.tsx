@@ -41,10 +41,10 @@ export default function MovieRow({ title, movies, priority = false, variant = 'd
     return (
         <div className={styles.row}>
             <div className={styles.header}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {isTop10 && <span className={styles.top10Badge}>TOP 10</span>}
-                    <h2 className={styles.title}>{title}</h2>
-                </div>
+                <h2 className={styles.title}>
+                    {isTop10 && <span className={styles.top10Prefix}>TOP 10 </span>}
+                    {title}
+                </h2>
                 <a href="#" className={styles.viewAll}>Ver todos <ChevronRight size={16} /></a>
             </div>
 

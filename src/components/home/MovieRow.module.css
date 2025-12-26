@@ -272,20 +272,17 @@
     z-index: 100 !important;
 }
 
-/* Top 10 Badge in Header */
-.top10Badge {
-    background-color: #dc2626;
-    /* Red-600 */
-    color: white;
-    font-weight: 800;
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-right: 0.8rem;
-    letter-spacing: 0.05em;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-    display: inline-block;
-    vertical-align: middle;
+/* Top 10 Gradient Title (Replaces Badge) */
+.top10Prefix {
+    background: linear-gradient(135deg, #FFD700 0%, #FDB931 30%, #FFFFFF 60%, #9E7D2D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+    margin-right: 8px;
+    letter-spacing: -1px;
+    text-shadow: 0px 0px 20px rgba(253, 185, 49, 0.4);
+    font-size: 1.5rem;
+    /* Larger than title */
 }
 
 /* Responsiveness */
