@@ -60,13 +60,22 @@ export default async function Home() {
 
   // --- Dynamic Categorization Logic ---
 
-  // 1. Hero: Pure Random (Changes on every refresh for "New" feel, or we can make it hourly)
-  // Let's keep Hero random on refresh for that "Dynamic" feel the user likes? 
-  // User asked for "Categories" to be fixed time. Hero is usually "Destaque".
-  // Let's make Hero "Hourly" to be stable but fresh.
+  // 1. Hero: Pure Random on Refresh (Requested "Aleatorio")
+  // User feedback: "Não esta aleatorio", "Começa sempre pelo A Origem".
+  // Solution: Switch to purely random shuffle by using Date.now() as part of seed or just not using time-seed for Hero.
+  // Filters: Year >= 2001, Rating >= 5.
   const allContent = [...catalogMovies, ...catalogSeries];
-  const heroSeed = getTimeSeed(1, 'hero'); // Changes every 1 hour
-  const heroMovies = seededShuffle(allContent, heroSeed).slice(0, 10);
+
+  const heroCandidates = allContent.filter(item => {
+    const date = item.release_date || item.first_air_date;
+    const year = date ? new Date(date).getFullYear() : 0;
+    const rating = item.vote_average || 0;
+    return year >= 2001 && rating >= 5;
+  });
+
+  // Use a random seed for Hero to ensure freshness on every load
+  const heroSeed = Math.random();
+  const heroMovies = seededShuffle(heroCandidates, heroSeed).slice(0, 10);
 
   // 2. "Filmes" (Movies): Changes every 6 hours
   const moviesSeed = getTimeSeed(6, 'movies');
