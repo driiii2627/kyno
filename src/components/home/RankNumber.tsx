@@ -5,49 +5,30 @@ import React from 'react';
 export default function RankNumber({ rank }: { rank: number }) {
     return (
         <svg
-            width="160"
-            height="280"
-            viewBox="0 0 160 280"
+            width="100"
+            height="100"
+            viewBox="0 0 100 100"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             style={{
                 position: 'absolute',
-                left: '-70px', /* Adjust overlap slightly more for the wider box */
-                bottom: '-20px', /* Adjust vertical alignment */
-                zIndex: -1
+                left: '-10px',
+                bottom: '-25px',
+                zIndex: 10, /* Strictly on top */
+                pointerEvents: 'none', /* Let clicks pass through to card */
+                filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.9))' /* Heavy shadow for contrast */
             }}
             className="rank-number"
         >
-            <defs>
-                <linearGradient id="rankGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="100%" stopColor="#999999" />
-                </linearGradient>
-            </defs>
             <text
-                x="150"
-                y="240"
-                textAnchor="end"
+                x="10"
+                y="90"
                 fontFamily="'Inter', 'Roboto', sans-serif"
                 fontWeight="900"
-                fontSize="240"
-                fill="none"
-                stroke="url(#rankGradient)"
-                strokeWidth="4"
-                className="rank-text"
-            >
-                {rank}
-            </text>
-            <text
-                x="150"
-                y="240"
-                textAnchor="end"
-                fontFamily="'Inter', 'Roboto', sans-serif"
-                fontWeight="900"
-                fontSize="240"
-                fill="#000"
-                fillOpacity="0.5"
-                stroke="none"
+                fontSize="90"
+                fill="#ffffff" /* Pure white fill */
+                stroke="#000000" /* Black outline */
+                strokeWidth="2"
             >
                 {rank}
             </text>
