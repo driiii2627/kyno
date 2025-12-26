@@ -54,3 +54,39 @@ export function getTimeSeed(intervalHours: number, salt: string = ''): number {
 
     return timeIndex + hash;
 }
+
+/**
+ * Stable Sort based on ID + Seed.
+ * Prevents catalog shifting when items are added/removed.
+ * Each item gets a score, and we sort by score. 
+ * Adding a new item just inserts it into its score position without shuffling others.
+ */
+export function hashedSort<T extends { id?: string | number }>(array: T[], seed: number): T[] {
+    const scored = array.map(item => {
+        const idStr = String(item.id || '');
+        // Simple hash of Seed + ID
+        let h = seed;
+        for (let i = 0; i < idStr.length; i++) {
+            h = Math.imul(31, h) + idStr.charCodeAt(i) | 0;
+        }
+        return { item, score: h };
+    });
+
+    // Sort by score
+    scored.sort((a, b) => a.score - b.score);
+
+    return scored.map(s => s.item);
+}
+
+/**
+ * True Random Shuffle (Fisher-Yates) using Math.random()
+ * Much better distribution than .sort(() => Math.random() - 0.5)
+ */
+export function randomShuffle<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}

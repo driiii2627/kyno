@@ -2,7 +2,7 @@ import Hero from '@/components/home/Hero';
 import MovieRow from '@/components/home/MovieRow';
 import { tmdb } from '@/services/tmdb';
 import { contentService } from '@/services/content';
-import { seededShuffle, getTimeSeed } from '@/lib/utils';
+import { hashedSort, randomShuffle, getTimeSeed } from '@/lib/utils';
 // import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'; // Removed to fix build
 // import { cookies } from 'next/headers';
 
@@ -61,9 +61,6 @@ export default async function Home() {
   // --- Dynamic Categorization Logic ---
 
   // 1. Hero: Pure Random on Refresh (Requested "Aleatorio")
-  // User feedback: "Não esta aleatorio", "Começa sempre pelo A Origem".
-  // Solution: Switch to purely random shuffle by using Date.now() as part of seed or just not using time-seed for Hero.
-  // Filters: Year >= 2001, Rating >= 5.
   const allContent = [...catalogMovies, ...catalogSeries];
 
   // Filters: Year >= 2001, Rating >= 5.
@@ -74,38 +71,37 @@ export default async function Home() {
     return year >= 2001 && rating >= 5;
   });
 
-  // Use simple random sort for Hero to ensure freshness on every load
-  // seededShuffle may have issues with float seeds from Math.random()
-  const heroMovies = [...heroCandidates].sort(() => Math.random() - 0.5).slice(0, 10);
+  // Use robust Fisher-Yates shuffle for Hero
+  // This ensures better randomness than .sort(random - 0.5)
+  // And it will change on every render (force-dynamic)
+  const heroMovies = randomShuffle(heroCandidates).slice(0, 10);
 
   // 2. "Filmes" (Movies): Changes every 6 hours
+  // Use hashedSort so adding new movies doesn't reshuffle the old ones completely
   const moviesSeed = getTimeSeed(6, 'movies');
-  const dynamicMovies = seededShuffle(catalogMovies, moviesSeed);
+  const dynamicMovies = hashedSort(catalogMovies, moviesSeed);
 
   // 3. "Séries" (Series): Changes every 5 hours
   const seriesSeed = getTimeSeed(5, 'series');
-  const dynamicSeries = seededShuffle(catalogSeries, seriesSeed);
+  const dynamicSeries = hashedSort(catalogSeries, seriesSeed);
 
   // 4. "Recomendações" (Recommendations): Personalized, changes every 24h
   // We use UserID string chars sum as part of the seed
   let userSalt = 0;
   for (let i = 0; i < userId.length; i++) userSalt += userId.charCodeAt(i);
   const recSeed = getTimeSeed(24, 'recommendations') + userSalt;
-  const recommendations = seededShuffle(allContent, recSeed).slice(0, 20);
+  const recommendations = hashedSort(allContent, recSeed).slice(0, 20);
 
   // 5. "Top 10" (Weekly): Changes every 7 days (168 hours)
-  // Ideally this should be based on Rating, but user said "Top 10" and "changes every 7 days".
-  // So we take the HIGHEST RATED items, and then maybe shuffle slightly or just show them?
-  // Use a stable sort first by rating, then slice top 50, then shuffle weekly to rotate the "Top 10" display?
-  // Or just show Top 10 Rated. The user said "troca a cada 7 dias", implying rotation.
-  // So: Take top 50 rated -> Shuffle with 7-day seed -> Take 10.
+  // We first take the actual top rated (Quality Control)
+  // Then we shuffle those top 50 so the Top 10 display rotates among the best
   const topRatedSource = [...catalogMovies].sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0)).slice(0, 50);
   const top10Seed = getTimeSeed(168, 'top10movies');
-  const top10Movies = seededShuffle(topRatedSource, top10Seed).slice(0, 10);
+  const top10Movies = hashedSort(topRatedSource, top10Seed).slice(0, 10);
 
   const topSeriesSource = [...catalogSeries].sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0)).slice(0, 50);
   const top10SeriesSeed = getTimeSeed(168, 'top10series');
-  const top10Series = seededShuffle(topSeriesSource, top10SeriesSeed).slice(0, 10);
+  const top10Series = hashedSort(topSeriesSource, top10SeriesSeed).slice(0, 10);
 
 
   return (
