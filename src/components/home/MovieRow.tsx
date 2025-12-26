@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import tmdbLoader from '@/lib/tmdbLoader';
 import { ChevronLeft, Star } from 'lucide-react';
 import styles from './MovieRow.module.css';
 import { Movie, getImageUrl } from '@/services/tmdb';
@@ -81,8 +82,9 @@ export default function MovieRow({ title, movies, priority = false, variant = 'd
 
                                 <div className={styles.imageWrapper}>
                                     <OptimizedImage
-                                        src={getImageUrl(movie.poster_path, 'w780')}
+                                        src={movie.poster_path || ''}
                                         tinySrc={getImageUrl(movie.poster_path, 'w92')}
+                                        loader={tmdbLoader}
                                         alt={movie.title || movie.name || 'Movie'}
                                         fill
                                         className={styles.image}

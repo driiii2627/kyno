@@ -30,15 +30,11 @@
     background-size: cover;
     background-position: center top;
     opacity: 0;
-    transition: opacity 1s ease-in-out, transform 8s linear;
-    /* Smooth fade + Slow zoom effect */
-    transform: scale(1);
+    transition: opacity 1s ease-in-out;
 }
 
 .heroImage.active {
     opacity: 1;
-    transform: scale(1.05);
-    /* Subtle zoom while active */
 }
 
 /* Cleaner, less intrusive overlay with SUBTLE BLUE hint at edges */

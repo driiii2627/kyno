@@ -5,15 +5,10 @@ import Image, { ImageProps } from 'next/image';
 
 interface OptimizedImageProps extends Omit<ImageProps, 'onLoad'> {
     tinySrc?: string; // URL for the tiny blur placeholder
-    enhance?: boolean; // New prop for visuals
 }
 
-export default function OptimizedImage({ src, tinySrc, alt, className, enhance = true, ...props }: OptimizedImageProps) {
+export default function OptimizedImage({ src, tinySrc, alt, className, loader, ...props }: OptimizedImageProps) {
     const [isLoaded, setIsLoaded] = useState(false);
-
-    // If priority is true, we might want to skip the blur effect or handle it differently.
-    // However, for "ultra fast" feel, showing something immediately (tinySrc) is still good.
-    // If no tinySrc provided, behave like normal Image but with our strict settings.
 
     const handleLoad = () => {
         setIsLoaded(true);
@@ -49,20 +44,16 @@ export default function OptimizedImage({ src, tinySrc, alt, className, enhance =
                 {...props}
                 src={src}
                 alt={alt || ''}
+                loader={loader}
                 onLoad={handleLoad}
-                decoding="async"
                 className={`${className || ''}`}
                 style={{
                     ...props.style,
                     opacity: isLoaded ? 1 : 0,
-                    transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)', // Even smoother transition
-                    zIndex: 2,
-                    // "HDR" Simulation: Boost contrast & saturation slightly to make it pop
-                    filter: enhance ? 'contrast(1.08) saturate(1.12) brightness(1.02)' : 'none'
+                    transition: 'opacity 0.5s ease-in',
+                    zIndex: 2
                 }}
-                // User requirement: Do NOT use Vercel optimization (server usage).
-                // "não quero de jeito nenhum que as imagens usem o servidor"
-                unoptimized={true}
+            // removed unoptimized={true} to allow loader to generate srcset
             />
         </div>
     );

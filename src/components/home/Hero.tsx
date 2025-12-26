@@ -4,6 +4,7 @@ import { Play, Plus, Tv } from 'lucide-react';
 import styles from './Hero.module.css';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import tmdbLoader from '@/lib/tmdbLoader';
 import { Movie, MovieDetails, getImageUrl, tmdb } from '@/services/tmdb';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -94,8 +95,9 @@ export default function Hero({ movies }: HeroProps) {
                         className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
                     >
                         <OptimizedImage
-                            src={getImageUrl(m.backdrop_path || '', 'original')}
-                            tinySrc={getImageUrl(m.backdrop_path || '', 'w92')}
+                            src={m.backdrop_path || ''} // Pass relative path for loader
+                            tinySrc={getImageUrl(m.backdrop_path || '', 'w92')} // Explicit URL for placeholder
+                            loader={tmdbLoader}
                             alt={m.title || m.name || 'Hero Background'}
                             fill
                             className={styles.image}
