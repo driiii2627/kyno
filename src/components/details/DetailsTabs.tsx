@@ -5,15 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './DetailsTabs.module.css';
-import { Movie } from '@/services/tmdb';
 import seasonStyles from './SeasonBrowser.module.css'; // Reusing card styles
-
-import { useRouter } from 'next/navigation';
-import { resolveTmdbContent } from '@/app/actions';
 
 interface DetailsTabsProps {
     seasonBrowser?: React.ReactNode;
-    recommendations: Movie[];
+    recommendations: any[]; // Accepts CatalogItems now
     uuid: string; // Current item UUID
 }
 
@@ -21,7 +17,6 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
     // If seasonBrowser is provided, default to 'episodes', else 'recommendations'
     const [activeTab, setActiveTab] = useState<'episodes' | 'recommendations'>(seasonBrowser ? 'episodes' : 'recommendations');
     const scrollRef = useRef<HTMLDivElement>(null);
-    const router = useRouter();
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
@@ -30,17 +25,6 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
             const scrollAmount = current.clientWidth;
             const directionMultiplier = direction === 'left' ? -1 : 1;
             current.scrollBy({ left: scrollAmount * directionMultiplier, behavior: 'smooth' });
-        }
-    };
-
-    const handleRecommendationClick = async (rec: Movie) => {
-        // Optimistic UI could prevent double clicks here if needed
-        const newUuid = await resolveTmdbContent(rec.id, !!rec.title ? 'movie' : 'tv');
-        if (newUuid) {
-            router.push(`/details/${newUuid}`);
-        } else {
-            // Simple feedback for unavailable content
-            alert('Este conteúdo ainda não está disponível no sistema.');
         }
     };
 
@@ -85,11 +69,10 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
 
                                 <div ref={scrollRef} className={seasonStyles.grid}>
                                     {recommendations.map(rec => (
-                                        <div
+                                        <Link
                                             key={rec.id}
-                                            onClick={() => handleRecommendationClick(rec)}
+                                            href={`/details/${rec.supabase_id}`}
                                             className={seasonStyles.card}
-                                            style={{ cursor: 'pointer' }}
                                         >
                                             <div className={seasonStyles.thumbnailWrapper}>
                                                 <Image
@@ -112,14 +95,14 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
                                                         {rec.title || rec.name}
                                                     </h4>
                                                     <span className={seasonStyles.duration}>
-                                                        {(rec as any).vote_average ? `★ ${(rec as any).vote_average.toFixed(1)}` : ''}
+                                                        {rec.vote_average ? `★ ${rec.vote_average.toFixed(1)}` : ''}
                                                     </span>
                                                 </div>
                                                 <p className={seasonStyles.overview}>
                                                     {rec.overview || 'Sem descrição.'}
                                                 </p>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
 
@@ -131,7 +114,7 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
                                 </button>
                             </div>
                         ) : (
-                            <div className="text-zinc-500 py-8">Nenhuma recomendação encontrada.</div>
+                            <div className="text-zinc-500 py-8">Nenhuma recomendação disponível no momento.</div>
                         )}
                     </div>
                 )}

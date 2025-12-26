@@ -1,5 +1,6 @@
 
 import { contentService } from '@/services/content';
+import { supabase } from '@/lib/supabase';
 import { tmdb } from '@/services/tmdb';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -70,25 +71,52 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         }
     }
 
-    // Filter Recommendations:
-    // 1. Must have a poster path (Visual check)
-    // 2. Must have a release date
-    // 3. Release date must be in the past (Released)
-    const today = new Date();
-    recommendations = recommendations.filter((rec: any) => {
-        if (!rec.poster_path && !rec.backdrop_path) return false; // Must have image
+    // 4. Validate Recommendations against Supabase (Security Check)
+    // We only show items that are ALREADY in our database.
+    const candidateIds = recommendations.map((r: any) => r.id);
+    let validRecommendations: any[] = [];
 
-        const dateStr = rec.release_date || rec.first_air_date;
-        if (!dateStr) return false; // Must have date
+    if (candidateIds.length > 0) {
+        const { data: validMovies } = await supabase
+            .from('movies')
+            .select('id, tmdb_id, title, overview, poster_url, backdrop_url, rating')
+            .in('tmdb_id', candidateIds);
 
-        const releaseDate = new Date(dateStr);
-        if (isNaN(releaseDate.getTime())) return false; // Invalid date
+        const { data: validSeries } = await supabase
+            .from('series')
+            .select('id, tmdb_id, title, overview, poster_url, backdrop_url, rating')
+            .in('tmdb_id', candidateIds);
 
-        return releaseDate <= today; // Must be released
-    });
+        // Map Valid Items to Catalog Schema
+        const safeMovies = (validMovies || []).map(m => ({
+            id: m.tmdb_id,
+            supabase_id: m.id,
+            title: m.title,
+            overview: m.description || m.overview, // Handle DB vs TMDB schema diff
+            poster_path: m.poster_url,
+            backdrop_path: m.backdrop_url,
+            vote_average: m.rating,
+            type: 'movie'
+        }));
 
-    // Limit recommendations to top 10 as requested
-    recommendations = recommendations.slice(0, 10);
+        const safeSeries = (validSeries || []).map(s => ({
+            id: s.tmdb_id,
+            supabase_id: s.id,
+            name: s.title, // Series title in DB
+            title: s.title,
+            overview: s.description || s.overview,
+            poster_path: s.poster_url,
+            backdrop_path: s.backdrop_url,
+            vote_average: s.rating,
+            type: 'tv'
+        }));
+
+        // Re-construct the list preserving TMDB relevance order if possible, 
+        // or just use the found list. Using found list is faster.
+        validRecommendations = [...safeMovies, ...safeSeries];
+    }
+
+    recommendations = validRecommendations.slice(0, 15); // Limit limit
 
     // Prepare Season Browser Node
     let seasonBrowserNode = null;
