@@ -52,10 +52,35 @@ export async function getSeason(tvId: number, seasonNumber: number) {
 }
 
 /**
+ * Verify if content exists on Superflix API
+ */
+async function verifySuperflixContent(tmdbId: number, type: 'movie' | 'tv'): Promise<boolean> {
+    try {
+        const baseUrl = 'https://superflixapi.buzz'; // Could use config, but keeping it simple for server action
+        const url = type === 'movie'
+            ? `${baseUrl}/filme/${tmdbId}`
+            : `${baseUrl}/serie/${tmdbId}`;
+
+        const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+
+        // Superflix returns 404 if content page doesn't exist
+        // We can also do a GET and check for specific markers if 200 is unreliable,
+        // but 404 is the standard "not found" for this API structure.
+        return res.status === 200;
+
+    } catch (e) {
+        console.error(`Superflix verification failed for ${type} ${tmdbId}:`, e);
+        return false; // Fail safe
+    }
+}
+
+/**
  * Resolves a TMDB ID to a Kyno UUID.
  * 1. Checks if it exists in Supabase.
  * 2. If yes, returns UUID.
- * 3. If no, syncs it (creates it) and returns new UUID.
+ * 3. If no, CHECKS SUPERFLIX AVAILABILITY.
+ * 4. If available, syncs it (creates it) and returns new UUID.
+ * 5. If not available, returns null.
  */
 export async function resolveTmdbContent(tmdbId: number, type: 'movie' | 'tv') {
     // 1. Check if already exists in Supabase
@@ -63,6 +88,13 @@ export async function resolveTmdbContent(tmdbId: number, type: 'movie' | 'tv') {
 
     if (existing) {
         return existing.id;
+    }
+
+    // NEW: Check Availability before adding
+    const isAvailable = await verifySuperflixContent(tmdbId, type);
+    if (!isAvailable) {
+        // console.log(`Content ${tmdbId} not available on Superflix. Skipping auto-add.`);
+        return null;
     }
 
     // 2. Fetch details from TMDB to sync

@@ -38,6 +38,9 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
         const newUuid = await resolveTmdbContent(rec.id, !!rec.title ? 'movie' : 'tv');
         if (newUuid) {
             router.push(`/details/${newUuid}`);
+        } else {
+            // Simple feedback for unavailable content
+            alert('Este conteúdo ainda não está disponível no sistema.');
         }
     };
 

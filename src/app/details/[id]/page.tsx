@@ -70,6 +70,9 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         }
     }
 
+    // Limit recommendations to top 10 as requested
+    recommendations = recommendations.slice(0, 10);
+
     // Prepare Season Browser Node
     let seasonBrowserNode = null;
     if (item.type === 'tv' && initialSeasonData && 'seasons' in details) {
