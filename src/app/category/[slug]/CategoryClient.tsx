@@ -58,33 +58,37 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
             {/* Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                 {filteredItems.map(item => (
-                    <Link
+                    <div
                         key={item.id}
-                        href={`/details/${item.supabase_id || item.id}`}
-                        className="group relative block aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        className="group relative aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10"
                     >
-                        {/* Image */}
-                        <Image
-                            src={getImageUrl(item.poster_path, 'w500')}
-                            alt={item.title || item.name || 'Cover'}
-                            fill
-                            className="object-cover transition-opacity duration-300 group-hover:opacity-100" // Always 100, checking for ease
-                            sizes="(max-width: 768px) 50vw, 20vw"
-                        />
+                        <Link
+                            href={`/details/${item.supabase_id || item.id}`}
+                            className="absolute inset-0 block w-full h-full focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        >
+                            {/* Image */}
+                            <Image
+                                src={getImageUrl(item.poster_path, 'w500')}
+                                alt={item.title || item.name || 'Cover'}
+                                fill
+                                className="object-cover transition-opacity duration-300 group-hover:opacity-100"
+                                sizes="(max-width: 768px) 50vw, 20vw"
+                            />
 
-                        {/* Gradient Overlay (Visible on Hover) */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                            <h3 className="font-bold text-sm md:text-base leading-tight mb-1">{item.title || item.name}</h3>
-                            <div className="flex items-center gap-2 text-xs text-zinc-300">
-                                <div className="flex items-center gap-1 text-amber-400">
-                                    <Star size={10} fill="currentColor" />
-                                    <span>{item.vote_average?.toFixed(1) || '0.0'}</span>
+                            {/* Gradient Overlay (Visible on Hover) */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                                <h3 className="font-bold text-sm md:text-base leading-tight mb-1">{item.title || item.name}</h3>
+                                <div className="flex items-center gap-2 text-xs text-zinc-300">
+                                    <div className="flex items-center gap-1 text-amber-400">
+                                        <Star size={10} fill="currentColor" />
+                                        <span>{item.vote_average?.toFixed(1) || '0.0'}</span>
+                                    </div>
+                                    <span>•</span>
+                                    <span>{new Date(item.release_date || item.first_air_date || Date.now()).getFullYear()}</span>
                                 </div>
-                                <span>•</span>
-                                <span>{new Date(item.release_date || item.first_air_date || Date.now()).getFullYear()}</span>
                             </div>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
                 ))}
             </div>
 
