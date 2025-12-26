@@ -61,7 +61,7 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                     <Link
                         key={item.id}
                         href={`/details/${item.supabase_id || item.id}`}
-                        className="group relative aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        className="group relative block aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10 focus:outline-none focus:ring-2 focus:ring-amber-500"
                     >
                         {/* Image */}
                         <Image

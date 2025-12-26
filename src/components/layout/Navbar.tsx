@@ -34,10 +34,11 @@ export default function Navbar() {
 
             {/* Navigation Links */}
             <div className={styles.navLinks}>
-                <Link href="/" className={`${styles.link} ${styles.active}`}>Home</Link>
-                <Link href="/movies" className={styles.link}>Filmes</Link>
-                <Link href="/series" className={styles.link}>Séries</Link>
-                <Link href="/categories" className={styles.link}>Categorias</Link>
+                <Link href="/" className={`${styles.link} ${pathname === '/' ? styles.active : ''}`}>Home</Link>
+                <Link href="/category/filmes" className={`${styles.link} ${pathname?.includes('/category/filmes') ? styles.active : ''}`}>Filmes</Link>
+                <Link href="/category/series" className={`${styles.link} ${pathname?.includes('/category/series') ? styles.active : ''}`}>Séries</Link>
+                {/* Categories usually implies a browse page, but we'll leave it as /categories if that route exists, or link to movies for now */}
+                <Link href="/category/filmes" className={styles.link}>Categorias</Link>
             </div>
 
             {/* Icons */}
