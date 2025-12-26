@@ -55,27 +55,41 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                 </div>
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+            {/* Grid - Using inline styles to guarantee layout works regardless of Tailwind config */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: '1.5rem',
+                width: '100%'
+            }}>
                 {filteredItems.map(item => (
                     <div
                         key={item.id}
-                        className="group relative aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/10"
+                        style={{
+                            position: 'relative',
+                            aspectRatio: '2/3',
+                            width: '100%',
+                            borderRadius: '0.5rem',
+                            overflow: 'hidden',
+                            backgroundColor: '#18181b', // zinc-900
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}
+                        className="group hover:scale-105 transition-transform duration-300"
                     >
                         <Link
                             href={`/details/${item.supabase_id || item.id}`}
-                            className="absolute inset-0 block w-full h-full focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            style={{ display: 'block', width: '100%', height: '100%', position: 'absolute', inset: 0 }}
                         >
                             {/* Image */}
                             <Image
                                 src={getImageUrl(item.poster_path, 'w500')}
                                 alt={item.title || item.name || 'Cover'}
                                 fill
-                                className="object-cover transition-opacity duration-300 group-hover:opacity-100"
+                                className="object-cover"
                                 sizes="(max-width: 768px) 50vw, 20vw"
                             />
 
-                            {/* Gradient Overlay (Visible on Hover) */}
+                            {/* Gradient Overlay */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                                 <h3 className="font-bold text-sm md:text-base leading-tight mb-1">{item.title || item.name}</h3>
                                 <div className="flex items-center gap-2 text-xs text-zinc-300">
