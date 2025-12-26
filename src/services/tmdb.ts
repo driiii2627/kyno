@@ -14,7 +14,7 @@ export interface Movie {
   genre_ids: number[];
 }
 
-export const getImageUrl = (path: string | null, size: 'original' | 'w500' | 'w342' | 'w1280' = 'original') => {
+export const getImageUrl = (path: string | null, size: 'original' | 'w500' | 'w342' | 'w780' | 'w1280' = 'original') => {
   if (!path) return '/placeholder.png';
   return `https://image.tmdb.org/t/p/${size}${path}`;
 };
