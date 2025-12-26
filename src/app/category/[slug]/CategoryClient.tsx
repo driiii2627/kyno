@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Search, ArrowLeft, Star } from 'lucide-react';
 import { CatalogItem } from '@/services/content';
 import { getImageUrl } from '@/services/tmdb';
+import styles from './CategoryClient.module.css';
 
 interface CategoryClientProps {
     title: string;
@@ -25,76 +26,60 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
     }, [items, searchQuery]);
 
     return (
-        <div className="min-h-screen bg-black text-white px-4 md:px-12 py-8">
+        <div className={styles.container}>
             {/* Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 sticky top-0 bg-black/90 backdrop-blur-md z-50 py-4 border-b border-white/5">
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                    <Link href="/" className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                        <ArrowLeft size={24} />
+            <div className={styles.header}>
+                <div className={styles.titleGroup}>
+                    <Link href="/" className={styles.backBtn}>
+                        <ArrowLeft size={20} />
                     </Link>
-                    <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                    <h1 className={styles.pageTitle}>
                         {title}
                     </h1>
-                    <span className="text-sm text-zinc-500 bg-zinc-900 px-3 py-1 rounded-full border border-white/5">
+                    <span className={styles.countBadge}>
                         {filteredItems.length}
                     </span>
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative w-full md:w-96 group">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-white transition-colors">
-                        <Search size={18} />
-                    </div>
+                <div className={styles.searchWrapper}>
                     <input
                         type="text"
-                        placeholder={`Buscar em ${title}...`}
+                        placeholder={`Buscar...`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-zinc-900/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all placeholder-zinc-600"
+                        className={styles.searchInput}
                     />
+                    <Search size={18} className={styles.searchIcon} />
                 </div>
             </div>
 
-            {/* Grid - Using inline styles to guarantee layout works regardless of Tailwind config */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                gap: '1.5rem',
-                width: '100%'
-            }}>
+            {/* Grid */}
+            <div className={styles.grid}>
                 {filteredItems.map(item => (
                     <div
                         key={item.id}
-                        style={{
-                            position: 'relative',
-                            aspectRatio: '2/3',
-                            width: '100%',
-                            borderRadius: '0.5rem',
-                            overflow: 'hidden',
-                            backgroundColor: '#18181b', // zinc-900
-                            border: '1px solid rgba(255,255,255,0.05)'
-                        }}
-                        className="group hover:scale-105 transition-transform duration-300"
+                        className={styles.cardWrapper}
                     >
                         <Link
                             href={`/details/${item.supabase_id || item.id}`}
-                            style={{ display: 'block', width: '100%', height: '100%', position: 'absolute', inset: 0 }}
+                            className={styles.cardContent}
                         >
                             {/* Image */}
                             <Image
                                 src={getImageUrl(item.poster_path, 'w500')}
                                 alt={item.title || item.name || 'Cover'}
                                 fill
-                                className="object-cover"
+                                className={styles.image}
                                 sizes="(max-width: 768px) 50vw, 20vw"
                             />
 
                             {/* Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                                <h3 className="font-bold text-sm md:text-base leading-tight mb-1">{item.title || item.name}</h3>
-                                <div className="flex items-center gap-2 text-xs text-zinc-300">
-                                    <div className="flex items-center gap-1 text-amber-400">
-                                        <Star size={10} fill="currentColor" />
+                            <div className={styles.overlay}>
+                                <h3 className={styles.itemTitle}>{item.title || item.name}</h3>
+                                <div className={styles.meta}>
+                                    <div className={styles.rating}>
+                                        <Star size={12} fill="currentColor" />
                                         <span>{item.vote_average?.toFixed(1) || '0.0'}</span>
                                     </div>
                                     <span>•</span>
@@ -108,12 +93,12 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
 
             {/* Empty State */}
             {filteredItems.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-                    <Search size={48} className="mb-4 opacity-20" />
-                    <p className="text-lg">Nenhum resultado encontrado para "{searchQuery}"</p>
+                <div className={styles.emptyState}>
+                    <Search size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                    <p className="text-lg">Nenhum resultado encontrado.</p>
                     <button
                         onClick={() => setSearchQuery('')}
-                        className="mt-4 text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors"
+                        className={styles.clearBtn}
                     >
                         Limpar busca
                     </button>
