@@ -90,16 +90,38 @@ export async function resolveTmdbContent(tmdbId: number, type: 'movie' | 'tv') {
         return existing.id;
     }
 
-    // NEW: Check Availability before adding
-    const isAvailable = await verifySuperflixContent(tmdbId, type);
-    if (!isAvailable) {
-        // console.log(`Content ${tmdbId} not available on Superflix. Skipping auto-add.`);
-        return null;
-    }
-
-    // 2. Fetch details from TMDB to sync
+    // 2. Fetch details from TMDB FIRST to validate eligibility (Release Date, Status)
     try {
         const details = await tmdb.getDetails(tmdbId, type);
+
+        // CHECK 1: Is it released?
+        const releaseDateStr = details.release_date || details.first_air_date;
+        if (!releaseDateStr) {
+            console.warn(`Content ${tmdbId} rejected: No release date.`);
+            return null;
+        }
+
+        const releaseDate = new Date(releaseDateStr);
+        const today = new Date();
+
+        // Allow a small buffer (e.g., 2 days) for timezone diffs, but generally strictly past
+        if (releaseDate > today) {
+            // console.warn(`Content ${tmdbId} rejected: Future release date (${releaseDateStr}).`);
+            return null;
+        }
+
+        // CHECK 2: Status check (if available)
+        // Movies usually have 'status'. 'Released' is what we want. 'Post Production' etc should be blocked.
+        if ('status' in details && details.status !== 'Released' && details.status !== 'Returning Series' && details.status !== 'Ended') {
+            // console.warn(`Content ${tmdbId} rejected: Status is ${details.status}`);
+            return null;
+        }
+
+        // CHECK 3: Superflix Availability (Final Gate)
+        const isAvailable = await verifySuperflixContent(tmdbId, type);
+        if (!isAvailable) {
+            return null;
+        }
 
         // 3. Sync to Supabase
         if (type === 'movie') {

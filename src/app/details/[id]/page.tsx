@@ -70,6 +70,23 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         }
     }
 
+    // Filter Recommendations:
+    // 1. Must have a poster path (Visual check)
+    // 2. Must have a release date
+    // 3. Release date must be in the past (Released)
+    const today = new Date();
+    recommendations = recommendations.filter((rec: any) => {
+        if (!rec.poster_path && !rec.backdrop_path) return false; // Must have image
+
+        const dateStr = rec.release_date || rec.first_air_date;
+        if (!dateStr) return false; // Must have date
+
+        const releaseDate = new Date(dateStr);
+        if (isNaN(releaseDate.getTime())) return false; // Invalid date
+
+        return releaseDate <= today; // Must be released
+    });
+
     // Limit recommendations to top 10 as requested
     recommendations = recommendations.slice(0, 10);
 
