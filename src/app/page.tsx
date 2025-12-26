@@ -74,7 +74,7 @@ export default async function Home() {
   // Use robust Fisher-Yates shuffle for Hero
   // This ensures better randomness than .sort(random - 0.5)
   // And it will change on every render (force-dynamic)
-  const heroMovies = randomShuffle(heroCandidates).slice(0, 10);
+  const heroMovies = randomShuffle(heroCandidates).slice(0, 6);
 
   // 2. "Filmes" (Movies): Changes every 6 hours
   // Use hashedSort so adding new movies doesn't reshuffle the old ones completely
