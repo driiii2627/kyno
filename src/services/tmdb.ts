@@ -15,7 +15,7 @@ export interface Movie {
 }
 
 export const getImageUrl = (path: string | null, size: 'original' | 'w500' | 'w342' | 'w780' | 'w1280' | 'w154' | 'w92' = 'original') => {
-  if (!path) return 'https://placehold.co/600x400?text=No+Image';
+  if (!path) return '/placeholder.png';
   return `https://image.tmdb.org/t/p/${size}${path}`;
 };
 

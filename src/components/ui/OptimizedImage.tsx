@@ -5,10 +5,15 @@ import Image, { ImageProps } from 'next/image';
 
 interface OptimizedImageProps extends Omit<ImageProps, 'onLoad'> {
     tinySrc?: string; // URL for the tiny blur placeholder
+    enhance?: boolean; // New prop for visuals
 }
 
-export default function OptimizedImage({ src, tinySrc, alt, className, loader, ...props }: OptimizedImageProps) {
+export default function OptimizedImage({ src, tinySrc, alt, className, enhance = true, ...props }: OptimizedImageProps) {
     const [isLoaded, setIsLoaded] = useState(false);
+
+    // If priority is true, we might want to skip the blur effect or handle it differently.
+    // However, for "ultra fast" feel, showing something immediately (tinySrc) is still good.
+    // If no tinySrc provided, behave like normal Image but with our strict settings.
 
     const handleLoad = () => {
         setIsLoaded(true);
@@ -17,15 +22,16 @@ export default function OptimizedImage({ src, tinySrc, alt, className, loader, .
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
             {/* Tiny Placeholder (Blur) */}
-            objectFit: props.style?.objectFit || 'cover',
             {tinySrc && (
                 <Image
                     {...props}
                     src={tinySrc}
-                    alt={`${alt || ''} (placeholder)`}
-                    className={className}
+                    alt={alt || ''}
+                    fill
+                    quality={10} // Extremely low quality for smallest size
+                    priority={props.priority} // Load placeholder fast if main is priority
+                    className={`${className || ''}`}
                     style={{
-                        ...props.style,
                         objectFit: props.style?.objectFit || 'cover',
                         filter: 'blur(20px)',
                         transform: 'scale(1.1)', // Prevent blur edges showing white
@@ -34,7 +40,7 @@ export default function OptimizedImage({ src, tinySrc, alt, className, loader, .
                         position: 'absolute',
                         zIndex: 1
                     }}
-                    unoptimized={true}
+                    unoptimized={true} // Keep distinct from main image cache if needed, or false to use Vercel (user said no vercel usage)
                 />
             )}
 
@@ -43,16 +49,20 @@ export default function OptimizedImage({ src, tinySrc, alt, className, loader, .
                 {...props}
                 src={src}
                 alt={alt || ''}
-                loader={loader}
                 onLoad={handleLoad}
+                decoding="async"
                 className={`${className || ''}`}
                 style={{
                     ...props.style,
                     opacity: isLoaded ? 1 : 0,
-                    transition: 'opacity 0.5s ease-in',
-                    zIndex: 2
+                    transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)', // Even smoother transition
+                    zIndex: 2,
+                    // "HDR" Simulation: Boost contrast & saturation slightly to make it pop
+                    filter: enhance ? 'contrast(1.08) saturate(1.12) brightness(1.02)' : 'none'
                 }}
-            // removed unoptimized={true} to allow loader to generate srcset
+                // User requirement: Do NOT use Vercel optimization (server usage).
+                // "não quero de jeito nenhum que as imagens usem o servidor"
+                unoptimized={true}
             />
         </div>
     );
