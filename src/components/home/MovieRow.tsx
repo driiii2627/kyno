@@ -80,7 +80,8 @@ export default function MovieRow({ title, movies, priority = false, variant = 'd
 
                                 <div className={styles.imageWrapper}>
                                     <Image
-                                        src={getImageUrl(movie.poster_path, 'w500')}
+                                        src={getImageUrl(movie.poster_path, 'w780')}
+                                        unoptimized={true}
                                         alt={movie.title || movie.name || 'Movie'}
                                         fill
                                         className={styles.image}

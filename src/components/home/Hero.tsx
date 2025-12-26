@@ -85,13 +85,14 @@ export default function Hero({ movies }: HeroProps) {
                         className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
                     >
                         <Image
-                            src={getImageUrl(m.backdrop_path || '', 'w1280')}
+                            src={getImageUrl(m.backdrop_path || '', 'original')}
                             alt={m.title || m.name || 'Hero Background'}
                             fill
                             className={styles.image}
                             priority={index === 0} // Only prioritize the first one
                             loading={index === 0 ? 'eager' : 'lazy'}
-                            // "unoptimized" is global in next.config.ts, but explicit here doesn't hurt if we want to be sure
+                            unoptimized={true} // Bypass Vercel optimization completely for MAX quality
+                            quality={100} // Request highest JPG quality if processed
                             sizes="100vw"
                             style={{ objectFit: 'cover' }}
                         />
