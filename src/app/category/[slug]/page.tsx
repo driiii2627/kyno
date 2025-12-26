@@ -23,15 +23,24 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         } else if (slug === 'acao') {
             title = 'Filmes de Ação';
             const allMovies = await contentService.getCatalogMovies();
-            items = allMovies.filter(m => m.genre?.toLowerCase().includes('ação') || m.genre?.toLowerCase().includes('action'));
+            items = allMovies.filter(m => {
+                const combined = (m.genre?.toLowerCase() || '') + ' ' + (m.genres?.map(g => g.name.toLowerCase()).join(' ') || '');
+                return combined.includes('ação') || combined.includes('action');
+            });
         } else if (slug === 'comedia') {
             title = 'Comédia';
             const allMovies = await contentService.getCatalogMovies();
-            items = allMovies.filter(m => m.genre?.toLowerCase().includes('comédia') || m.genre?.toLowerCase().includes('comedy'));
+            items = allMovies.filter(m => {
+                const combined = (m.genre?.toLowerCase() || '') + ' ' + (m.genres?.map(g => g.name.toLowerCase()).join(' ') || '');
+                return combined.includes('comédia') || combined.includes('comedy');
+            });
         } else if (slug === 'terror') {
             title = 'Terror';
             const allMovies = await contentService.getCatalogMovies();
-            items = allMovies.filter(m => m.genre?.toLowerCase().includes('terror') || m.genre?.toLowerCase().includes('horror'));
+            items = allMovies.filter(m => {
+                const combined = (m.genre?.toLowerCase() || '') + ' ' + (m.genres?.map(g => g.name.toLowerCase()).join(' ') || '');
+                return combined.includes('terror') || combined.includes('horror');
+            });
         } else {
             return notFound();
         }

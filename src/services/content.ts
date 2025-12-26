@@ -22,6 +22,7 @@ export interface CatalogItem extends Movie {
     video_url: string;
     supabase_id: string;
     genre?: string;
+    genres?: { id: number; name: string }[];
     duration?: number;
 }
 

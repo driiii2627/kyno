@@ -121,11 +121,19 @@ export default async function Home() {
   const top10Series = hashedSort(topSeriesSource, top10SeriesSeed).slice(0, 10);
 
   // 6. Genres Filtering (From DB Data)
-  // We look for the string in 'genre' field since Supabase stores it as "Action, Adventure..."
-  const actionMovies = catalogMovies.filter(m => m.genre?.toLowerCase().includes('ação') || m.genre?.toLowerCase().includes('action')).slice(0, 15);
-  const comedyMovies = catalogMovies.filter(m => m.genre?.toLowerCase().includes('comédia') || m.genre?.toLowerCase().includes('comedy')).slice(0, 15);
-  // Horror often translated as 'Terror'
-  const horrorMovies = catalogMovies.filter(m => m.genre?.toLowerCase().includes('terror') || m.genre?.toLowerCase().includes('horror')).slice(0, 15);
+  // Check both 'genre' string (Database fallback) and 'genres' array (TMDB Hydrated)
+  const filterByGenre = (items: import('@/services/content').CatalogItem[], keywords: string[]) => {
+    return items.filter(m => {
+      const dbGenre = m.genre?.toLowerCase() || '';
+      const tmdbGenres = m.genres?.map(g => g.name.toLowerCase()).join(' ') || '';
+      const combined = `${dbGenre} ${tmdbGenres}`;
+      return keywords.some(k => combined.includes(k));
+    });
+  };
+
+  const actionMovies = filterByGenre(catalogMovies, ['ação', 'action']).slice(0, 15);
+  const comedyMovies = filterByGenre(catalogMovies, ['comédia', 'comedy']).slice(0, 15);
+  const horrorMovies = filterByGenre(catalogMovies, ['terror', 'horror']).slice(0, 15);
 
 
   return (
