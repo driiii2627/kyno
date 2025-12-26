@@ -61,12 +61,25 @@ async function verifySuperflixContent(tmdbId: number, type: 'movie' | 'tv'): Pro
             ? `${baseUrl}/filme/${tmdbId}`
             : `${baseUrl}/serie/${tmdbId}`;
 
-        const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+        // Use GET to inspect body, not just HEAD status
+        const res = await fetch(url, {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
 
-        // Superflix returns 404 if content page doesn't exist
-        // We can also do a GET and check for specific markers if 200 is unreliable,
-        // but 404 is the standard "not found" for this API structure.
-        return res.status === 200;
+        if (!res.ok) return false;
+
+        const html = await res.text();
+
+        // Strict Check: The page must contain the 'Visualização' button which links to the player.
+        // This is the specific signature of a valid page on this API.
+        // If this is missing, the page is likely a placeholder or 404.
+        const hasPlayerLink = html.includes('class="btn btn-secondary">Visualização</a>');
+
+        return hasPlayerLink;
 
     } catch (e) {
         console.error(`Superflix verification failed for ${type} ${tmdbId}:`, e);
