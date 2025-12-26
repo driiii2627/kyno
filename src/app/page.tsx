@@ -95,19 +95,17 @@ export default async function Home() {
 
   // 2. "Filmes" (Movies): Changes every 6 hours
   // Use hashedSort so adding new movies doesn't reshuffle the old ones completely
-  const moviesSeed = getTimeSeed(6, 'movies');
+  // Changed salt to '_v2' to force a fresh rotation for the user
+  const moviesSeed = getTimeSeed(6, 'movies_v2');
   const dynamicMovies = hashedSort(catalogMovies, moviesSeed);
 
   // 3. "Séries" (Series): Changes every 5 hours
-  const seriesSeed = getTimeSeed(5, 'series');
+  const seriesSeed = getTimeSeed(5, 'series_v2');
   const dynamicSeries = hashedSort(catalogSeries, seriesSeed);
 
-  // 4. "Recomendações" (Recommendations): Personalized, changes every 24h
-  // We use UserID string chars sum as part of the seed
-  let userSalt = 0;
-  for (let i = 0; i < userId.length; i++) userSalt += userId.charCodeAt(i);
-  const recSeed = getTimeSeed(24, 'recommendations') + userSalt;
-  const recommendations = hashedSort(allContent, recSeed).slice(0, 20);
+  // 4. "Recomendações" (Recommendations): True Random (Pure Variety)
+  // Ensures a mix of Movies and Series every time
+  const recommendations = randomShuffle(allContent).slice(0, 20);
 
   // 5. "Top 10" (Weekly): Changes every 7 days (168 hours)
   // We first take the actual top rated (Quality Control)
