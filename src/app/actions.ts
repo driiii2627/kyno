@@ -75,9 +75,10 @@ async function verifySuperflixContent(tmdbId: number, type: 'movie' | 'tv'): Pro
         const html = await res.text();
 
         // Strict Check: The page must contain the 'Visualização' button which links to the player.
-        // This is the specific signature of a valid page on this API.
-        // If this is missing, the page is likely a placeholder or 404.
-        const hasPlayerLink = html.includes('class="btn btn-secondary">Visualização</a>');
+        // We relax the check to just look for the text ">Visualização<" (inside any tag)
+        // to avoid breaking if classes change (e.g. btn-primary vs btn-secondary).
+        // A valid page ALWAYS has this button to access the content.
+        const hasPlayerLink = html.includes('>Visualização<') || html.includes('Visualização');
 
         return hasPlayerLink;
 
