@@ -23,14 +23,19 @@ export default function Navbar() {
         return null; // Don't render navbar on player or details pages
     }
 
+    // Check if we are on a category page
+    const isCategoryPage = pathname?.startsWith('/category/');
+
     return (
-        <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
-            {/* Logo */}
-            <div className={styles.brand}>
-                <Link href="/" className={styles.logo}>
-                    Kyno<span>+</span>
-                </Link>
-            </div>
+        <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`} style={isCategoryPage ? { padding: '1rem', justifyContent: 'center' } : {}}>
+            {/* Logo - Hide on Category Pages */}
+            {!isCategoryPage && (
+                <div className={styles.brand}>
+                    <Link href="/" className={styles.logo}>
+                        Kyno<span>+</span>
+                    </Link>
+                </div>
+            )}
 
             {/* Navigation Links */}
             <div className={styles.navLinks}>
@@ -41,18 +46,20 @@ export default function Navbar() {
                 <Link href="/category/filmes" className={styles.link}>Categorias</Link>
             </div>
 
-            {/* Icons */}
-            <div className={styles.actions}>
-                <button className={styles.iconBtn}>
-                    <Search size={22} />
-                </button>
-                <button className={styles.iconBtn}>
-                    <Bookmark size={22} />
-                </button>
-                <button className={styles.iconBtn}>
-                    <User size={22} />
-                </button>
-            </div>
+            {/* Icons - Hide on Category Pages */}
+            {!isCategoryPage && (
+                <div className={styles.actions}>
+                    <button className={styles.iconBtn}>
+                        <Search size={22} />
+                    </button>
+                    <button className={styles.iconBtn}>
+                        <Bookmark size={22} />
+                    </button>
+                    <button className={styles.iconBtn}>
+                        <User size={22} />
+                    </button>
+                </div>
+            )}
         </nav>
     );
 }
