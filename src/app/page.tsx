@@ -66,6 +66,7 @@ export default async function Home() {
   // Filters: Year >= 2001, Rating >= 5.
   const allContent = [...catalogMovies, ...catalogSeries];
 
+  // Filters: Year >= 2001, Rating >= 5.
   const heroCandidates = allContent.filter(item => {
     const date = item.release_date || item.first_air_date;
     const year = date ? new Date(date).getFullYear() : 0;
@@ -73,9 +74,9 @@ export default async function Home() {
     return year >= 2001 && rating >= 5;
   });
 
-  // Use a random seed for Hero to ensure freshness on every load
-  const heroSeed = Math.random();
-  const heroMovies = seededShuffle(heroCandidates, heroSeed).slice(0, 10);
+  // Use simple random sort for Hero to ensure freshness on every load
+  // seededShuffle may have issues with float seeds from Math.random()
+  const heroMovies = [...heroCandidates].sort(() => Math.random() - 0.5).slice(0, 10);
 
   // 2. "Filmes" (Movies): Changes every 6 hours
   const moviesSeed = getTimeSeed(6, 'movies');
