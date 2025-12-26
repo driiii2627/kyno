@@ -16,9 +16,10 @@ interface MovieRowProps {
     movies: Movie[];
     priority?: boolean;
     variant?: 'default' | 'top10';
+    viewAllLink?: string;
 }
 
-export default function MovieRow({ title, movies, priority = false, variant = 'default' }: MovieRowProps) {
+export default function MovieRow({ title, movies, priority = false, variant = 'default', viewAllLink }: MovieRowProps) {
     const listRef = useRef<HTMLDivElement>(null);
     const isTop10 = variant === 'top10';
 
@@ -45,7 +46,11 @@ export default function MovieRow({ title, movies, priority = false, variant = 'd
                     {isTop10 && <span className={styles.top10Prefix}>TOP 10 </span>}
                     {title}
                 </h2>
-                <a href="#" className={styles.viewAll}>Ver todos <ChevronRight size={16} /></a>
+                {!isTop10 && viewAllLink && (
+                    <Link href={viewAllLink} className={styles.viewAll}>
+                        Ver todos <ChevronRight size={16} />
+                    </Link>
+                )}
             </div>
 
             <div className={styles.container}>

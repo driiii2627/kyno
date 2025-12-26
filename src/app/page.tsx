@@ -113,7 +113,13 @@ export default async function Home() {
 
         {/* Recomendações (Personalized) */}
         {recommendations.length > 0 && (
-          <MovieRow title="Recomendados para Você" movies={recommendations} priority={true} />
+          <MovieRow
+            title="Recomendados para Você"
+            movies={recommendations.slice(0, 15)}
+            priority={true}
+            // Recommendations usually don't have a clean "View All" category, but we could link to 'filmes' or just leave it
+            viewAllLink="/category/filmes"
+          />
         )}
 
         {/* Top 10 Filmes */}
@@ -128,11 +134,19 @@ export default async function Home() {
 
         {/* Rotational Categories */}
         {dynamicMovies.length > 0 && (
-          <MovieRow title="Filmes" movies={dynamicMovies} />
+          <MovieRow
+            title="Filmes"
+            movies={dynamicMovies.slice(0, 15)}
+            viewAllLink="/category/filmes"
+          />
         )}
 
         {dynamicSeries.length > 0 && (
-          <MovieRow title="Séries" movies={dynamicSeries} />
+          <MovieRow
+            title="Séries"
+            movies={dynamicSeries.slice(0, 15)}
+            viewAllLink="/category/series"
+          />
         )}
       </div>
     </div>
