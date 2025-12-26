@@ -112,12 +112,12 @@ export default async function Home() {
 
         {/* Top 10 Filmes */}
         {top10Movies.length > 0 && (
-          <MovieRow title="Top 10 Filmes da Semana" movies={top10Movies} />
+          <MovieRow title="Top 10 Filmes da Semana" movies={top10Movies} variant="top10" />
         )}
 
         {/* Top 10 Séries */}
         {top10Series.length > 0 && (
-          <MovieRow title="Top 10 Séries da Semana" movies={top10Series} />
+          <MovieRow title="Top 10 Séries da Semana" movies={top10Series} variant="top10" />
         )}
 
         {/* Rotational Categories */}
