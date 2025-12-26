@@ -250,24 +250,24 @@
 
 /* Top 10 Variant Overrides */
 
+/* Top 10 Variant Overrides */
+
 .top10List {
-    gap: 6rem;
-    /* Even more space for numbers */
+    gap: 1.5rem;
+    /* Standard gap */
 }
 
 .top10Card {
-    /* Push card to make room for number */
-    margin-left: 1.5rem;
+    /* No special margins needed for overlay style */
+    margin-left: 0;
     overflow: visible !important;
-    /* Allow numbering SVG to hang out */
 }
 
-/* Ensure image wrapper stays on top of the number when static */
 .top10Card .imageWrapper {
-    z-index: 2;
+    /* Normal z-index */
+    z-index: 1;
 }
 
-/* When hovering Top 10 card, ensure number stays valid visually */
 .top10Card:hover .imageWrapper {
     z-index: 100 !important;
 }
