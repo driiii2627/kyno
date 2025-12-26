@@ -11,12 +11,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Home() {
-  const supabase = createServerComponentClient({ cookies });
-
-  // Try to get user session for personalized recommendations
-  // If no user, we fall back to a "Daily" shuffle as a "Recommendations" placeholder
-  const { data: { session } } = await supabase.auth.getSession();
-  const userId = session?.user?.id || 'guest';
+  // Simulating user ID or just using 'guest' for now to avoid Auth complexity on Vercel build
+  const userId = 'guest';
 
   // Fetch real data in parallel
   // We use try/catch to prevent the whole page from crashing if API fails
