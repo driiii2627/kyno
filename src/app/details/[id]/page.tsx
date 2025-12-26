@@ -79,12 +79,12 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     if (candidateIds.length > 0) {
         const { data: validMovies } = await supabase
             .from('movies')
-            .select('id, tmdb_id, title, overview, poster_url, backdrop_url, rating')
+            .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
             .in('tmdb_id', candidateIds);
 
         const { data: validSeries } = await supabase
             .from('series')
-            .select('id, tmdb_id, title, overview, poster_url, backdrop_url, rating')
+            .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
             .in('tmdb_id', candidateIds);
 
         // Map Valid Items to Catalog Schema
@@ -92,7 +92,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             id: m.tmdb_id,
             supabase_id: m.id,
             title: m.title,
-            overview: m.description || m.overview, // Handle DB vs TMDB schema diff
+            overview: m.description, // DB column is description
             poster_path: m.poster_url,
             backdrop_path: m.backdrop_url,
             vote_average: m.rating,
@@ -104,7 +104,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             supabase_id: s.id,
             name: s.title, // Series title in DB
             title: s.title,
-            overview: s.description || s.overview,
+            overview: s.description,
             poster_path: s.poster_url,
             backdrop_path: s.backdrop_url,
             vote_average: s.rating,
