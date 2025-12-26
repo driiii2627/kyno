@@ -3,8 +3,8 @@ import MovieRow from '@/components/home/MovieRow';
 import { tmdb } from '@/services/tmdb';
 import { contentService } from '@/services/content';
 import { seededShuffle, getTimeSeed } from '@/lib/utils';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+// import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'; // Removed to fix build
+// import { cookies } from 'next/headers';
 
 // Force dynamic rendering to ensure randomization happens on every request
 export const dynamic = 'force-dynamic';
