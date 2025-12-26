@@ -5,9 +5,10 @@ import Image, { ImageProps } from 'next/image';
 
 interface OptimizedImageProps extends Omit<ImageProps, 'onLoad'> {
     tinySrc?: string; // URL for the tiny blur placeholder
+    enhance?: boolean; // New prop for visuals
 }
 
-export default function OptimizedImage({ src, tinySrc, alt, className, ...props }: OptimizedImageProps) {
+export default function OptimizedImage({ src, tinySrc, alt, className, enhance = true, ...props }: OptimizedImageProps) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     // If priority is true, we might want to skip the blur effect or handle it differently.
@@ -49,12 +50,15 @@ export default function OptimizedImage({ src, tinySrc, alt, className, ...props 
                 src={src}
                 alt={alt || ''}
                 onLoad={handleLoad}
+                decoding="async"
                 className={`${className || ''}`}
                 style={{
                     ...props.style,
                     opacity: isLoaded ? 1 : 0,
-                    transition: 'opacity 0.5s ease-in',
-                    zIndex: 2
+                    transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)', // Even smoother transition
+                    zIndex: 2,
+                    // "HDR" Simulation: Boost contrast & saturation slightly to make it pop
+                    filter: enhance ? 'contrast(1.08) saturate(1.12) brightness(1.02)' : 'none'
                 }}
                 // User requirement: Do NOT use Vercel optimization (server usage).
                 // "não quero de jeito nenhum que as imagens usem o servidor"
