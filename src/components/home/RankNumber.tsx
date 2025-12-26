@@ -20,23 +20,35 @@ export default function RankNumber({ rank }: { rank: number }) {
         >
             <defs>
                 <linearGradient id="rankGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#444" />
-                    <stop offset="100%" stopColor="#111" />
+                    <stop offset="0%" stopColor="#FFFFFF" />
+                    <stop offset="100%" stopColor="#999999" />
                 </linearGradient>
             </defs>
             <text
-                x="110" // Align right to push against the card
-                y="145" // Bottom align roughly
+                x="130" // Push more to the right to be visible
+                y="145" // Keep vertical alignment
                 textAnchor="end"
                 fontFamily="'Inter', 'Roboto', sans-serif"
                 fontWeight="900"
                 fontSize="220"
-                fill="url(#rankGradient)" // Dark gradient fill
-                stroke="#666" // Subtle highlight stroke
-                strokeWidth="2"
-                style={{
-                    textShadow: '4px 4px 10px rgba(0,0,0,0.8)'
-                }}
+                fill="none" // Outline style mostly
+                stroke="url(#rankGradient)" // Silver stroke
+                strokeWidth="4"
+                className="rank-text"
+            >
+                {rank}
+            </text>
+            {/* Inner fill for better contrast */}
+            <text
+                x="130"
+                y="145"
+                textAnchor="end"
+                fontFamily="'Inter', 'Roboto', sans-serif"
+                fontWeight="900"
+                fontSize="220"
+                fill="#000" // Dark fill inside
+                fillOpacity="0.5"
+                stroke="none"
             >
                 {rank}
             </text>

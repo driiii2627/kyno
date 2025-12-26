@@ -251,8 +251,8 @@
 /* Top 10 Variant Overrides */
 
 .top10List {
-    gap: 5rem;
-    /* More space for numbers */
+    gap: 6rem;
+    /* Even more space for numbers */
 }
 
 .top10Card {
