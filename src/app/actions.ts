@@ -51,36 +51,53 @@ export async function getSeason(tvId: number, seasonNumber: number) {
     };
 }
 
+// Simple in-memory cache to avoid fetching the huge list on every request
+// In a serverless environment, this persists only for the lifetime of the container
+const validIdsCache: {
+    movie: { timestamp: number; ids: Set<string> } | null;
+    tv: { timestamp: number; ids: Set<string> } | null;
+} = {
+    movie: null,
+    tv: null
+};
+
+const CACHE_DURATION = 1000 * 60 * 60; // 1 hour
+
 /**
- * Verify if content exists on Superflix API
+ * Verify if content exists on Superflix API using the /lista endpoint
  */
 async function verifySuperflixContent(tmdbId: number, type: 'movie' | 'tv'): Promise<boolean> {
     try {
-        const baseUrl = 'https://superflixapi.buzz'; // Could use config, but keeping it simple for server action
-        const url = type === 'movie'
-            ? `${baseUrl}/filme/${tmdbId}`
-            : `${baseUrl}/serie/${tmdbId}`;
+        const category = type === 'movie' ? 'movie' : 'serie';
 
-        // Use GET to inspect body, not just HEAD status
-        const res = await fetch(url, {
-            method: 'GET',
-            cache: 'no-store',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
-        });
+        // 1. Check Cache
+        const cached = validIdsCache[type];
+        if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+            return cached.ids.has(tmdbId.toString());
+        }
 
-        if (!res.ok) return false;
+        // 2. Fetch Fresh List
+        const url = `https://superflixapi.buzz/lista?category=${category}&type=tmdb&format=json`;
+        console.log(`Fetching Superflix list for ${category}...`);
 
-        const html = await res.text();
+        const res = await fetch(url, { method: 'GET', cache: 'no-store' });
 
-        // Strict Check: The page must contain the 'Visualização' button which links to the player.
-        // We relax the check to just look for the text ">Visualização<" (inside any tag)
-        // to avoid breaking if classes change (e.g. btn-primary vs btn-secondary).
-        // A valid page ALWAYS has this button to access the content.
-        const hasPlayerLink = html.includes('>Visualização<') || html.includes('Visualização');
+        if (!res.ok) {
+            console.error("Superflix list fetch failed:", res.status);
+            return false;
+        }
 
-        return hasPlayerLink;
+        const idsArray: string[] = await res.json();
+        const idsSet = new Set(idsArray);
+
+        // 3. Update Cache
+        validIdsCache[type] = {
+            timestamp: Date.now(),
+            ids: idsSet
+        };
+
+        // 4. Verify
+        return idsSet.has(tmdbId.toString());
 
     } catch (e) {
         console.error(`Superflix verification failed for ${type} ${tmdbId}:`, e);
