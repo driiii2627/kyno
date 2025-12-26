@@ -5,16 +5,16 @@ import React from 'react';
 export default function RankNumber({ rank }: { rank: number }) {
     return (
         <svg
-            width="140"
-            height="180"
-            viewBox="0 0 140 180"
+            width="160"
+            height="280"
+            viewBox="0 0 160 280"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             style={{
                 position: 'absolute',
-                left: '-60px', /* Adjust overlap */
-                bottom: '0',
-                zIndex: -1 /* Behind the card */
+                left: '-70px', /* Adjust overlap slightly more for the wider box */
+                bottom: '-20px', /* Adjust vertical alignment */
+                zIndex: -1
             }}
             className="rank-number"
         >
@@ -25,28 +25,27 @@ export default function RankNumber({ rank }: { rank: number }) {
                 </linearGradient>
             </defs>
             <text
-                x="130" // Push more to the right to be visible
-                y="145" // Keep vertical alignment
+                x="150"
+                y="240"
                 textAnchor="end"
                 fontFamily="'Inter', 'Roboto', sans-serif"
                 fontWeight="900"
-                fontSize="220"
-                fill="none" // Outline style mostly
-                stroke="url(#rankGradient)" // Silver stroke
+                fontSize="240"
+                fill="none"
+                stroke="url(#rankGradient)"
                 strokeWidth="4"
                 className="rank-text"
             >
                 {rank}
             </text>
-            {/* Inner fill for better contrast */}
             <text
-                x="130"
-                y="145"
+                x="150"
+                y="240"
                 textAnchor="end"
                 fontFamily="'Inter', 'Roboto', sans-serif"
                 fontWeight="900"
-                fontSize="220"
-                fill="#000" // Dark fill inside
+                fontSize="240"
+                fill="#000"
                 fillOpacity="0.5"
                 stroke="none"
             >
