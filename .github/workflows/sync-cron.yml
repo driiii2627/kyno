@@ -1,0 +1,15 @@
+name: Weekly Metadata Sync
+
+on:
+  schedule:
+    # Runs at 00:00 on Monday (UTC)
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel API
+        run: |
+          curl -X GET "https://kynoo.vercel.app/api/cron/sync-metadata?key=${{ secrets.CRON_SECRET }}"
