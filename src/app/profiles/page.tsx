@@ -83,8 +83,9 @@ export default function ProfilesPage() {
     const [newAvatar, setNewAvatar] = useState(AVATAR_CATEGORIES['Original Kyno+'][0]);
     const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
-    // Dynamic Theme State (replaces simple themeColor)
+    // Dynamic Theme State
     const [bgStyle, setBgStyle] = useState<React.CSSProperties>({});
+    const [profileColors, setProfileColors] = useState<Record<string, string>>({});
 
     // Auth/Status
     const [turnstileToken, setTurnstileToken] = useState('');
@@ -99,6 +100,7 @@ export default function ProfilesPage() {
         if (!ENABLE_DYNAMIC_THEME) return;
 
         const updateBackground = async () => {
+            // 1. EDIT / CREATE MODE
             if (view === 'CREATE' || view === 'EDIT') {
                 if (newAvatar) {
                     const color = await getDominantColor(newAvatar);
@@ -106,14 +108,23 @@ export default function ProfilesPage() {
                         setBgStyle({
                             background: `radial-gradient(circle at center, ${color} 0%, #020617 100%)`
                         });
+                        // Store single color for edit icon/accents
+                        setProfileColors({ temp: color });
                     }
                 }
             } else {
-                // SELECT MODE: Blend colors from all profiles
+                // 2. SELECT MODE: Blend colors from all profiles
                 if (profiles.length > 0) {
+                    const colorsMap: Record<string, string> = {};
                     const colors = await Promise.all(
-                        profiles.map(p => getDominantColor(p.avatar_url))
+                        profiles.map(async p => {
+                            const c = await getDominantColor(p.avatar_url);
+                            if (c) colorsMap[p.id] = c;
+                            return c;
+                        })
                     );
+
+                    setProfileColors(colorsMap);
 
                     const validColors = colors.filter(c => c !== null) as string[];
 
@@ -128,7 +139,6 @@ export default function ProfilesPage() {
                         });
                     } else {
                         // Create a mesh/blend of colors
-                        // Example: Radial gradients at different positions
                         const positions = [
                             'top left', 'top right', 'bottom left', 'bottom right', 'center'
                         ];
@@ -138,7 +148,6 @@ export default function ProfilesPage() {
                             return `radial-gradient(circle at ${pos}, ${color} 0%, transparent 60%)`;
                         });
 
-                        // Add base dark layer at the end
                         setBgStyle({
                             background: `${gradients.join(', ')}, #020617`
                         });
@@ -252,6 +261,8 @@ export default function ProfilesPage() {
     }
 
     if (view === 'CREATE' || view === 'EDIT') {
+        const accentColor = profileColors['temp'] || '#0ea5e9'; // Fallback to blue if needed
+
         return (
             <div className={styles.container} style={bgStyle}>
                 <div className={styles.editContainer}>
@@ -266,10 +277,21 @@ export default function ProfilesPage() {
 
                     <div className={styles.editContent}>
                         <div className={styles.editAvatarPreview}>
-                            <img src={newAvatar} alt="Avatar" className={styles.previewImage} crossOrigin="anonymous" />
+                            <img
+                                src={newAvatar}
+                                alt="Avatar"
+                                className={styles.previewImage}
+                                crossOrigin="anonymous"
+                                style={{ borderColor: accentColor }}
+                            />
                             <div
                                 className={styles.editIcon}
                                 onClick={() => setShowAvatarPicker(true)}
+                                style={{
+                                    background: accentColor,
+                                    borderColor: accentColor,
+                                    boxShadow: `0 0 20px ${accentColor}40` // Optional glow
+                                }}
                             >
                                 <Edit2 size={24} />
                             </div>
@@ -283,6 +305,7 @@ export default function ProfilesPage() {
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
                                     maxLength={20}
+                                    style={{ borderColor: newName ? accentColor : undefined }}
                                 />
                             </div>
 
@@ -301,6 +324,7 @@ export default function ProfilesPage() {
                                     className={styles.saveButton}
                                     onClick={handleSave}
                                     disabled={processing}
+                                    style={{ background: accentColor }}
                                 >
                                     {processing ? 'Salvando...' : 'Salvar'}
                                 </button>
@@ -337,7 +361,12 @@ export default function ProfilesPage() {
                         <div className={styles.pickerScrollContent}>
                             {Object.entries(AVATAR_CATEGORIES).map(([category, urls]) => (
                                 <div key={category} className={styles.categorySection}>
-                                    <h3 className={styles.categoryTitle}>{category}</h3>
+                                    <h3
+                                        className={styles.categoryTitle}
+                                        style={{ borderLeftColor: accentColor }}
+                                    >
+                                        {category}
+                                    </h3>
                                     <div className={styles.pickerGrid}>
                                         {urls.map((av, idx) => (
                                             <img
@@ -348,6 +377,7 @@ export default function ProfilesPage() {
                                                     setNewAvatar(av);
                                                     setShowAvatarPicker(false);
                                                 }}
+                                                style={{ borderColor: newAvatar === av ? accentColor : 'transparent' }}
                                             />
                                         ))}
                                     </div>
@@ -365,29 +395,41 @@ export default function ProfilesPage() {
             <h1 className={styles.title}>Quem está assistindo?</h1>
 
             <div className={styles.profileGrid}>
-                {profiles.map(profile => (
-                    <div
-                        key={profile.id}
-                        className={styles.profileCard}
-                        onClick={() => handleSelectProfile(profile.id)}
-                        style={{ opacity: enteringProfileId && enteringProfileId !== profile.id ? 0.3 : 1 }}
-                    >
-                        <div className={styles.avatarWrapper}>
-                            <img src={profile.avatar_url} alt={profile.name} className={styles.avatar} />
-                            {isManaging && (
-                                <div className={styles.editOverlay}>
-                                    <Edit2 size={32} />
-                                </div>
-                            )}
-                            {enteringProfileId === profile.id && (
-                                <div className={styles.cardSpinner}>
-                                    <div className={styles.spinnerSmall}></div>
-                                </div>
-                            )}
+                {profiles.map(profile => {
+                    const pColor = profileColors[profile.id]; // Get dynamic color for this profile
+
+                    return (
+                        <div
+                            key={profile.id}
+                            className={styles.profileCard}
+                            onClick={() => handleSelectProfile(profile.id)}
+                            style={{ opacity: enteringProfileId && enteringProfileId !== profile.id ? 0.3 : 1 }}
+                        >
+                            <div
+                                className={styles.avatarWrapper}
+                                style={isManaging && pColor ? { borderColor: pColor } : {}}
+                            >
+                                <img src={profile.avatar_url} alt={profile.name} className={styles.avatar} />
+                                {isManaging && (
+                                    <div className={styles.editOverlay} style={{ color: pColor || '#fff' }}>
+                                        <Edit2 size={32} />
+                                    </div>
+                                )}
+                                {enteringProfileId === profile.id && (
+                                    <div className={styles.cardSpinner}>
+                                        <div className={styles.spinnerSmall}></div>
+                                    </div>
+                                )}
+                            </div>
+                            <span
+                                className={styles.profileName}
+                                style={enteringProfileId === profile.id ? { color: pColor } : {}}
+                            >
+                                {enteringProfileId === profile.id ? 'Entrando...' : profile.name}
+                            </span>
                         </div>
-                        <span className={styles.profileName}>{enteringProfileId === profile.id ? 'Entrando...' : profile.name}</span>
-                    </div>
-                ))}
+                    );
+                })}
 
                 {profiles.length < 3 && !isManaging && (
                     <div
