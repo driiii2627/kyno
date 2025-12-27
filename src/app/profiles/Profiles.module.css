@@ -226,7 +226,6 @@
     justify-content: center;
     background: transparent;
     border-radius: 12px;
-    overflow: hidden;
     margin: 0 auto;
     width: 100%;
 }
@@ -466,6 +465,12 @@
         font-size: 2.5rem;
     }
 
+    /* Turnstile fix */
+    .turnstileWrapper {
+        overflow: visible;
+    }
+
+    /* Mobile Flex Wrapping */
     .profileGrid {
         gap: 1.5rem;
     }
@@ -473,7 +478,10 @@
     .profileCard,
     .avatarWrapper,
     .addButton {
-        width: 120px;
-        height: 120px;
+        width: 130px;
+        /* Slight adjust */
+        height: 130px;
+        flex-shrink: 0;
+        /* Prevent squashing */
     }
 }
