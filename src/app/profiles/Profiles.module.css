@@ -1,3 +1,4 @@
+/* Main Container */
 .container {
     display: flex;
     flex-direction: column;
@@ -5,24 +6,29 @@
     justify-content: center;
     min-height: 100vh;
     padding: 2rem;
+    background: #141414;
+    /* Netflix dark background */
+    color: #fff;
     animation: fadeIn 0.5s ease;
 }
 
 .title {
     font-size: 3.5rem;
-    font-weight: 500;
+    font-weight: 400;
     color: #fff;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     text-align: center;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
 }
 
+/* Profile Grid */
 .profileGrid {
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
     justify-content: center;
     align-items: flex-start;
+    max-width: 1200px;
 }
 
 .profileCard {
@@ -31,18 +37,29 @@
     align-items: center;
     gap: 1rem;
     cursor: pointer;
-    position: relative;
+    group: relative;
+    width: 154px;
+    /* Fixed width for consistency */
 }
 
 .avatarWrapper {
-    width: 150px;
-    height: 150px;
-    border-radius: 12px;
+    width: 154px;
+    height: 154px;
+    border-radius: 4px;
+    /* Default square-ish like Netflix */
     overflow: hidden;
     position: relative;
     border: 3px solid transparent;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     background: #111;
+}
+
+/* Netflix avatars are usually square with slight radius, but user reference showed circles. 
+   User said "Netflix-style" and sent reference images. 
+   Ref image 1: Circular avatars. Ref image 3: Circular in grid. 
+   I will use Circular as per Reference images. */
+.avatarWrapper {
+    border-radius: 50%;
 }
 
 .avatar {
@@ -53,14 +70,19 @@
 
 .profileName {
     color: #808080;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     transition: color 0.3s ease;
     text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
 }
 
 .profileCard:hover .avatarWrapper {
     border-color: #fff;
     transform: scale(1.05);
+    /* Slight grow */
 }
 
 .profileCard:hover .profileName {
@@ -69,34 +91,18 @@
 
 /* Add Button */
 .addButton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    /* Circular for add button similar to ref? Or square? Ref usage circles */
-    /* Ref image has circular profiles. User said "like ref". */
-    /* Wait, ref image has CIRCULAR avatars. My code above used square with radius. */
-    /* Let's make avatars circular to match reference image strictly. */
-}
-
-/* Update to Circular */
-.avatarWrapper {
-    border-radius: 50%;
-    /* Circle */
-}
-
-.addButton {
     border-radius: 50%;
     border: 2px solid #808080;
+    /* Subtle border */
     background: transparent;
     color: #808080;
-    font-size: 4rem;
+    font-size: 5rem;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 154px;
+    height: 154px;
 }
 
 .addButton:hover {
@@ -111,12 +117,13 @@
     background: transparent;
     border: 1px solid #808080;
     color: #808080;
-    padding: 0.5rem 1.5rem;
+    padding: 0.6rem 2rem;
     font-size: 1.1rem;
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .manageButton:hover {
@@ -124,40 +131,67 @@
     color: #fff;
 }
 
-/* Modal / Form */
-.modalOverlay {
-    position: fixed;
+/* Overlays (Edit Mode) */
+.editOverlay {
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 2rem;
 }
 
-.modal {
-    background: #000;
-    padding: 2rem;
-    border-radius: 8px;
+/* CREATE / EDIT SCREEN (Full Page Feel) */
+.editContainer {
     width: 100%;
-    max-width: 500px;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.editHeader {
+    text-align: left;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.editTitle {
+    font-size: 4rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.editContent {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+}
+
+/* Left Form */
+.editForm {
+    flex: 2;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.modalTitle {
-    color: #fff;
-    font-size: 2rem;
-    margin-bottom: 1rem;
+.inputGroup {
+    background: #333;
+    padding: 0.5rem 1rem;
+    border-radius: 0;
+    /* Boxy like ref */
 }
 
 .input {
-    background: #333;
+    background: #666;
     border: none;
     padding: 1rem;
     color: #fff;
@@ -166,56 +200,179 @@
     outline: none;
 }
 
-.avatarGrid {
+.input::placeholder {
+    color: #ccc;
+}
+
+/* Right Avatar Preview */
+.editAvatarPreview {
+    flex: 1;
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
 }
 
-.gridAvatar {
-    width: 60px;
-    height: 60px;
+.previewImage {
+    width: 180px;
+    height: 180px;
+    border-radius: 4px;
+    /* Square for edit preview as per ref? Ref implies square-ish. Let's stick to consistent circle if main is circle, but ref image 4 shows circle avatar. */
     border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    opacity: 0.7;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    object-fit: cover;
 }
 
-.gridAvatar.selected {
-    border-color: #fff;
-    opacity: 1;
-    transform: scale(1.1);
+.editIcon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    /* Or centered? Ref has green pencil. */
+    background: #fff;
+    color: #000;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .actionButtons {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
+    margin-top: 2rem;
 }
 
 .saveButton {
     background: #fff;
     color: #000;
-    padding: 0.5rem 1.5rem;
-    font-weight: bold;
+    padding: 0.8rem 2rem;
+    font-weight: 700;
     font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.saveButton:hover {
+    background: #c00;
+    /* Maybe red? Or keep white. Ref has white/black. */
+    background: #e50914;
+    /* Netflix Red */
+    color: #fff;
 }
 
 .cancelButton {
     background: transparent;
     border: 1px solid #808080;
     color: #808080;
-    padding: 0.5rem 1.5rem;
+    padding: 0.8rem 2rem;
     font-size: 1.1rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.cancelButton:hover {
+    border-color: #fff;
+    color: #fff;
+}
+
+/* Avatar Grid Overlay (Picker) */
+.pickerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #141414;
+    z-index: 200;
+    padding: 3rem;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease;
+}
+
+.pickerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+}
+
+.pickerGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1px));
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.pickerItem {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 3px solid transparent;
+}
+
+.pickerItem:hover {
+    transform: scale(1.1);
+    border-color: #fff;
+}
+
+/* Loading Helper */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #141414;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-left-color: #e50914;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: scale(1.1);
     }
 
     to {
         opacity: 1;
-        transform: scale(1);
+    }
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .editContent {
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+
+    .editAvatarPreview {
+        margin-bottom: 2rem;
+    }
+
+    .title {
+        font-size: 2.5rem;
     }
 }

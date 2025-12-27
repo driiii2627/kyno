@@ -117,12 +117,12 @@ export async function switchProfileAction(profileId: string) {
     const cookieStore = await cookies();
     cookieStore.set('kyno_active_profile', profileId, {
         path: '/',
-        httpOnly: false, // Accessible by client if needed, or secure
+        httpOnly: false, // Accessible by client
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 30 // 30 days
     });
 
-    return { success: true };
+    redirect('/');
 }
 
 export async function getActiveProfileAction() {
