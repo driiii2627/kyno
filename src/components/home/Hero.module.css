@@ -1,4 +1,4 @@
-/* Preserve existing styles, just appending the button style */
+/* Preserve existing styles */
 .hero {
     position: relative;
     width: 100%;
@@ -33,6 +33,14 @@
     transition: opacity 1s ease-in-out, transform 8s linear;
     /* Smooth fade + Slow zoom effect */
     transform: scale(1);
+}
+
+/* NEW: Image class for OptimizedImage wrapper */
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .heroImage.active {
