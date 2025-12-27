@@ -1,16 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './AuthForm.module.css';
 import Turnstile from './Turnstile';
 import { useRouter } from 'next/navigation';
 
 interface AuthFormProps {
     loginCode: string;
-    onLogin: (formData: FormData) => Promise<{ error?: string }>;
-    onRegister: (formData: FormData) => Promise<{ error?: string; autoLogin?: boolean }>;
+    onLogin: (formData: FormData) => Promise<{ error?: string; blockedUntil?: string }>;
+    onRegister: (formData: FormData) => Promise<{ error?: string; autoLogin?: boolean; blockedUntil?: string }>;
     siteKey: string;
 }
+
+const ALLOWED_DOMAINS = ['gmail.com', 'outlook.com', 'hotmail.com', 'live.com', 'yahoo.com', 'icloud.com', 'proton.me', 'protonmail.com'];
 
 export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: AuthFormProps) {
     const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -20,7 +22,33 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [blockedUntil, setBlockedUntil] = useState<Date | null>(null);
+    const [timeLeft, setTimeLeft] = useState<string>('');
+
     const router = useRouter();
+
+    // Rate Limit Timer
+    useEffect(() => {
+        if (!blockedUntil) return;
+
+        const interval = setInterval(() => {
+            const now = new Date();
+            const diff = blockedUntil.getTime() - now.getTime();
+
+            if (diff <= 0) {
+                setBlockedUntil(null);
+                setTimeLeft('');
+                clearInterval(interval);
+                return;
+            }
+
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            setTimeLeft(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [blockedUntil]);
 
     const calculatePasswordStrength = (pwd: string) => {
         let score = 0;
@@ -42,6 +70,12 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
     const strength = calculatePasswordStrength(password);
     const isPasswordStrongEnough = strength.score >= 3;
 
+    const isEmailValid = (e: string) => {
+        if (!e) return true;
+        const domain = e.split('@')[1]?.toLowerCase();
+        return ALLOWED_DOMAINS.includes(domain);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -55,10 +89,17 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
             return;
         }
 
-        if (mode === 'register' && !isPasswordStrongEnough) {
-            setError('A senha precisa ser mais forte.');
-            setLoading(false);
-            return;
+        if (mode === 'register') {
+            if (!isPasswordStrongEnough) {
+                setError('A senha precisa ser mais forte.');
+                setLoading(false);
+                return;
+            }
+            if (!isEmailValid(email)) {
+                setError('Domínio de e-mail não permitido (apenas Gmail, Outlook, Yahoo, etc).');
+                setLoading(false);
+                return;
+            }
         }
 
         const formData = new FormData();
@@ -72,6 +113,9 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                 const result = await onLogin(formData);
                 if (result.error) {
                     setError(result.error);
+                    if (result.blockedUntil) {
+                        setBlockedUntil(new Date(result.blockedUntil));
+                    }
                     // Reset token on error
                     if (window.turnstile) {
                         window.turnstile.reset();
@@ -79,9 +123,11 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                     }
                 } else {
                     setSuccess('Bem vindo de volta! Redirecionando...');
+                    // Keep loading true to show overlay
                     setTimeout(() => {
                         router.refresh();
-                    }, 1000);
+                    }, 2000); // 2s delay as requested
+                    return;
                 }
             } else {
                 // Register Mode
@@ -89,6 +135,9 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
 
                 if (result.error) {
                     setError(result.error);
+                    if (result.blockedUntil) {
+                        setBlockedUntil(new Date(result.blockedUntil));
+                    }
                     if (window.turnstile) {
                         window.turnstile.reset();
                         setToken('');
@@ -99,7 +148,8 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                         setSuccess('Bem vindo! Redirecionando...');
                         setTimeout(() => {
                             router.refresh();
-                        }, 1000);
+                        }, 2000);
+                        return;
                     } else {
                         // User needs to login manually
                         setMode('login');
@@ -114,7 +164,6 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
             }
         } catch (err) {
             setError('Ocorreu um erro inesperado. Tente novamente.');
-            setLoading(false);
         } finally {
             if (!success) setLoading(false);
         }
@@ -128,8 +177,27 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
         if (window.turnstile) window.turnstile.reset();
     };
 
+    if (blockedUntil) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.rateLimitContainer}>
+                    <div className={styles.timer}>{timeLeft}</div>
+                    <p className={styles.timerLabel}>Muitas tentativas. Aguarde para tentar novamente.</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.container}>
+            {/* Loading Overlay */}
+            {success && (
+                <div className={styles.loadingOverlay}>
+                    <div className={styles.spinner}></div>
+                    <div className={styles.loadingText}>Entrando...</div>
+                </div>
+            )}
+
             <header className={styles.header}>
                 <h1 className={styles.title}>Kyno+</h1>
                 <p className={styles.subtitle}>Acesse sua conta para continuar</p>
@@ -161,6 +229,11 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                         placeholder="seu@email.com"
                         required
                     />
+                    {mode === 'register' && email && !isEmailValid(email) && (
+                        <span style={{ fontSize: '0.75rem', color: '#eab308', marginTop: '4px' }}>
+                            Apenas e-mails confiáveis (Gmail, Outlook, Yahoo...)
+                        </span>
+                    )}
                 </div>
 
                 <div className={styles.inputGroup}>
@@ -201,7 +274,9 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
 
                 {error && <div className={styles.error}>{error}</div>}
 
-                {success && (
+                {/* We can hide the static success box if we have the overlay, or keep it. 
+                    The overlay covers everything so this might not be seen, but good for 'Create Account' success */}
+                {success && !success.includes('Redirecionando') && (
                     <div style={{
                         backgroundColor: 'rgba(34, 197, 94, 0.2)',
                         border: '1px solid #22c55e',
@@ -222,7 +297,7 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                     disabled={
                         loading ||
                         !token ||
-                        (mode === 'register' && !isPasswordStrongEnough)
+                        (mode === 'register' && (!isPasswordStrongEnough || !isEmailValid(email)))
                     }
                 >
                     {loading ? 'Processando...' : (mode === 'login' ? 'Entrar' : 'Criar Conta')}

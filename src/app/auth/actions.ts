@@ -4,6 +4,13 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+const ALLOWED_DOMAINS = ['gmail.com', 'outlook.com', 'hotmail.com', 'live.com', 'yahoo.com', 'icloud.com', 'proton.me', 'protonmail.com'];
+
+function isEmailAllowed(email: string) {
+    const domain = email.split('@')[1]?.toLowerCase();
+    return ALLOWED_DOMAINS.includes(domain);
+}
+
 export async function loginAction(formData: FormData) {
     const email = String(formData.get('email'));
     const password = String(formData.get('password'));
@@ -13,7 +20,41 @@ export async function loginAction(formData: FormData) {
     const headerList = await headers();
     const ip = headerList.get('x-forwarded-for') || '127.0.0.1';
 
-    // 0. Verify Cloudflare Turnstile
+    // 0. Rate Limit Check (4 attempts, 2 minutes block)
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() { return cookieStore.getAll(); },
+                setAll(cookiesToSet) {
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        );
+                    } catch { }
+                },
+            },
+        }
+    );
+
+    const { data: limitData, error: limitError } = await supabase.rpc('check_and_update_rate_limit', {
+        request_ip: ip,
+        request_email: email,
+        request_type: 'login',
+        max_attempts: 4,
+        block_duration_seconds: 120
+    });
+
+    if (limitData && !limitData.allowed) {
+        return {
+            error: 'Muitas tentativas falhas. Tente novamente mais tarde.',
+            blockedUntil: limitData.blocked_until
+        };
+    }
+
+    // 1. Verify Cloudflare Turnstile
     const secretKey = process.env.TURNSTILE_SECRET_KEY;
     if (!secretKey) return { error: 'Configuração de servidor inválida.' };
 
@@ -32,39 +73,22 @@ export async function loginAction(formData: FormData) {
         return { error: 'Falha na verificação de segurança (Captcha).' };
     }
 
-    // 1. Validate Credentials
-    const cookieStore = await cookies();
-
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll();
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        );
-                    } catch {
-                    }
-                },
-            },
-        }
-    );
-
+    // 2. Validate Credentials
     const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
     });
 
     if (error) {
-        // Retornar a mensagem exata do erro para ajudar no debug (ex: Email not confirmed)
         console.error('Login Error:', error.message);
         return { error: error.message };
     }
+
+    // Success: Reset rate limit
+    await supabase.rpc('reset_rate_limit', {
+        request_ip: ip,
+        request_type: 'login'
+    });
 
     return { success: true };
 }
@@ -75,8 +99,46 @@ export async function registerAction(formData: FormData) {
     const code = String(formData.get('code'));
     const turnstileToken = String(formData.get('cf-turnstile-response'));
 
+    if (!isEmailAllowed(email)) {
+        return { error: 'Domínio de e-mail não permitido. Use Gmail, Outlook, Yahoo, etc.' };
+    }
+
     const headerList = await headers();
     const ip = headerList.get('x-forwarded-for') || '127.0.0.1';
+
+    // 0. Rate Limit Check (9 attempts, 2 minutes block)
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() { return cookieStore.getAll(); },
+                setAll(cookiesToSet) {
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        );
+                    } catch { }
+                },
+            },
+        }
+    );
+
+    const { data: limitData } = await supabase.rpc('check_and_update_rate_limit', {
+        request_ip: ip,
+        request_email: email,
+        request_type: 'register',
+        max_attempts: 9,
+        block_duration_seconds: 120
+    });
+
+    if (limitData && !limitData.allowed) {
+        return {
+            error: 'Muitas tentativas de cadastro. Aguarde um momento.',
+            blockedUntil: limitData.blocked_until
+        };
+    }
 
     // 1. Verify Cloudflare Turnstile
     const secretKey = process.env.TURNSTILE_SECRET_KEY;
@@ -98,29 +160,7 @@ export async function registerAction(formData: FormData) {
     }
 
     // 2. Check IP Limit && Create Account
-    const cookieStore = await cookies();
-
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll();
-                },
-                setAll(cookiesToSet) {
-                    try {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            cookieStore.set(name, value, options)
-                        );
-                    } catch {
-                    }
-                },
-            },
-        }
-    );
-
-    const { data: isAllowed, error: rpcError } = await supabase.rpc('check_ip_registration_rate_limit', {
+    const { data: isAllowed } = await supabase.rpc('check_ip_registration_rate_limit', {
         request_ip: ip
     });
 
@@ -165,14 +205,13 @@ export async function registerAction(formData: FormData) {
             });
 
             if (signInError) {
-                // Should not happen if creation was successful, but just in case
                 console.error("Auto-login failed after admin creation", signInError);
             } else {
                 authData.session = signInData.session;
             }
         }
     } else {
-        // Fallback to standard flow (confirms via email if enabled in Supabase)
+        // Fallback to standard flow
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
@@ -193,13 +232,17 @@ export async function registerAction(formData: FormData) {
             registration_ip: ip,
             last_ip: ip
         });
+
+        // Reset rate limit on success
+        await supabase.rpc('reset_rate_limit', {
+            request_ip: ip,
+            request_type: 'register'
+        });
     }
 
-    // Se tiver sessão, foi logado automaticamente
     if (authData.session) {
         return { success: true, autoLogin: true };
     }
 
-    // Se não tiver sessão (e usou o fallback), provavelmente requer confirmação de email
     return { success: true, autoLogin: false };
 }
