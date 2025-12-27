@@ -19,11 +19,13 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
     const [token, setToken] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
         setLoading(true);
 
         const formData = new FormData();
@@ -65,7 +67,7 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                     } else {
                         // User needs to login manually
                         setMode('login');
-                        setError('Conta criada com sucesso! Faça login para continuar.');
+                        setSuccess('Conta criada com sucesso! Faça login para continuar.');
                         setPassword('');
                         if (window.turnstile) {
                             window.turnstile.reset();
@@ -91,13 +93,13 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
             <div className={styles.tabs}>
                 <button
                     className={`${styles.tab} ${mode === 'login' ? styles.activeTab : ''}`}
-                    onClick={() => { setMode('login'); setError(null); }}
+                    onClick={() => { setMode('login'); setError(null); setSuccess(null); }}
                 >
                     Entrar
                 </button>
                 <button
                     className={`${styles.tab} ${mode === 'register' ? styles.activeTab : ''}`}
-                    onClick={() => { setMode('register'); setError(null); }}
+                    onClick={() => { setMode('register'); setError(null); setSuccess(null); }}
                 >
                     Criar Conta
                 </button>
@@ -141,6 +143,21 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                 )}
 
                 {error && <div className={styles.error}>{error}</div>}
+
+                {success && (
+                    <div style={{
+                        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                        border: '1px solid #22c55e',
+                        color: '#22c55e',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        fontSize: '0.875rem',
+                        marginBottom: '1rem',
+                        textAlign: 'center'
+                    }}>
+                        {success}
+                    </div>
+                )}
 
                 <button type="submit" className={styles.submitButton} disabled={loading}>
                     {loading ? 'Processando...' : (mode === 'login' ? 'Acessar Painel' : 'Criar Conta')}

@@ -106,14 +106,57 @@ export async function registerAction(formData: FormData) {
     }
 
     // 3. Create Account
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        // Opções removidas para evitar fluxo de confirmação se o projeto estiver configurado para tal, 
-        // ou mantidas se necessário. O user disse que NÃO quer confirmação.
-        // Se a confirmação de email estiver ligada no Supabase, isso aqui vai criar o user mas exigir confirmação.
-        // Se estiver desligada, vai logar direto.
-    });
+    let authData: { user: any; session: any } = { user: null, session: null };
+    let authError: any = null;
+
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (serviceRoleKey) {
+        // Use Admin API to bypass email confirmation
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            serviceRoleKey,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            }
+        );
+
+        const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+            email,
+            password,
+            email_confirm: true
+        });
+
+        if (createError) {
+            authError = createError;
+        } else if (userData.user) {
+            authData.user = userData.user;
+            // Now sign in to create the session for the user
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+
+            if (signInError) {
+                // Should not happen if creation was successful, but just in case
+                console.error("Auto-login failed after admin creation", signInError);
+            } else {
+                authData.session = signInData.session;
+            }
+        }
+    } else {
+        // Fallback to standard flow (confirms via email if enabled in Supabase)
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+        });
+        authData = data;
+        authError = error;
+    }
 
     if (authError) {
         return { error: authError.message };
@@ -134,6 +177,6 @@ export async function registerAction(formData: FormData) {
         return { success: true, autoLogin: true };
     }
 
-    // Se não tiver sessão, provavelmente requer confirmação de email ou configuração do Supabase
+    // Se não tiver sessão (e usou o fallback), provavelmente requer confirmação de email
     return { success: true, autoLogin: false };
 }
