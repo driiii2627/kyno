@@ -165,3 +165,23 @@ export async function deleteProfileAction(profileId: string) {
 
     return { success: true };
 }
+
+export async function updateProfileAction(formData: FormData) {
+    const id = String(formData.get('id')); // Profile ID
+    const name = String(formData.get('name'));
+    const avatar = String(formData.get('avatar'));
+
+    const supabase = await getSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: 'Unauthorized' };
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({ name, avatar_url: avatar })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+    if (error) return { error: 'Erro ao atualizar perfil.' };
+
+    return { success: true };
+}
