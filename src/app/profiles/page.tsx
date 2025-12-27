@@ -7,6 +7,10 @@ import { getProfilesAction, createProfileAction, switchProfileAction, deleteProf
 import Turnstile from '@/components/auth/Turnstile';
 import { User, Edit2, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
+import { getDominantColor } from '@/utils/colors';
+
+// Feature Flag
+const ENABLE_DYNAMIC_THEME = true;
 
 interface Profile {
     id: string;
@@ -55,27 +59,38 @@ const AVATAR_CATEGORIES = {
     ]
 };
 
-// ... imports
-import { getDominantColor } from '@/utils/colors';
-
-// Feature Flag
-const ENABLE_DYNAMIC_THEME = true;
-
-// ... Profile interface ...
-
-// ... AVATAR_CATEGORIES ...
-
 export default function ProfilesPage() {
     const router = useRouter();
-    // ... existing state ...
+
+    // Check for ?manage=true
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('manage') === 'true') {
+            setIsManaging(true);
+        }
+    }, []);
+
+    // View State: 'SELECT' | 'EDIT' | 'CREATE'
+    const [view, setView] = useState<'SELECT' | 'EDIT' | 'CREATE'>('SELECT');
+
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [isManaging, setIsManaging] = useState(false);
 
-    // Dynamic Theme State
+    // Form State
+    const [editProfile, setEditProfile] = useState<Profile | null>(null);
+    const [newName, setNewName] = useState('');
+    const [newAvatar, setNewAvatar] = useState(AVATAR_CATEGORIES['Original Kyno+'][0]);
+    const [showAvatarPicker, setShowAvatarPicker] = useState(false);
     const [themeColor, setThemeColor] = useState<string>('');
 
-    // ... useEffect for loadProfiles ...
+    // Auth/Status
+    const [turnstileToken, setTurnstileToken] = useState('');
+    const [processing, setProcessing] = useState(false);
+    const toast = useToast();
+
+    // Granular Loading
+    const [enteringProfileId, setEnteringProfileId] = useState<string | null>(null);
 
     // Effect for "Create/Edit" mode dynamic color
     useEffect(() => {
@@ -94,8 +109,96 @@ export default function ProfilesPage() {
         }
     }, [newAvatar, view]);
 
+    useEffect(() => {
+        loadProfiles();
+    }, []);
 
-    // ... functions ...
+    const loadProfiles = async () => {
+        setLoading(true);
+        const { profiles, error } = await getProfilesAction();
+        if (profiles) setProfiles(profiles);
+        setLoading(false);
+    };
+
+    const handleSelectProfile = async (id: string) => {
+        if (enteringProfileId) return; // Debounce
+
+        if (isManaging) {
+            const profile = profiles.find(p => p.id === id);
+            if (profile) {
+                setEditProfile(profile);
+                setNewName(profile.name);
+                setNewAvatar(profile.avatar_url);
+                setView('EDIT');
+            }
+            return;
+        }
+
+        setEnteringProfileId(id);
+        const { success } = await switchProfileAction(id);
+
+        if (success) {
+            router.refresh();
+            router.push('/');
+        } else {
+            setEnteringProfileId(null);
+            toast.error('Erro ao acessar perfil.');
+        }
+    };
+
+    const handleSave = async () => {
+        if (!newName.trim()) {
+            toast.error('Digite um nome para o perfil.');
+            return;
+        }
+
+        setProcessing(true);
+        const formData = new FormData();
+        formData.append('name', newName);
+        formData.append('avatar', newAvatar);
+
+        if (view === 'EDIT' && editProfile) {
+            formData.append('id', editProfile.id);
+            const result = await updateProfileAction(formData);
+            if (result.error) {
+                toast.error(result.error);
+            } else {
+                toast.success('Perfil atualizado com sucesso!');
+                await loadProfiles();
+                setView('SELECT');
+                setIsManaging(false);
+            }
+        } else {
+            // CREATE
+            if (!turnstileToken) {
+                toast.error('Complete a verificação de segurança.');
+                setProcessing(false);
+                return;
+            }
+            formData.append('cf-turnstile-response', turnstileToken);
+            const result = await createProfileAction(formData);
+            if (result.error) {
+                toast.error(result.error);
+                if (window.turnstile) window.turnstile.reset();
+                setTurnstileToken('');
+            } else {
+                toast.success('Perfil criado com sucesso!');
+                await loadProfiles();
+                setView('SELECT');
+            }
+        }
+        setProcessing(false);
+    };
+
+    const deleteProfile = async () => {
+        if (!editProfile) return;
+        if (!confirm('Excluir este perfil permanentemente?')) return;
+
+        await deleteProfileAction(editProfile.id);
+        await loadProfiles();
+        setView('SELECT');
+        setIsManaging(false);
+    };
 
     // Background Style
     const backgroundStyle = themeColor
@@ -103,7 +206,7 @@ export default function ProfilesPage() {
         : {}; // Fallback to CSS default
 
     if (loading) {
-        return ( // ... existing loading
+        return (
             <div className={styles.loadingContainer}>
                 <div className={styles.spinner}></div>
             </div>
@@ -113,48 +216,166 @@ export default function ProfilesPage() {
     if (view === 'CREATE' || view === 'EDIT') {
         return (
             <div className={styles.container} style={backgroundStyle}>
-                {/* ... existing edit content ... */}
                 <div className={styles.editContainer}>
-                    {/* ... */}
+                    <div className={styles.editHeader}>
+                        <h1 className={styles.editTitle}>
+                            {view === 'EDIT' ? 'Editar Perfil' : 'Adicionar Perfil'}
+                        </h1>
+                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginTop: '0.5rem' }}>
+                            {view === 'EDIT' ? 'Personalize seu espaço.' : 'Crie um espaço para outra pessoa.'}
+                        </p>
+                    </div>
+
                     <div className={styles.editContent}>
-                        {/* ... Avatar Preview etc using newAvatar ... */}
                         <div className={styles.editAvatarPreview}>
-                            <img
-                                src={newAvatar}
-                                alt="Avatar"
-                                className={styles.previewImage}
-                                crossOrigin="anonymous" // Important for canvas
-                            />
-                            {/* ... */}
+                            <img src={newAvatar} alt="Avatar" className={styles.previewImage} crossOrigin="anonymous" />
+                            <div
+                                className={styles.editIcon}
+                                onClick={() => setShowAvatarPicker(true)}
+                            >
+                                <Edit2 size={24} />
+                            </div>
                         </div>
-                        {/* ... */}
+
+                        <div className={styles.editForm}>
+                            <div className={styles.inputGroup}>
+                                <input
+                                    className={styles.input}
+                                    placeholder="Nome do Perfil"
+                                    value={newName}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                    maxLength={20}
+                                />
+                            </div>
+
+                            {view === 'CREATE' && (
+                                <div className={styles.turnstileWrapper}>
+                                    <Turnstile
+                                        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                                        onVerify={setTurnstileToken}
+                                        theme="dark"
+                                    />
+                                </div>
+                            )}
+
+                            <div className={styles.actionButtons}>
+                                <button
+                                    className={styles.saveButton}
+                                    onClick={handleSave}
+                                    disabled={processing}
+                                >
+                                    {processing ? 'Salvando...' : 'Salvar'}
+                                </button>
+                                <button
+                                    className={styles.cancelButton}
+                                    onClick={() => {
+                                        setView('SELECT');
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+
+                                {view === 'EDIT' && (
+                                    <button
+                                        onClick={deleteProfile}
+                                        className={styles.deleteButton}
+                                    >
+                                        Excluir Perfil
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {/* ... picker overlay ... */}
+
+                {showAvatarPicker && (
+                    <div className={styles.pickerOverlay}>
+                        <div className={styles.pickerHeader}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => setShowAvatarPicker(false)}>
+                                <span style={{ color: '#fff', fontSize: '1.5rem' }}>←</span>
+                                <h2 style={{ fontSize: '2rem', margin: 0, fontWeight: 500 }}>Escolher Avatar</h2>
+                            </div>
+                        </div>
+                        <div className={styles.pickerScrollContent}>
+                            {Object.entries(AVATAR_CATEGORIES).map(([category, urls]) => (
+                                <div key={category} className={styles.categorySection}>
+                                    <h3 className={styles.categoryTitle}>{category}</h3>
+                                    <div className={styles.pickerGrid}>
+                                        {urls.map((av, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={av}
+                                                className={styles.pickerItem}
+                                                onClick={() => {
+                                                    setNewAvatar(av);
+                                                    setShowAvatarPicker(false);
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
 
     return (
-        <div className={styles.container}> {/* Select View doesn't need dynamic theme yet, unless requested for hover? User said "when creating/managing" context mostly */}
+        <div className={styles.container}>
             <h1 className={styles.title}>Quem está assistindo?</h1>
-            {/* ... profiles grid ... */}
-            {profiles.length < 3 && !isManaging && (
-                <div
-                    className={styles.profileCard}
-                    onClick={() => {
-                        setNewName('');
-                        const defaultAvatar = AVATAR_CATEGORIES['Original Kyno+'][0];
-                        setNewAvatar(defaultAvatar);
-                        setTurnstileToken('');
-                        setView('CREATE');
-                    }}
-                >
-                    {/* ... */}
-                </div>
-            )}
 
-            {/* ... button ... */}
+            <div className={styles.profileGrid}>
+                {profiles.map(profile => (
+                    <div
+                        key={profile.id}
+                        className={styles.profileCard}
+                        onClick={() => handleSelectProfile(profile.id)}
+                        style={{ opacity: enteringProfileId && enteringProfileId !== profile.id ? 0.3 : 1 }}
+                    >
+                        <div className={styles.avatarWrapper}>
+                            <img src={profile.avatar_url} alt={profile.name} className={styles.avatar} />
+                            {isManaging && (
+                                <div className={styles.editOverlay}>
+                                    <Edit2 size={32} />
+                                </div>
+                            )}
+                            {enteringProfileId === profile.id && (
+                                <div className={styles.cardSpinner}>
+                                    <div className={styles.spinnerSmall}></div>
+                                </div>
+                            )}
+                        </div>
+                        <span className={styles.profileName}>{enteringProfileId === profile.id ? 'Entrando...' : profile.name}</span>
+                    </div>
+                ))}
+
+                {profiles.length < 3 && !isManaging && (
+                    <div
+                        className={styles.profileCard}
+                        onClick={() => {
+                            setNewName('');
+                            const defaultAvatar = AVATAR_CATEGORIES['Original Kyno+'][0];
+                            setNewAvatar(defaultAvatar);
+                            setTurnstileToken('');
+                            setView('CREATE');
+                        }}
+                    >
+                        <div className={styles.addButton}>
+                            <Plus size={64} />
+                        </div>
+                        <span className={styles.profileName}>Adicionar</span>
+                    </div>
+                )}
+            </div>
+
+            <button
+                className={styles.manageButton}
+                onClick={() => setIsManaging(!isManaging)}
+            >
+                {isManaging ? 'Concluído' : 'Gerenciar Perfis'}
+            </button>
         </div>
     );
 }
