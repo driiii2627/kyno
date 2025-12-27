@@ -14,26 +14,27 @@ interface Profile {
 }
 
 const AVATARS = [
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Zack',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Sky',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Lilith',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+    // Famous Characters (TMDB High Res)
+    'https://image.tmdb.org/t/p/w500/5weKu49pzJCt06OPpjvT80efnQj.jpg', // No Way Home Spider-Man
+    'https://image.tmdb.org/t/p/w500/udDclJoHjfjb8JzDKgdHg2kT8pj.jpg', // Joker
+    'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', // Dark Knight Batman
+    'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', // Fight Club
+    'https://image.tmdb.org/t/p/w500/8t882GWfgO72787x8j0TfC2d38.jpg', // Pulp Fiction (Mia)
+    'https://image.tmdb.org/t/p/w500/saPqeb5rC7PQJv7g12r0sH2C0p.jpg', // Avengers (Iron Manish art)
+
+    // Vibrant Avatars
+    'https://api.dicebear.com/7.x/notionists/svg?seed=Felix',
+    'https://api.dicebear.com/7.x/notionists/svg?seed=Aneka',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Zoey',
+    'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Milo',
+    'https://api.dicebear.com/7.x/micah/svg?seed=Lola',
+
+    // Classic
     'https://api.dicebear.com/7.x/avataaars/svg?seed=Rocky',
     'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Shadow',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Leo',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Nala',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Simba',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Coco',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Pepper',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Buster',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Milo',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Oreo',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack',
-    'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie'
+    'https://api.dicebear.com/7.x/bottts/svg?seed=Robot1',
+    'https://api.dicebear.com/7.x/bottts/svg?seed=Robot2'
 ];
 
 export default function ProfilesPage() {
@@ -41,6 +42,14 @@ export default function ProfilesPage() {
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [isManaging, setIsManaging] = useState(false);
+
+    // Check for ?manage=true
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('manage') === 'true') {
+            setIsManaging(true);
+        }
+    }, []);
 
     // View State: 'SELECT' | 'EDIT' | 'CREATE'
     const [view, setView] = useState<'SELECT' | 'EDIT' | 'CREATE'>('SELECT');

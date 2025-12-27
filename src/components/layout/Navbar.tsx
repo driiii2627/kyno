@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Bookmark, User } from 'lucide-react';
+import { Search, Bookmark, User, Edit2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
@@ -64,24 +64,38 @@ export default function Navbar() {
 }
 
 function ProfileMenu() {
-    const [profile, setProfile] = useState<any>(null);
+    const [profiles, setProfiles] = useState<any[]>([]);
+    const [activeProfile, setActiveProfile] = useState<any>(null);
     const [open, setOpen] = useState(false);
-    const { push } = useRouter();
+    const { push, refresh } = useRouter();
 
     useEffect(() => {
-        import('@/app/profiles/actions').then(async ({ getActiveProfileAction }) => {
+        // Fetch All Profiles to list in dropdown
+        import('@/app/profiles/actions').then(async ({ getProfilesAction, getActiveProfileAction }) => {
+            const { profiles } = await getProfilesAction();
             const { profile } = await getActiveProfileAction();
-            setProfile(profile);
+            if (profiles) setProfiles(profiles);
+            if (profile) setActiveProfile(profile);
         });
     }, []);
+
+    const handleSwitch = async (profileId: string) => {
+        if (activeProfile?.id === profileId) return;
+        const { switchProfileAction } = await import('@/app/profiles/actions');
+        setOpen(false); // Close immediately
+        const { success } = await switchProfileAction(profileId);
+        if (success) {
+            refresh();
+            // Optional: Optimistic update can be done here if needed
+        }
+    };
 
     const handleSignOut = async () => {
         const { signOutAction } = await import('@/app/profiles/actions');
         await signOutAction();
     };
 
-    if (!profile) {
-        // Fallback or loading state
+    if (!activeProfile) {
         return (
             <Link href="/profiles" className={styles.iconBtn}>
                 <User size={22} />
@@ -95,32 +109,51 @@ function ProfileMenu() {
                 className={styles.profileTrigger}
                 onClick={() => setOpen(!open)}
             >
-                <img src={profile.avatar_url} alt="Profile" className={styles.navAvatar} />
+                <img src={activeProfile.avatar_url} alt="Profile" className={styles.navAvatar} />
             </div>
 
-            {/* Click outside listener could be added here or simple toggle for now */}
             {open && (
                 <>
                     <div className={styles.dropdownOverlay} onClick={() => setOpen(false)} />
                     <div className={styles.dropdown}>
                         <div className={styles.dropdownHeader}>
-                            <p className={styles.dropdownLabel}>PERFIS</p>
-                            <div className={styles.activeProfileRow}>
-                                <img src={profile.avatar_url} className={styles.miniAvatar} />
-                                <span className={styles.activeName}>{profile.name}</span>
+                            <span className={styles.dropdownLabel}>PERFIS</span>
+                            <Link href="/profiles?manage=true" className={styles.manageLink}>
+                                <Edit2 size={12} />
+                                Gerenciar
+                            </Link>
+                        </div>
+
+                        <div className={styles.profilesList}>
+                            {profiles.map(p => (
+                                <div
+                                    key={p.id}
+                                    className={`${styles.profileItem} ${activeProfile.id === p.id ? styles.activeProfileItem : ''}`}
+                                    onClick={() => handleSwitch(p.id)}
+                                >
+                                    <img src={p.avatar_url} className={styles.miniAvatar} />
+                                    <span className={styles.profileNameList}>{p.name}</span>
+                                    {activeProfile.id === p.id && <div className={styles.activeDot} />}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className={styles.dropdownDivider} />
+
+                        <div className={styles.menuLinks}>
+                            <div className={styles.menuLink}>
+                                <Bookmark size={16} />
+                                <span>Minha Lista</span>
+                            </div>
+                            <div className={styles.menuLink}>
+                                <User size={16} />
+                                <span>Conta</span>
                             </div>
                         </div>
 
                         <div className={styles.dropdownDivider} />
 
-                        <div className={styles.dropdownItem} onClick={() => push('/profiles')}>
-                            <User size={16} className={styles.itemIcon} />
-                            <span>Trocar de Perfil</span>
-                        </div>
-
-                        <div className={styles.dropdownDivider} />
-
-                        <div className={styles.dropdownItem} onClick={handleSignOut}>
+                        <div className={styles.signOutItem} onClick={handleSignOut}>
                             <span>Sair da Conta</span>
                         </div>
                     </div>
