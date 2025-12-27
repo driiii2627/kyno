@@ -5,6 +5,7 @@ import { Search, Bookmark, User, Edit2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
+import { getProfilesAction, getActiveProfileAction, switchProfileAction, signOutAction } from '@/app/profiles/actions';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -72,12 +73,13 @@ function ProfileMenu() {
 
     useEffect(() => {
         // Fetch All Profiles to list in dropdown
-        import('@/app/profiles/actions').then(async ({ getProfilesAction, getActiveProfileAction }) => {
+        const loadProfiles = async () => {
             const { profiles } = await getProfilesAction();
             const { profile } = await getActiveProfileAction();
             if (profiles) setProfiles(profiles);
             if (profile) setActiveProfile(profile);
-        });
+        };
+        loadProfiles();
     }, []);
 
     const handleSwitch = async (profileId: string) => {
@@ -87,7 +89,6 @@ function ProfileMenu() {
         setSwitchingProfileId(profileId);
 
         // 2. Perform Switch in Background
-        const { switchProfileAction } = await import('@/app/profiles/actions');
         const { success } = await switchProfileAction(profileId);
 
         if (success) {
@@ -101,7 +102,6 @@ function ProfileMenu() {
     };
 
     const handleSignOut = async () => {
-        const { signOutAction } = await import('@/app/profiles/actions');
         await signOutAction();
     };
 
