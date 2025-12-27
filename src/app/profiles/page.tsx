@@ -82,7 +82,9 @@ export default function ProfilesPage() {
     const [newName, setNewName] = useState('');
     const [newAvatar, setNewAvatar] = useState(AVATAR_CATEGORIES['Original Kyno+'][0]);
     const [showAvatarPicker, setShowAvatarPicker] = useState(false);
-    const [themeColor, setThemeColor] = useState<string>('');
+
+    // Dynamic Theme State (replaces simple themeColor)
+    const [bgStyle, setBgStyle] = useState<React.CSSProperties>({});
 
     // Auth/Status
     const [turnstileToken, setTurnstileToken] = useState('');
@@ -92,22 +94,63 @@ export default function ProfilesPage() {
     // Granular Loading
     const [enteringProfileId, setEnteringProfileId] = useState<string | null>(null);
 
-    // Effect for "Create/Edit" mode dynamic color
+    // Effect for Dynamic Color / Background
     useEffect(() => {
         if (!ENABLE_DYNAMIC_THEME) return;
 
-        // If in create or edit view, use the newAvatar
-        if ((view === 'CREATE' || view === 'EDIT') && newAvatar) {
-            getDominantColor(newAvatar).then(color => {
-                if (color) setThemeColor(color);
-            });
-        }
-        // If in Select mode, reset or default?
-        // Let's reset to default dark blue/black when selecting
-        else {
-            setThemeColor('');
-        }
-    }, [newAvatar, view]);
+        const updateBackground = async () => {
+            if (view === 'CREATE' || view === 'EDIT') {
+                if (newAvatar) {
+                    const color = await getDominantColor(newAvatar);
+                    if (color) {
+                        setBgStyle({
+                            background: `radial-gradient(circle at center, ${color} 0%, #020617 100%)`
+                        });
+                    }
+                }
+            } else {
+                // SELECT MODE: Blend colors from all profiles
+                if (profiles.length > 0) {
+                    const colors = await Promise.all(
+                        profiles.map(p => getDominantColor(p.avatar_url))
+                    );
+
+                    const validColors = colors.filter(c => c !== null) as string[];
+
+                    if (validColors.length === 0) {
+                        setBgStyle({});
+                        return;
+                    }
+
+                    if (validColors.length === 1) {
+                        setBgStyle({
+                            background: `radial-gradient(circle at center, ${validColors[0]} 0%, #020617 100%)`
+                        });
+                    } else {
+                        // Create a mesh/blend of colors
+                        // Example: Radial gradients at different positions
+                        const positions = [
+                            'top left', 'top right', 'bottom left', 'bottom right', 'center'
+                        ];
+
+                        const gradients = validColors.map((color, i) => {
+                            const pos = positions[i % positions.length];
+                            return `radial-gradient(circle at ${pos}, ${color} 0%, transparent 60%)`;
+                        });
+
+                        // Add base dark layer at the end
+                        setBgStyle({
+                            background: `${gradients.join(', ')}, #020617`
+                        });
+                    }
+                } else {
+                    setBgStyle({});
+                }
+            }
+        };
+
+        updateBackground();
+    }, [newAvatar, view, profiles]);
 
     useEffect(() => {
         loadProfiles();
@@ -199,11 +242,6 @@ export default function ProfilesPage() {
         setView('SELECT');
         setIsManaging(false);
     };
-
-    // Background Style
-    const backgroundStyle = themeColor
-        ? { background: `radial-gradient(circle at center, ${themeColor} 0%, #020617 100%)` }
-        : {}; // Fallback to CSS default
 
     if (loading) {
         return (
@@ -323,7 +361,7 @@ export default function ProfilesPage() {
     }
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} style={bgStyle}>
             <h1 className={styles.title}>Quem está assistindo?</h1>
 
             <div className={styles.profileGrid}>
