@@ -356,19 +356,42 @@
 
 .pickerHeader {
     max-width: 1200px;
-    margin: 0 auto 3rem;
+    margin: 0 auto 2rem;
     display: flex;
     align-items: center;
     gap: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    /* ensure header stays on top if we wanted specific layout, but here just margin */
 }
 
-.pickerGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1px));
-    gap: 2rem;
+.pickerScrollContent {
     max-width: 1200px;
     margin: 0 auto;
     padding-bottom: 4rem;
+}
+
+.categorySection {
+    margin-bottom: 3rem;
+}
+
+.categoryTitle {
+    font-size: 1.8rem;
+    color: #f8fafc;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    padding-left: 1rem;
+    border-left: 4px solid #0ea5e9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pickerGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 0 1rem;
 }
 
 .pickerItem {
