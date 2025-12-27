@@ -122,7 +122,7 @@ export async function switchProfileAction(profileId: string) {
         maxAge: 60 * 60 * 24 * 30 // 30 days
     });
 
-    redirect('/');
+    return { success: true };
 }
 
 export async function getActiveProfileAction() {

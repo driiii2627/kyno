@@ -7,7 +7,6 @@
     min-height: 100vh;
     padding: 2rem;
     background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-    /* Deep Blue Vignette */
     color: #fff;
     animation: fadeIn 0.5s ease;
 }
@@ -50,11 +49,9 @@
     width: 160px;
     height: 160px;
     border-radius: 50%;
-    /* Circle Avatars as requested */
     overflow: hidden;
     position: relative;
     border: 4px solid transparent;
-    /* Highlight border space */
     transition: all 0.3s ease;
     background: #1e293b;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -68,13 +65,11 @@
 
 .profileCard:hover .avatarWrapper {
     border-color: #fff;
-    /* White glow on hover */
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .profileName {
     color: #94a3b8;
-    /* Slate 400 */
     font-size: 1.2rem;
     font-weight: 400;
     transition: color 0.3s ease;
@@ -89,7 +84,6 @@
 .addButton {
     border-radius: 50%;
     border: 2px solid #334155;
-    /* Slate 700 */
     background: rgba(15, 23, 42, 0.6);
     color: #94a3b8;
     display: flex;
@@ -126,7 +120,6 @@
     transition: all 0.3s ease;
     font-weight: 600;
     border-radius: 4px;
-    /* Slight rounding, not full pill */
 }
 
 .manageButton:hover {
@@ -135,7 +128,6 @@
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* Overlay for Edit Icon on Avatar */
 .editOverlay {
     position: absolute;
     top: 0;
@@ -147,12 +139,9 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    opacity: 1;
-    /* Always visible in Manage mode? Or on hover? Usually manage mode puts an icon over it. */
 }
 
-
-/* --- CREATE / EDIT SCREEN (Reference 4 Style) --- */
+/* --- CREATE / EDIT SCREEN --- */
 .editContainer {
     width: 100%;
     max-width: 900px;
@@ -178,12 +167,12 @@
 .editContent {
     display: flex;
     gap: 5rem;
-    align-items: center;
+    align-items: flex-start;
+    /* Better alignment for columns */
     justify-content: center;
     padding: 2rem;
 }
 
-/* Right Side (Avatar) in Ref 4, but let's keep it visually balanced. Ref 4 has Avatar Right. */
 .editAvatarPreview {
     position: relative;
     flex-shrink: 0;
@@ -193,11 +182,9 @@
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    /* Circle */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     object-fit: cover;
     border: 4px solid #1e293b;
-    /* Dark border to separate */
 }
 
 .editIcon {
@@ -205,7 +192,6 @@
     bottom: 10px;
     right: 10px;
     background: #0ea5e9;
-    /* Sky 500 - Valid "Blue" */
     color: #fff;
     border-radius: 50%;
     width: 48px;
@@ -217,7 +203,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s;
     border: 3px solid #020617;
-    /* Match bg to cut out */
 }
 
 .editIcon:hover {
@@ -225,27 +210,32 @@
     background: #38bdf8;
 }
 
-/* Left Side (Form) in Ref 4 */
 .editForm {
     flex: 1;
     max-width: 400px;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding-top: 1rem;
+    /* Align visually with avatar */
 }
 
-.inputGroup {
-    /* No background container, just the input */
+/* Clean Turnstile Container */
+.turnstileWrapper {
+    display: flex;
+    justify-content: center;
+    background: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .input {
     background: rgba(30, 41, 59, 0.6);
-    /* Slate 800 glass */
     border: 1px solid rgba(148, 163, 184, 0.2);
-    /* Subtle border */
     padding: 1.2rem;
     border-radius: 12px;
-    /* Rounded corners */
     color: #fff;
     font-size: 1.1rem;
     width: 100%;
@@ -256,7 +246,6 @@
 .input:focus {
     background: rgba(30, 41, 59, 0.9);
     border-color: #0ea5e9;
-    /* Focus Blue */
     box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
 }
 
@@ -267,15 +256,11 @@
 .actionButtons {
     display: flex;
     flex-direction: column;
-    /* Stacked buttons like Ref 4? Ref 4 has one distinct green button. Keep row or stack. */
     gap: 1rem;
     margin-top: 1rem;
 }
 
 .saveButton {
-    background: #fff;
-    /* White button for strong contrast as requested in Ref 1, or Blue? Ref 4 is Green. App is Blue. */
-    /* Let's go with Blue to match "Site Colors" user request */
     background: #0ea5e9;
     color: #fff;
     padding: 1rem;
@@ -310,15 +295,58 @@
     text-decoration: underline;
 }
 
-/* Avatar Picker Overlay */
+.deleteButton {
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    margin-top: 1rem;
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+.deleteButton:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+}
+
+/* Spinner for individual card */
+.cardSpinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.spinnerSmall {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Picker */
 .pickerOverlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(2, 6, 23, 0.95);
-    /* High opacity dark blue */
+    background: rgba(2, 6, 23, 0.98);
     backdrop-filter: blur(10px);
     z-index: 300;
     padding: 2rem;
@@ -358,7 +386,6 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Loading Spinner */
 .loadingContainer {
     display: flex;
     flex-direction: column;
@@ -373,7 +400,6 @@
     height: 60px;
     border: 4px solid rgba(255, 255, 255, 0.1);
     border-left-color: #0ea5e9;
-    /* Blue spinner */
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -406,11 +432,9 @@
     }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
     .editContent {
         flex-direction: column-reverse;
-        /* Form bottom, Avatar top */
         gap: 2rem;
     }
 

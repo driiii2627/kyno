@@ -1,9 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// Remove useRouter for switching, but keep for other Nav if needed. 
-// Actually switchProfileAction redirects server-side now.
-// We might need it for forceful refresh if needed, but let's try clean first.
 import { useRouter } from 'next/navigation';
 import styles from './Profiles.module.css';
 import { getProfilesAction, createProfileAction, switchProfileAction, deleteProfileAction, updateProfileAction } from './actions';
@@ -16,7 +13,6 @@ interface Profile {
     avatar_url: string;
 }
 
-// Extended Avatar List
 const AVATARS = [
     'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
     'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
@@ -41,6 +37,7 @@ const AVATARS = [
 ];
 
 export default function ProfilesPage() {
+    const router = useRouter();
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [isManaging, setIsManaging] = useState(false);
@@ -59,6 +56,9 @@ export default function ProfilesPage() {
     const [createError, setCreateError] = useState<string | null>(null);
     const [processing, setProcessing] = useState(false);
 
+    // Granular Loading
+    const [enteringProfileId, setEnteringProfileId] = useState<string | null>(null);
+
     useEffect(() => {
         loadProfiles();
     }, []);
@@ -71,6 +71,8 @@ export default function ProfilesPage() {
     };
 
     const handleSelectProfile = async (id: string) => {
+        if (enteringProfileId) return; // Debounce
+
         if (isManaging) {
             const profile = profiles.find(p => p.id === id);
             if (profile) {
@@ -82,9 +84,15 @@ export default function ProfilesPage() {
             return;
         }
 
-        // Switch Profile Logic
-        // Server action handles redirect('/');
-        await switchProfileAction(id);
+        setEnteringProfileId(id);
+        const { success } = await switchProfileAction(id);
+
+        if (success) {
+            router.refresh();
+            router.push('/');
+        } else {
+            setEnteringProfileId(null);
+        }
     };
 
     const handleSave = async () => {
@@ -144,12 +152,10 @@ export default function ProfilesPage() {
         return (
             <div className={styles.loadingContainer}>
                 <div className={styles.spinner}></div>
-                <p style={{ marginTop: '1rem', color: '#666' }}>Carregando perfis...</p>
             </div>
         );
     }
 
-    // RENDER: CREATE or EDIT View (Full Page)
     if (view === 'CREATE' || view === 'EDIT') {
         return (
             <div className={styles.container}>
@@ -158,24 +164,22 @@ export default function ProfilesPage() {
                         <h1 className={styles.editTitle}>
                             {view === 'EDIT' ? 'Editar Perfil' : 'Adicionar Perfil'}
                         </h1>
-                        <p style={{ color: '#808080', fontSize: '1.2rem' }}>
-                            {view === 'EDIT' ? 'Personalize as configurações do perfil.' : 'Crie um perfil para outra pessoa assistir.'}
+                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginTop: '0.5rem' }}>
+                            {view === 'EDIT' ? 'Personalize seu espaço.' : 'Crie um espaço para outra pessoa.'}
                         </p>
                     </div>
 
                     <div className={styles.editContent}>
-                        {/* Right: Avatar Preview (Mobile: Top) */}
                         <div className={styles.editAvatarPreview}>
                             <img src={newAvatar} alt="Avatar" className={styles.previewImage} />
                             <div
                                 className={styles.editIcon}
                                 onClick={() => setShowAvatarPicker(true)}
                             >
-                                <Edit2 size={18} />
+                                <Edit2 size={24} />
                             </div>
                         </div>
 
-                        {/* Left: Inputs */}
                         <div className={styles.editForm}>
                             <div className={styles.inputGroup}>
                                 <input
@@ -187,9 +191,8 @@ export default function ProfilesPage() {
                                 />
                             </div>
 
-                            {/* Turnstile only for Create */}
                             {view === 'CREATE' && (
-                                <div style={{ background: '#000', padding: '10px', display: 'flex', justifyContent: 'center' }}>
+                                <div className={styles.turnstileWrapper}>
                                     <Turnstile
                                         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                                         onVerify={setTurnstileToken}
@@ -198,7 +201,7 @@ export default function ProfilesPage() {
                                 </div>
                             )}
 
-                            {createError && <p style={{ color: '#e50914' }}>{createError}</p>}
+                            {createError && <p style={{ color: '#ef4444', textAlign: 'center', fontSize: '0.9rem' }}>{createError}</p>}
 
                             <div className={styles.actionButtons}>
                                 <button
@@ -221,15 +224,7 @@ export default function ProfilesPage() {
                                 {view === 'EDIT' && (
                                     <button
                                         onClick={deleteProfile}
-                                        style={{
-                                            background: 'transparent',
-                                            border: '1px solid #e50914',
-                                            color: '#e50914',
-                                            padding: '0.8rem 2rem',
-                                            textTransform: 'uppercase',
-                                            cursor: 'pointer',
-                                            marginLeft: 'auto'
-                                        }}
+                                        className={styles.deleteButton}
                                     >
                                         Excluir Perfil
                                     </button>
@@ -239,13 +234,12 @@ export default function ProfilesPage() {
                     </div>
                 </div>
 
-                {/* Avatar Picker Overlay */}
                 {showAvatarPicker && (
                     <div className={styles.pickerOverlay}>
                         <div className={styles.pickerHeader}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <button onClick={() => setShowAvatarPicker(false)} style={{ color: '#fff', fontSize: '1.5rem' }}>←</button>
-                                <h2 style={{ fontSize: '2rem', margin: 0 }}>Escolher Avatar</h2>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => setShowAvatarPicker(false)}>
+                                <span style={{ color: '#fff', fontSize: '1.5rem' }}>←</span>
+                                <h2 style={{ fontSize: '2rem', margin: 0, fontWeight: 500 }}>Escolher Avatar</h2>
                             </div>
                         </div>
                         <div className={styles.pickerGrid}>
@@ -267,7 +261,6 @@ export default function ProfilesPage() {
         );
     }
 
-    // RENDER: SELECT View (Default)
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>Quem está assistindo?</h1>
@@ -278,6 +271,7 @@ export default function ProfilesPage() {
                         key={profile.id}
                         className={styles.profileCard}
                         onClick={() => handleSelectProfile(profile.id)}
+                        style={{ opacity: enteringProfileId && enteringProfileId !== profile.id ? 0.3 : 1 }}
                     >
                         <div className={styles.avatarWrapper}>
                             <img src={profile.avatar_url} alt={profile.name} className={styles.avatar} />
@@ -286,12 +280,16 @@ export default function ProfilesPage() {
                                     <Edit2 size={32} />
                                 </div>
                             )}
+                            {enteringProfileId === profile.id && (
+                                <div className={styles.cardSpinner}>
+                                    <div className={styles.spinnerSmall}></div>
+                                </div>
+                            )}
                         </div>
-                        <span className={styles.profileName}>{profile.name}</span>
+                        <span className={styles.profileName}>{enteringProfileId === profile.id ? 'Entrando...' : profile.name}</span>
                     </div>
                 ))}
 
-                {/* Add Profile Button */}
                 {profiles.length < 3 && !isManaging && (
                     <div
                         className={styles.profileCard}
