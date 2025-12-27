@@ -158,6 +158,21 @@
     border: 1px solid transparent;
     transition: background-color 0.2s, border-color 0.2s;
     background-color: rgba(24, 24, 27, 0.3);
+
+    /* Desktop Default (4 items) */
+    min-width: calc((100% - 6rem) / 4);
+    max-width: calc((100% - 6rem) / 4);
+    flex-shrink: 0;
+    scroll-snap-align: start;
+}
+
+@media (max-width: 768px) {
+    .card {
+        /* Mobile: Show ~2.2 items for "peek" effect or just 2 items */
+        min-width: 160px;
+        /* Fixed readable width */
+        max-width: 160px;
+    }
 }
 
 .card:hover {

@@ -133,7 +133,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
     // Format Data
     const backdropUrl = details.backdrop_path
-        ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
+        ? `https://image.tmdb.org/t/p/w1280${details.backdrop_path}`
         : null;
 
     const posterUrl = details.poster_path
