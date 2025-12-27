@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -9,11 +9,29 @@ export async function loginAction(formData: FormData) {
     const password = String(formData.get('password'));
     const code = String(formData.get('code'));
 
-    // Security: Check IP rate limit (Optional: implementing strictly via the DB function provided)
-    // For Login, we check credentials first.
-
     // 1. Validate Credentials
-    const supabase = createServerActionClient({ cookies });
+    const cookieStore = await cookies();
+
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return cookieStore.getAll();
+                },
+                setAll(cookiesToSet) {
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        );
+                    } catch {
+                    }
+                },
+            },
+        }
+    );
+
     const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -22,15 +40,6 @@ export async function loginAction(formData: FormData) {
     if (error) {
         return { error: 'Credenciais inválidas ou erro no login.' };
     }
-
-    // 2. Log Access (After success)
-    const headerList = await headers();
-    const ip = headerList.get('x-forwarded-for') || 'unknown';
-
-    // Use the Service Role to log security events safely
-    // (In a real scenario we'd use a separate admin client, but here we assume RLS policies handle 'own' logs or we rely on the implicit session)
-    // Actually, update `last_ip` in the tracking table
-    // For now, we proceed.
 
     return { success: true };
 }
@@ -42,7 +51,7 @@ export async function registerAction(formData: FormData) {
     const turnstileToken = String(formData.get('cf-turnstile-response'));
 
     const headerList = await headers();
-    const ip = headerList.get('x-forwarded-for') || '127.0.0.1'; // simplified for local
+    const ip = headerList.get('x-forwarded-for') || '127.0.0.1';
 
     // 1. Verify Cloudflare Turnstile
     const secretKey = process.env.TURNSTILE_SECRET_KEY;
@@ -63,21 +72,32 @@ export async function registerAction(formData: FormData) {
         return { error: 'Falha na verificação de segurança (Captcha).' };
     }
 
-    // 2. Check IP Limit (Database Function)
-    const supabase = createServerActionClient({ cookies });
+    // 2. Check IP Limit && Create Account
+    const cookieStore = await cookies();
 
-    // We need to call the RPC function created in the SQL schema
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return cookieStore.getAll();
+                },
+                setAll(cookiesToSet) {
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        );
+                    } catch {
+                    }
+                },
+            },
+        }
+    );
+
     const { data: isAllowed, error: rpcError } = await supabase.rpc('check_ip_registration_rate_limit', {
         request_ip: ip
     });
-
-    // If function missing or error, default to Allow (or Block if strict) - deciding Allow for MVP unless strict requested.
-    // User requested strict: "maximo 3 contas por IP". So default Block if error?
-    // If table doesn't exist, this fails. Assuming it exists.
-    if (rpcError) {
-        console.error('RPC Error:', rpcError);
-        // fallback?
-    }
 
     if (isAllowed === false) {
         return { error: 'Limite de contas atingido para este dispositivo.' };
@@ -88,7 +108,7 @@ export async function registerAction(formData: FormData) {
         email,
         password,
         options: {
-            emailRedirectTo: `https://kyno.vercel.app/auth/callback`, // Default
+            emailRedirectTo: `https://kyno.vercel.app/auth/callback`,
         },
     });
 
@@ -97,13 +117,7 @@ export async function registerAction(formData: FormData) {
     }
 
     if (authData.user) {
-        // 4. Record Security Log
-        // We use an admin client ideally to assume Service Role to insert arbitrary data like 'registration_ip'
-        // But since we are logged in as the new user now (or will be), we can insert into our own rows if RLS permits.
-        // My schema allowed "Service role full access", but "Users can view own".
-        // Inserting 'registration_ip' might need admin.
-        // For simplicity in this stack, we assume standard insert works or we skip detailed log if blocked.
-
+        // Log access
         await supabase.from('kyno_user_security_logs').insert({
             user_id: authData.user.id,
             unique_login_code: code,
