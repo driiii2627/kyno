@@ -25,43 +25,8 @@ export default async function Home() {
   let catalogSeries: import('@/services/content').CatalogItem[] = [];
 
   try {
-    // 1. Fetch Source Data from TMDB
-    // We fetch genres too to ensure they are seeded in Supabase
-    const [
-      trendingMovies,
-      popularMovies,
-      topRatedMovies,
-      trendingSeries,
-      actionMoviesSrc,
-      comedyMoviesSrc,
-      horrorMoviesSrc
-    ] = await Promise.all([
-      tmdb.getTrending('movie'),
-      tmdb.getPopular('movie'),
-      tmdb.getTopRated('movie'),
-      tmdb.getTrending('tv'),
-      tmdb.getByGenre(28, 'movie'), // Action
-      tmdb.getByGenre(35, 'movie'), // Comedy
-      tmdb.getByGenre(27, 'movie')  // Horror
-    ]);
-
-    // 2. Sync fetched content to Supabase (Auto-register)
-    // We combine all movie sources for sync
-    const allMoviesToSync = [
-      ...trendingMovies.results,
-      ...popularMovies.results,
-      ...topRatedMovies.results,
-      ...actionMoviesSrc.results,
-      ...comedyMoviesSrc.results,
-      ...horrorMoviesSrc.results
-    ];
-
-    await Promise.allSettled([
-      contentService.syncMovies(allMoviesToSync),
-      contentService.syncSeries(trendingSeries.results)
-    ]);
-
-    // 3. Fetch ONLY what is in the database for display
+    // Optimized: Only fetch what is in the database for display. 
+    // No external TMDB calls on render.
     try {
       [catalogMovies, catalogSeries] = await Promise.all([
         contentService.getCatalogMovies(),
@@ -72,7 +37,7 @@ export default async function Home() {
     }
 
   } catch (error) {
-    console.error("Failed to fetch TMDB data:", error);
+    console.error("Failed to fetch data:", error);
   }
 
   // --- Dynamic Categorization Logic ---

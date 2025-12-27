@@ -207,7 +207,7 @@ export const contentService = {
     },
 
     /**
-     * Get all movies from the catalog (Hydrated)
+     * Get all movies from the catalog (Fast - DB Only)
      */
     async getCatalogMovies(): Promise<CatalogItem[]> {
         const { data: dbMovies, error } = await supabase
@@ -220,50 +220,28 @@ export const contentService = {
             return [];
         }
 
-        if (!dbMovies || dbMovies.length === 0) return [];
+        if (!dbMovies) return [];
 
-        const hydratedMovies = await Promise.all(
-            dbMovies.map(async (dbMovie: SupabaseContent) => {
-                try {
-                    // Try to fetch fresh from TMDB, fallback to DB if fail
-                    const tmdbDetails = await tmdb.getDetails(dbMovie.tmdb_id, 'movie').catch(() => null);
-
-                    if (tmdbDetails) {
-                        return {
-                            ...tmdbDetails,
-                            video_url: dbMovie.video_url,
-                            supabase_id: dbMovie.id,
-                            id: dbMovie.tmdb_id,
-                            // Ideally, keep DB ID/URL logic
-                        } as CatalogItem;
-                    }
-
-                    // Fallback using stored backup data
-                    return {
-                        id: dbMovie.tmdb_id,
-                        title: dbMovie.title,
-                        poster_path: dbMovie.poster_url,  // Correct property mapping
-                        backdrop_path: dbMovie.backdrop_url, // Correct property mapping
-                        overview: dbMovie.description,    // Correct property mapping
-                        vote_average: dbMovie.rating || 0, // Correct property mapping
-                        release_date: dbMovie.release_year?.toString(),
-                        video_url: dbMovie.video_url,
-                        supabase_id: dbMovie.id,
-                        genre_ids: [], // Fallback
-                    } as CatalogItem;
-
-                } catch (e) {
-                    console.error("Hydration failed for", dbMovie.tmdb_id);
-                    return null;
-                }
-            })
-        );
-
-        return hydratedMovies.filter((m): m is CatalogItem => m !== null);
+        // Map directly from DB columns to CatalogItem interface
+        return dbMovies.map((dbMovie: SupabaseContent) => ({
+            id: dbMovie.tmdb_id,
+            title: dbMovie.title || 'Sem Título',
+            poster_path: dbMovie.poster_url,
+            backdrop_path: dbMovie.backdrop_url,
+            overview: dbMovie.description,
+            vote_average: dbMovie.rating || 0,
+            release_date: dbMovie.release_year?.toString(),
+            video_url: dbMovie.video_url,
+            supabase_id: dbMovie.id,
+            genre: dbMovie.genre,
+            // Construct a fake genre object if needed by UI, or just rely on 'genre' string
+            genres: dbMovie.genre ? [{ id: 0, name: dbMovie.genre }] : [],
+            duration: dbMovie.duration
+        })) as CatalogItem[];
     },
 
     /**
-     * Get all series from the catalog (Hydrated)
+     * Get all series from the catalog (Fast - DB Only)
      */
     async getCatalogSeries(): Promise<CatalogItem[]> {
         const { data: dbSeries, error } = await supabase
@@ -276,41 +254,21 @@ export const contentService = {
             return [];
         }
 
-        if (!dbSeries || dbSeries.length === 0) return [];
+        if (!dbSeries) return [];
 
-        const hydratedSeries = await Promise.all(
-            dbSeries.map(async (dbSeriesItem: SupabaseContent) => {
-                try {
-                    const tmdbDetails = await tmdb.getDetails(dbSeriesItem.tmdb_id, 'tv').catch(() => null);
-
-                    if (tmdbDetails) {
-                        return {
-                            ...tmdbDetails,
-                            video_url: dbSeriesItem.video_url,
-                            supabase_id: dbSeriesItem.id,
-                            id: dbSeriesItem.tmdb_id
-                        } as CatalogItem;
-                    }
-
-                    return {
-                        id: dbSeriesItem.tmdb_id,
-                        name: dbSeriesItem.title,
-                        title: dbSeriesItem.title,
-                        poster_path: dbSeriesItem.poster_url,
-                        backdrop_path: dbSeriesItem.backdrop_url,
-                        overview: dbSeriesItem.description,
-                        vote_average: dbSeriesItem.rating || 0,
-                        first_air_date: dbSeriesItem.release_year?.toString(),
-                        video_url: dbSeriesItem.video_url,
-                        supabase_id: dbSeriesItem.id,
-                        genre_ids: [], // Fallback
-                    } as CatalogItem;
-                } catch (e) {
-                    return null;
-                }
-            })
-        );
-
-        return hydratedSeries.filter((s): s is CatalogItem => s !== null);
+        return dbSeries.map((dbSeriesItem: SupabaseContent) => ({
+            id: dbSeriesItem.tmdb_id,
+            name: dbSeriesItem.title || 'Sem Título',
+            title: dbSeriesItem.title || 'Sem Título',
+            poster_path: dbSeriesItem.poster_url,
+            backdrop_path: dbSeriesItem.backdrop_url,
+            overview: dbSeriesItem.description,
+            vote_average: dbSeriesItem.rating || 0,
+            first_air_date: dbSeriesItem.release_year?.toString(),
+            video_url: dbSeriesItem.video_url,
+            supabase_id: dbSeriesItem.id,
+            genre: dbSeriesItem.genre,
+            genres: dbSeriesItem.genre ? [{ id: 0, name: dbSeriesItem.genre }] : [],
+        })) as CatalogItem[];
     }
 };

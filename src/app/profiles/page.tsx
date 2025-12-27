@@ -115,7 +115,6 @@ export default function ProfilesPage() {
         const { success } = await switchProfileAction(id);
 
         if (success) {
-            router.refresh();
             router.push('/');
         } else {
             setEnteringProfileId(null);
