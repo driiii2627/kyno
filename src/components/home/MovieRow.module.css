@@ -174,6 +174,9 @@
     height: 100%;
     object-fit: cover;
     transition: opacity 0.3s;
+    /* Anti-aliasing */
+    image-rendering: auto;
+    transform: translateZ(0);
 }
 
 .overlay {

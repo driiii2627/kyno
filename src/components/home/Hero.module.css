@@ -41,6 +41,10 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    /* Anti-aliasing for better downscaling */
+    image-rendering: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .heroImage.active {
@@ -300,7 +304,8 @@
 
 @media (max-width: 768px) {
     .hero {
-        height: 85vh;
+        height: 65vh;
+        /* Reduce height to reduce zoom/aliasing */
         align-items: flex-end;
     }
 
