@@ -19,6 +19,13 @@
     pointer-events: none;
 }
 
+@media (max-width: 768px) {
+    .heroBackground {
+        height: 65vh;
+        /* Reduce height on mobile to prevent extreme zoom/cropping */
+    }
+}
+
 .heroImage {
     object-fit: cover;
     opacity: 0.8;
