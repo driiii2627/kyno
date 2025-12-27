@@ -16,6 +16,7 @@ export interface Movie {
 
 export const getImageUrl = (path: string | null, size: 'original' | 'w500' | 'w342' | 'w780' | 'w1280' | 'w154' | 'w92' = 'original') => {
   if (!path) return '/placeholder.png';
+  if (path.startsWith('http')) return path; // Already a full URL (from DB)
   return `https://image.tmdb.org/t/p/${size}${path}`;
 };
 
