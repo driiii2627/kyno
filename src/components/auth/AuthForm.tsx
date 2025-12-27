@@ -26,43 +26,46 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
         setError(null);
         setLoading(true);
 
-        // Client-side Turnstile check for Register
-        if (mode === 'register' && !token) {
-            setError('Por favor, complete a verificação de segurança.');
-            setLoading(false);
-            return;
-        }
-
         const formData = new FormData();
         formData.append('email', email);
         formData.append('password', password);
         formData.append('code', loginCode);
-        if (token) formData.append('cf-turnstile-response', token);
 
         try {
-            const action = mode === 'login' ? onLogin : onRegister;
-            const result = await action(formData);
-
-            if (result.error) {
-                setError(result.error);
-                // Reset Turnstile on error if in register mode
-                if (mode === 'register' && window.turnstile) {
-                    window.turnstile.reset();
-                    setToken('');
+            if (mode === 'login') {
+                const result = await onLogin(formData);
+                if (result.error) {
+                    setError(result.error);
+                } else {
+                    router.refresh();
                 }
             } else {
-                // Success Handling
-                if (mode === 'login') {
-                    router.refresh();
+                // Register Mode
+                // Client-side Turnstile check for Register
+                if (!token) {
+                    setError('Por favor, complete a verificação de segurança.');
+                    setLoading(false);
+                    return;
+                }
+
+                if (token) formData.append('cf-turnstile-response', token);
+
+                const result = await onRegister(formData);
+
+                if (result.error) {
+                    setError(result.error);
+                    if (window.turnstile) {
+                        window.turnstile.reset();
+                        setToken('');
+                    }
                 } else {
                     // Register success
                     if (result.autoLogin) {
                         router.refresh();
                     } else {
-                        // User needs to login manually (or verify email if that was the case, but assuming manual login)
+                        // User needs to login manually
                         setMode('login');
-                        setError('Conta criada com sucesso! Faça login para continuar.'); // Showing as a "positive" error or just state
-                        // Reset forms
+                        setError('Conta criada com sucesso! Faça login para continuar.');
                         setPassword('');
                         if (window.turnstile) {
                             window.turnstile.reset();
