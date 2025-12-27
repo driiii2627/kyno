@@ -67,8 +67,18 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                         >
                             {/* Image */}
                             <OptimizedImage
-                                src={getImageUrl(item.poster_path, 'w1280')}
-                                tinySrc={getImageUrl(item.poster_path, 'w92')}
+                                src={(() => {
+                                    const path = item.poster_path || item.backdrop_path;
+                                    if (!path) return '/placeholder.png';
+                                    if (path.startsWith('http')) return path;
+                                    return `https://image.tmdb.org/t/p/w1280${path}`;
+                                })()}
+                                tinySrc={(() => {
+                                    const path = item.poster_path || item.backdrop_path;
+                                    if (!path) return '/placeholder.png';
+                                    if (path.startsWith('http')) return path;
+                                    return `https://image.tmdb.org/t/p/w92${path}`;
+                                })()}
                                 alt={item.title || item.name || 'Cover'}
                                 fill
                                 className={styles.image}
