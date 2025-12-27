@@ -38,7 +38,9 @@ export async function loginAction(formData: FormData) {
     });
 
     if (error) {
-        return { error: 'Credenciais inválidas ou erro no login.' };
+        // Retornar a mensagem exata do erro para ajudar no debug (ex: Email not confirmed)
+        console.error('Login Error:', error.message);
+        return { error: error.message };
     }
 
     return { success: true };
@@ -107,9 +109,10 @@ export async function registerAction(formData: FormData) {
     const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-            emailRedirectTo: `https://kyno.vercel.app/auth/callback`,
-        },
+        // Opções removidas para evitar fluxo de confirmação se o projeto estiver configurado para tal, 
+        // ou mantidas se necessário. O user disse que NÃO quer confirmação.
+        // Se a confirmação de email estiver ligada no Supabase, isso aqui vai criar o user mas exigir confirmação.
+        // Se estiver desligada, vai logar direto.
     });
 
     if (authError) {
@@ -126,5 +129,11 @@ export async function registerAction(formData: FormData) {
         });
     }
 
-    return { success: true };
+    // Se tiver sessão, foi logado automaticamente
+    if (authData.session) {
+        return { success: true, autoLogin: true };
+    }
+
+    // Se não tiver sessão, provavelmente requer confirmação de email ou configuração do Supabase
+    return { success: true, autoLogin: false };
 }

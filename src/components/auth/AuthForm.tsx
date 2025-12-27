@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 interface AuthFormProps {
     loginCode: string;
     onLogin: (formData: FormData) => Promise<{ error?: string }>;
-    onRegister: (formData: FormData) => Promise<{ error?: string }>;
+    onRegister: (formData: FormData) => Promise<{ error?: string; autoLogin?: boolean }>;
     siteKey: string;
 }
 
@@ -51,8 +51,25 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                     setToken('');
                 }
             } else {
-                // Success - Redirect happens in action or via router push if needed
-                router.refresh(); // Or redirect to dashboard
+                // Success Handling
+                if (mode === 'login') {
+                    router.refresh();
+                } else {
+                    // Register success
+                    if (result.autoLogin) {
+                        router.refresh();
+                    } else {
+                        // User needs to login manually (or verify email if that was the case, but assuming manual login)
+                        setMode('login');
+                        setError('Conta criada com sucesso! Faça login para continuar.'); // Showing as a "positive" error or just state
+                        // Reset forms
+                        setPassword('');
+                        if (window.turnstile) {
+                            window.turnstile.reset();
+                            setToken('');
+                        }
+                    }
+                }
             }
         } catch (err) {
             setError('Ocorreu um erro inesperado. Tente novamente.');
