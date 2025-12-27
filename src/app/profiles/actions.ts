@@ -57,14 +57,34 @@ export async function createProfileAction(formData: FormData) {
         }
     }
 
-    // Check Limit (Max 5 profiles is standard, user wanted a limit)
+    // 1. Check Profile Limit (Max 3)
     const { count } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id);
 
-    if (count !== null && count >= 5) {
-        return { error: 'Limite máximo de 5 perfis atingido.' };
+    if (count !== null && count >= 3) {
+        return { error: 'Limite máximo de 3 perfis atingido.' };
+    }
+
+    // 2. Check Creation Rate Limit (2 minutes)
+    const { data: lastProfile } = await supabase
+        .from('profiles')
+        .select('created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+    if (lastProfile) {
+        const lastCreated = new Date(lastProfile.created_at).getTime();
+        const now = Date.now();
+        const diffMinutes = (now - lastCreated) / (1000 * 60);
+
+        if (diffMinutes < 2) {
+            const remainingSeconds = Math.ceil((2 - diffMinutes) * 60);
+            return { error: `Aguarde ${remainingSeconds} segundos para criar outro perfil.` };
+        }
     }
 
     const { error } = await supabase
@@ -90,12 +110,59 @@ export async function updateProfileAction(formData: FormData) {
     if (!user) return { error: 'Não autorizado' };
 
     const id = formData.get('id') as string;
-    const name = formData.get('name') as string;
-    const avatar = formData.get('avatar') as string;
+    const newName = formData.get('name') as string;
+    const newAvatar = formData.get('avatar') as string;
+
+    // Fetch current profile data
+    const { data: currentProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single();
+
+    if (fetchError || !currentProfile) return { error: 'Perfil não encontrado.' };
+
+    const updates: any = {};
+    const now = new Date();
+
+    // 1. Name Check (7 Hours)
+    if (newName && newName !== currentProfile.name) {
+        if (currentProfile.last_name_update) {
+            const lastUpdate = new Date(currentProfile.last_name_update).getTime();
+            const diffHours = (now.getTime() - lastUpdate) / (1000 * 60 * 60);
+
+            if (diffHours < 7) {
+                const remainingHours = Math.ceil(7 - diffHours);
+                return { error: `Você só pode alterar o nome a cada 7 horas. Aguarde ${remainingHours}h.` };
+            }
+        }
+        updates.name = newName;
+        updates.last_name_update = now.toISOString();
+    }
+
+    // 2. Avatar Check (2 Minutes)
+    if (newAvatar && newAvatar !== currentProfile.avatar_url) {
+        if (currentProfile.last_avatar_update) {
+            const lastUpdate = new Date(currentProfile.last_avatar_update).getTime();
+            const diffMinutes = (now.getTime() - lastUpdate) / (1000 * 60);
+
+            if (diffMinutes < 2) {
+                const remainingSeconds = Math.ceil((2 - diffMinutes) * 60);
+                return { error: `Você só pode alterar a foto a cada 2 minutos. Aguarde ${remainingSeconds}s.` };
+            }
+        }
+        updates.avatar_url = newAvatar;
+        updates.last_avatar_update = now.toISOString();
+    }
+
+    if (Object.keys(updates).length === 0) {
+        return { success: true }; // No changes detected
+    }
 
     const { error } = await supabase
         .from('profiles')
-        .update({ name, avatar_url: avatar })
+        .update(updates)
         .eq('id', id)
         .eq('user_id', user.id);
 
