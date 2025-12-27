@@ -65,24 +65,24 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                             href={`/details/${item.supabase_id || item.id}`}
                             className={styles.cardContent}
                         >
-                            {/* Image */}
-                            <OptimizedImage
+                            {/* Image - Using standard img to bypass OptimizedImage onLoad issues */}
+                            <img
                                 src={(() => {
                                     const path = item.poster_path || item.backdrop_path;
                                     if (!path) return '/placeholder.png';
-                                    if (path.startsWith('http')) return path;
-                                    return `https://image.tmdb.org/t/p/w1280${path}`;
-                                })()}
-                                tinySrc={(() => {
-                                    const path = item.poster_path || item.backdrop_path;
-                                    if (!path) return '/placeholder.png';
-                                    if (path.startsWith('http')) return path;
-                                    return `https://image.tmdb.org/t/p/w92${path}`;
+                                    const trimmed = path.trim();
+                                    if (trimmed.startsWith('http')) return trimmed;
+                                    return `https://image.tmdb.org/t/p/w1280${trimmed}`;
                                 })()}
                                 alt={item.title || item.name || 'Cover'}
-                                fill
                                 className={styles.image}
-                                sizes="(max-width: 768px) 50vw, 20vw"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
+                                loading="lazy"
+                                onError={(e) => {
+                                    e.currentTarget.src = '/placeholder.png';
+                                    e.currentTarget.style.objectFit = 'contain';
+                                    e.currentTarget.style.padding = '20px';
+                                }}
                             />
 
                             {/* Gradient Overlay */}
