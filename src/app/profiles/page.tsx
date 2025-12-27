@@ -323,7 +323,7 @@ export default function ProfilesPage() {
                     </div>
                 ))}
 
-                {profiles.length < 3 && !isManaging && (
+                {profiles.length < 5 && !isManaging && (
                     <div
                         className={styles.profileCard}
                         onClick={() => {
