@@ -35,6 +35,11 @@
     /* Gradient mask that lets image show almost until the end */
     mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+
+    /* Improve downscaling quality */
+    image-rendering: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 /* Gradients for Blending - Minimal black */
