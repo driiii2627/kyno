@@ -67,6 +67,7 @@ function ProfileMenu() {
     const [profiles, setProfiles] = useState<any[]>([]);
     const [activeProfile, setActiveProfile] = useState<any>(null);
     const [open, setOpen] = useState(false);
+    const [switchingProfileId, setSwitchingProfileId] = useState<string | null>(null);
     const { push, refresh } = useRouter();
 
     useEffect(() => {
@@ -81,12 +82,21 @@ function ProfileMenu() {
 
     const handleSwitch = async (profileId: string) => {
         if (activeProfile?.id === profileId) return;
+
+        // 1. Trigger Animation
+        setSwitchingProfileId(profileId);
+
+        // 2. Perform Switch in Background
         const { switchProfileAction } = await import('@/app/profiles/actions');
-        setOpen(false); // Close immediately
         const { success } = await switchProfileAction(profileId);
+
         if (success) {
-            refresh();
-            // Optional: Optimistic update can be done here if needed
+            // 3. Wait for animation to finish then "hard refresh"
+            setTimeout(() => {
+                window.location.reload();
+            }, 800); // Match CSS transition time
+        } else {
+            setSwitchingProfileId(null);
         }
     };
 
@@ -115,7 +125,7 @@ function ProfileMenu() {
             {open && (
                 <>
                     <div className={styles.dropdownOverlay} onClick={() => setOpen(false)} />
-                    <div className={styles.dropdown}>
+                    <div className={`${styles.dropdown} ${switchingProfileId ? styles.fadeOut : ''}`}>
                         <div className={styles.dropdownHeader}>
                             <span className={styles.dropdownLabel}>PERFIS</span>
                             <Link href="/profiles?manage=true" className={styles.manageLink}>
@@ -128,12 +138,32 @@ function ProfileMenu() {
                             {profiles.map(p => (
                                 <div
                                     key={p.id}
-                                    className={`${styles.profileItem} ${activeProfile.id === p.id ? styles.activeProfileItem : ''}`}
-                                    onClick={() => handleSwitch(p.id)}
+                                    className={`
+                                        ${styles.profileItem} 
+                                        ${activeProfile.id === p.id ? styles.activeProfileItem : ''}
+                                    `}
+                                    onClick={(e) => {
+                                        // Quick hack to fix position for animation start if we wanted 
+                                        // exact coords, but CSS fixed transition is simpler/smoother for now.
+                                        handleSwitch(p.id);
+                                    }}
                                 >
-                                    <img src={p.avatar_url} className={styles.miniAvatar} />
+                                    <img
+                                        src={p.avatar_url}
+                                        className={`${styles.miniAvatar} ${switchingProfileId === p.id ? styles.flying : ''}`}
+                                        style={switchingProfileId === p.id ? {
+                                            position: 'fixed',
+                                            left: 'unset',
+                                            // We rely on the class adding top/right/transform
+                                        } : {}}
+                                    />
                                     <span className={styles.profileNameList}>{p.name}</span>
                                     {activeProfile.id === p.id && <div className={styles.activeDot} />}
+                                    {switchingProfileId === p.id && (
+                                        <div style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#4ade80' }}>
+                                            Trocando...
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
