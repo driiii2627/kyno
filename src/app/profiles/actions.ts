@@ -76,13 +76,34 @@ export async function createProfileAction(formData: FormData) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Unauthorized' };
 
+    // RATE LIMIT: Check last creation time (Global for user)
+    const { data: lastProfile } = await supabase
+        .from('profiles')
+        .select('created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+    if (lastProfile) {
+        const lastCreated = new Date(lastProfile.created_at);
+        const now = new Date();
+        const diffMinutes = (now.getTime() - lastCreated.getTime()) / (1000 * 60);
+
+        if (diffMinutes < 2) {
+            return { error: 'Aguarde 2 minutos para criar outro perfil.' };
+        }
+    }
+
     // Insert (Trigger will handle ID generation and Limit check)
     const { data, error } = await supabase
         .from('profiles')
         .insert({
             user_id: user.id,
             name,
-            avatar_url: avatar
+            avatar_url: avatar,
+            last_name_update: new Date().toISOString(), // Init trackers
+            last_avatar_update: new Date().toISOString()
         })
         .select()
         .single();
@@ -98,6 +119,7 @@ export async function createProfileAction(formData: FormData) {
     return { success: true, profile: data };
 }
 
+// ... existing switchProfileAction ...
 export async function switchProfileAction(profileId: string) {
     const supabase = await getSupabase();
     const { data: { user } } = await supabase.auth.getUser();
@@ -125,6 +147,7 @@ export async function switchProfileAction(profileId: string) {
     return { success: true };
 }
 
+// ... existing getActiveProfileAction ...
 export async function getActiveProfileAction() {
     const supabase = await getSupabase();
     const cookieStore = await cookies();
@@ -141,6 +164,7 @@ export async function getActiveProfileAction() {
     return { profile };
 }
 
+// ... existing signOutAction ...
 export async function signOutAction() {
     const supabase = await getSupabase();
     await supabase.auth.signOut();
@@ -150,6 +174,7 @@ export async function signOutAction() {
     redirect('/login');
 }
 
+// ... existing deleteProfileAction ...
 export async function deleteProfileAction(profileId: string) {
     const supabase = await getSupabase();
     const { data: { user } } = await supabase.auth.getUser();
@@ -168,16 +193,58 @@ export async function deleteProfileAction(profileId: string) {
 
 export async function updateProfileAction(formData: FormData) {
     const id = String(formData.get('id')); // Profile ID
-    const name = String(formData.get('name'));
-    const avatar = String(formData.get('avatar'));
+    const newName = String(formData.get('name'));
+    const newAvatar = String(formData.get('avatar'));
 
     const supabase = await getSupabase();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: 'Unauthorized' };
 
+    // Fetch current profile data for comparison
+    const { data: currentProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single();
+
+    if (!currentProfile) return { error: 'Perfil não encontrado.' };
+
+    const updates: any = {};
+    const now = new Date();
+
+    // Check NAME Limit (7 hours)
+    if (newName !== currentProfile.name) {
+        if (currentProfile.last_name_update) {
+            const lastUpdate = new Date(currentProfile.last_name_update);
+            const diffHours = (now.getTime() - lastUpdate.getTime()) / (1000 * 60 * 60);
+            if (diffHours < 7) {
+                const remaining = Math.ceil(7 - diffHours);
+                return { error: `Aguarde ${remaining}h para alterar o nome novamente.` };
+            }
+        }
+        updates.name = newName;
+        updates.last_name_update = now.toISOString();
+    }
+
+    // Check AVATAR Limit (2 minutes)
+    if (newAvatar !== currentProfile.avatar_url) {
+        if (currentProfile.last_avatar_update) {
+            const lastUpdate = new Date(currentProfile.last_avatar_update);
+            const diffMinutes = (now.getTime() - lastUpdate.getTime()) / (1000 * 60);
+            if (diffMinutes < 2) {
+                return { error: 'Aguarde 2 minutos para alterar a foto novamente.' };
+            }
+        }
+        updates.avatar_url = newAvatar;
+        updates.last_avatar_update = now.toISOString();
+    }
+
+    if (Object.keys(updates).length === 0) return { success: true }; // No changes
+
     const { error } = await supabase
         .from('profiles')
-        .update({ name, avatar_url: avatar })
+        .update(updates)
         .eq('id', id)
         .eq('user_id', user.id);
 

@@ -457,8 +457,9 @@
 
 @media (max-width: 768px) {
     .editContent {
-        flex-direction: column-reverse;
+        flex-direction: column;
         gap: 2rem;
+        align-items: center;
     }
 
     .editTitle {

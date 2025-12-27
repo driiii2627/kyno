@@ -6,6 +6,7 @@ import styles from './Profiles.module.css';
 import { getProfilesAction, createProfileAction, switchProfileAction, deleteProfileAction, updateProfileAction } from './actions';
 import Turnstile from '@/components/auth/Turnstile';
 import { User, Edit2, Plus, Trash2 } from 'lucide-react';
+import { useToast } from '@/components/ui/ToastContext';
 
 interface Profile {
     id: string;
@@ -79,8 +80,8 @@ export default function ProfilesPage() {
 
     // Auth/Status
     const [turnstileToken, setTurnstileToken] = useState('');
-    const [createError, setCreateError] = useState<string | null>(null);
     const [processing, setProcessing] = useState(false);
+    const toast = useToast();
 
     // Granular Loading
     const [enteringProfileId, setEnteringProfileId] = useState<string | null>(null);
@@ -118,13 +119,13 @@ export default function ProfilesPage() {
             router.push('/');
         } else {
             setEnteringProfileId(null);
+            toast.error('Erro ao acessar perfil.');
         }
     };
 
     const handleSave = async () => {
-        setCreateError(null);
         if (!newName.trim()) {
-            setCreateError('Digite um nome para o perfil.');
+            toast.error('Digite um nome para o perfil.');
             return;
         }
 
@@ -137,8 +138,9 @@ export default function ProfilesPage() {
             formData.append('id', editProfile.id);
             const result = await updateProfileAction(formData);
             if (result.error) {
-                setCreateError(result.error);
+                toast.error(result.error);
             } else {
+                toast.success('Perfil atualizado com sucesso!');
                 await loadProfiles();
                 setView('SELECT');
                 setIsManaging(false);
@@ -146,17 +148,18 @@ export default function ProfilesPage() {
         } else {
             // CREATE
             if (!turnstileToken) {
-                setCreateError('Complete a verificação de segurança.');
+                toast.error('Complete a verificação de segurança.');
                 setProcessing(false);
                 return;
             }
             formData.append('cf-turnstile-response', turnstileToken);
             const result = await createProfileAction(formData);
             if (result.error) {
-                setCreateError(result.error);
+                toast.error(result.error);
                 if (window.turnstile) window.turnstile.reset();
                 setTurnstileToken('');
             } else {
+                toast.success('Perfil criado com sucesso!');
                 await loadProfiles();
                 setView('SELECT');
             }
@@ -227,8 +230,6 @@ export default function ProfilesPage() {
                                 </div>
                             )}
 
-                            {createError && <p style={{ color: '#ef4444', textAlign: 'center', fontSize: '0.9rem' }}>{createError}</p>}
-
                             <div className={styles.actionButtons}>
                                 <button
                                     className={styles.saveButton}
@@ -241,7 +242,6 @@ export default function ProfilesPage() {
                                     className={styles.cancelButton}
                                     onClick={() => {
                                         setView('SELECT');
-                                        setCreateError(null);
                                     }}
                                 >
                                     Cancelar

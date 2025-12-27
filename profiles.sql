@@ -6,7 +6,9 @@ create table if not exists profiles (
     avatar_url text not null,
     internal_id text not null,
     created_at timestamptz default now(),
-    updated_at timestamptz default now()
+    updated_at timestamptz default now(),
+    last_name_update timestamptz,
+    last_avatar_update timestamptz
 );
 
 -- 2. Enable RLS
