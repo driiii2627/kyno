@@ -18,7 +18,7 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Hide Navbar on player routes, Details page, Login/Auth, and Profiles
+    // Hide Navbar on player routes (filme and serie), Details page, and Login/Auth, and Profiles
     if (pathname?.startsWith('/filme/') || pathname?.startsWith('/serie/') || pathname?.startsWith('/details/') || pathname?.startsWith('/login') || pathname?.startsWith('/auth') || pathname === '/profiles') {
         return null;
     }
@@ -90,28 +90,41 @@ function ProfileMenu() {
     }
 
     return (
-        <div className={styles.profileMenuContainer} onMouseLeave={() => setOpen(false)}>
+        <div className={styles.profileMenuContainer}>
             <div
                 className={styles.profileTrigger}
-                onMouseEnter={() => setOpen(true)}
                 onClick={() => setOpen(!open)}
             >
                 <img src={profile.avatar_url} alt="Profile" className={styles.navAvatar} />
             </div>
 
+            {/* Click outside listener could be added here or simple toggle for now */}
             {open && (
-                <div className={styles.dropdown}>
-                    <div className={styles.dropdownHeader}>
-                        <p>{profile.name}</p>
+                <>
+                    <div className={styles.dropdownOverlay} onClick={() => setOpen(false)} />
+                    <div className={styles.dropdown}>
+                        <div className={styles.dropdownHeader}>
+                            <p className={styles.dropdownLabel}>PERFIS</p>
+                            <div className={styles.activeProfileRow}>
+                                <img src={profile.avatar_url} className={styles.miniAvatar} />
+                                <span className={styles.activeName}>{profile.name}</span>
+                            </div>
+                        </div>
+
+                        <div className={styles.dropdownDivider} />
+
+                        <div className={styles.dropdownItem} onClick={() => push('/profiles')}>
+                            <User size={16} className={styles.itemIcon} />
+                            <span>Trocar de Perfil</span>
+                        </div>
+
+                        <div className={styles.dropdownDivider} />
+
+                        <div className={styles.dropdownItem} onClick={handleSignOut}>
+                            <span>Sair da Conta</span>
+                        </div>
                     </div>
-                    <div className={styles.dropdownItem} onClick={() => push('/profiles')}>
-                        Trocar de Perfil
-                    </div>
-                    {/* Future: Editar Perfil link can be added here */}
-                    <div className={styles.dropdownItem} onClick={handleSignOut} style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                        Sair da Conta
-                    </div>
-                </div>
+                </>
             )}
         </div>
     );
