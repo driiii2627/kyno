@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Search, Bookmark, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -18,9 +18,9 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Hide Navbar on player routes (filme and serie), Details page, and Login
+    // Hide Navbar on player routes (filme and serie), Details page, and Login/Auth
     if (pathname?.startsWith('/filme/') || pathname?.startsWith('/serie/') || pathname?.startsWith('/details/') || pathname?.startsWith('/login') || pathname?.startsWith('/auth')) {
-        return null; // Don't render navbar on player, details or login pages
+        return null;
     }
 
     // Check if we are on a category page
@@ -42,7 +42,6 @@ export default function Navbar() {
                 <Link href="/" className={`${styles.link} ${pathname === '/' ? styles.active : ''}`}>Home</Link>
                 <Link href="/category/filmes" className={`${styles.link} ${pathname?.includes('/category/filmes') ? styles.active : ''}`}>Filmes</Link>
                 <Link href="/category/series" className={`${styles.link} ${pathname?.includes('/category/series') ? styles.active : ''}`}>Séries</Link>
-                {/* Categories usually implies a browse page, but we'll leave it as /categories if that route exists, or link to movies for now */}
                 <Link href="/category/filmes" className={styles.link}>Categorias</Link>
             </div>
 
@@ -55,11 +54,65 @@ export default function Navbar() {
                     <button className={styles.iconBtn}>
                         <Bookmark size={22} />
                     </button>
-                    <button className={styles.iconBtn}>
-                        <User size={22} />
-                    </button>
+
+                    {/* Profile Menu instead of static User icon */}
+                    <ProfileMenu />
                 </div>
             )}
         </nav>
+    );
+}
+
+function ProfileMenu() {
+    const [profile, setProfile] = useState<any>(null);
+    const [open, setOpen] = useState(false);
+    const { push } = useRouter();
+
+    useEffect(() => {
+        import('@/app/profiles/actions').then(async ({ getActiveProfileAction }) => {
+            const { profile } = await getActiveProfileAction();
+            setProfile(profile);
+        });
+    }, []);
+
+    const handleSignOut = async () => {
+        const { signOutAction } = await import('@/app/profiles/actions');
+        await signOutAction();
+    };
+
+    if (!profile) {
+        // Fallback or loading state
+        return (
+            <Link href="/profiles" className={styles.iconBtn}>
+                <User size={22} />
+            </Link>
+        );
+    }
+
+    return (
+        <div className={styles.profileMenuContainer} onMouseLeave={() => setOpen(false)}>
+            <div
+                className={styles.profileTrigger}
+                onMouseEnter={() => setOpen(true)}
+                onClick={() => setOpen(!open)}
+            >
+                <img src={profile.avatar_url} alt="Profile" className={styles.navAvatar} />
+            </div>
+
+            {open && (
+                <div className={styles.dropdown}>
+                    <div className={styles.dropdownHeader}>
+                        <p>{profile.name}</p>
+                    </div>
+                    <div className={styles.dropdownItem} onClick={() => push('/profiles')}>
+                        Trocar de Perfil
+                    </div>
+                    {/* Future: Editar Perfil link can be added here */}
+                    <div className={styles.dropdownItem} onClick={handleSignOut} style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                        Sair da Conta
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
