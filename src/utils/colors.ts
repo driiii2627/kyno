@@ -19,9 +19,9 @@ export const getDominantColor = (imageSrc: string): Promise<string | null> => {
             ctx.drawImage(img, 0, 0, 1, 1);
             const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
 
-            // Darken the color slightly for better background contrast (as requested)
-            // Reduce brightness by 40%
-            const darkenFactor = 0.6;
+            // Darken the color significantly for better background contrast
+            // Reduce brightness to 30% (was 60%) to be very subtle
+            const darkenFactor = 0.3;
             const dr = Math.floor(r * darkenFactor);
             const dg = Math.floor(g * darkenFactor);
             const db = Math.floor(b * darkenFactor);

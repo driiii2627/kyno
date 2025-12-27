@@ -215,7 +215,7 @@ export default function ProfilesPage() {
 
     if (view === 'CREATE' || view === 'EDIT') {
         return (
-            <div className={styles.container} style={backgroundStyle}>
+            <div className={styles.container} style={bgStyle}>
                 <div className={styles.editContainer}>
                     <div className={styles.editHeader}>
                         <h1 className={styles.editTitle}>
