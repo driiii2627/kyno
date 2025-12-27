@@ -18,9 +18,9 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Hide Navbar on player routes (filme and serie) AND Details page
-    if (pathname?.startsWith('/filme/') || pathname?.startsWith('/serie/') || pathname?.startsWith('/details/')) {
-        return null; // Don't render navbar on player or details pages
+    // Hide Navbar on player routes (filme and serie), Details page, and Login
+    if (pathname?.startsWith('/filme/') || pathname?.startsWith('/serie/') || pathname?.startsWith('/details/') || pathname?.startsWith('/login') || pathname?.startsWith('/auth')) {
+        return null; // Don't render navbar on player, details or login pages
     }
 
     // Check if we are on a category page
