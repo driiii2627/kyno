@@ -328,7 +328,7 @@ export default function ProfilesPage() {
                         className={styles.profileCard}
                         onClick={() => {
                             setNewName('');
-                            setNewAvatar(AVATARS[0]);
+                            setNewAvatar(AVATAR_CATEGORIES['Original Kyno+'][0]);
                             setTurnstileToken('');
                             setView('CREATE');
                         }}
