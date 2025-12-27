@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
+import { ToastProvider } from '@/components/ui/ToastContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} font-sans antialiased text-white`}>
-        <Navbar />
-        <main className="min-h-screen relative">{children}</main>
+        <ToastProvider>
+          <Navbar />
+          <main className="min-h-screen relative">{children}</main>
+        </ToastProvider>
       </body>
     </html>
   );
