@@ -108,6 +108,7 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
                                     {ep.still_path ? (
                                         <OptimizedImage
                                             src={getImageUrl(ep.still_path || '', 'original')}
+                                            tinySrc={getImageUrl(ep.still_path || '', 'w92')}
                                             alt={ep.name}
                                             fill
                                             className={styles.thumbnailImage}

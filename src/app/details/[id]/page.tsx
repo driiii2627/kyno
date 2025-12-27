@@ -155,6 +155,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                 {backdropUrl && (
                     <OptimizedImage
                         src={backdropUrl}
+                        tinySrc={backdropUrl.replace('original', 'w300')} // Use w300 for decent blur on huge header
                         alt="Background"
                         fill
                         className={styles.heroImage}
