@@ -6,26 +6,26 @@
     justify-content: center;
     min-height: 100vh;
     padding: 2rem;
-    background: #141414;
-    /* Netflix dark background */
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+    /* Deep Blue Vignette */
     color: #fff;
     animation: fadeIn 0.5s ease;
 }
 
 .title {
-    font-size: 3.5rem;
-    font-weight: 400;
+    font-size: 3rem;
+    font-weight: 500;
     color: #fff;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     text-align: center;
-    transition: all 0.3s ease;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 /* Profile Grid */
 .profileGrid {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 2.5rem;
     justify-content: center;
     align-items: flex-start;
     max-width: 1200px;
@@ -35,31 +35,29 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 1.2rem;
     cursor: pointer;
-    group: relative;
-    width: 154px;
-    /* Fixed width for consistency */
+    position: relative;
+    width: 160px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.profileCard:hover {
+    transform: scale(1.05);
 }
 
 .avatarWrapper {
-    width: 154px;
-    height: 154px;
-    border-radius: 4px;
-    /* Default square-ish like Netflix */
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    /* Circle Avatars as requested */
     overflow: hidden;
     position: relative;
-    border: 3px solid transparent;
-    transition: all 0.2s ease;
-    background: #111;
-}
-
-/* Netflix avatars are usually square with slight radius, but user reference showed circles. 
-   User said "Netflix-style" and sent reference images. 
-   Ref image 1: Circular avatars. Ref image 3: Circular in grid. 
-   I will use Circular as per Reference images. */
-.avatarWrapper {
-    border-radius: 50%;
+    border: 4px solid transparent;
+    /* Highlight border space */
+    transition: all 0.3s ease;
+    background: #1e293b;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .avatar {
@@ -68,21 +66,19 @@
     object-fit: cover;
 }
 
-.profileName {
-    color: #808080;
-    font-size: 1.3rem;
-    transition: color 0.3s ease;
-    text-align: center;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    width: 100%;
-}
-
 .profileCard:hover .avatarWrapper {
     border-color: #fff;
-    transform: scale(1.05);
-    /* Slight grow */
+    /* White glow on hover */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.profileName {
+    color: #94a3b8;
+    /* Slate 400 */
+    font-size: 1.2rem;
+    font-weight: 400;
+    transition: color 0.3s ease;
+    text-align: center;
 }
 
 .profileCard:hover .profileName {
@@ -92,17 +88,22 @@
 /* Add Button */
 .addButton {
     border-radius: 50%;
-    border: 2px solid #808080;
-    /* Subtle border */
-    background: transparent;
-    color: #808080;
-    font-size: 5rem;
-    transition: all 0.3s ease;
+    border: 2px solid #334155;
+    /* Slate 700 */
+    background: rgba(15, 23, 42, 0.6);
+    color: #94a3b8;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 154px;
-    height: 154px;
+    width: 160px;
+    height: 160px;
+    transition: all 0.3s ease;
+}
+
+.addButton svg {
+    width: 64px;
+    height: 64px;
+    stroke-width: 1;
 }
 
 .addButton:hover {
@@ -115,232 +116,264 @@
 .manageButton {
     margin-top: 4rem;
     background: transparent;
-    border: 1px solid #808080;
-    color: #808080;
-    padding: 0.6rem 2rem;
-    font-size: 1.1rem;
+    border: 1px solid #64748b;
+    color: #94a3b8;
+    padding: 0.7rem 2.5rem;
+    font-size: 1rem;
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 2.5px;
+    letter-spacing: 2px;
     transition: all 0.3s ease;
-    font-weight: 500;
+    font-weight: 600;
+    border-radius: 4px;
+    /* Slight rounding, not full pill */
 }
 
 .manageButton:hover {
     border-color: #fff;
     color: #fff;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-/* Overlays (Edit Mode) */
+/* Overlay for Edit Icon on Avatar */
 .editOverlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 2rem;
+    opacity: 1;
+    /* Always visible in Manage mode? Or on hover? Usually manage mode puts an icon over it. */
 }
 
-/* CREATE / EDIT SCREEN (Full Page Feel) */
+
+/* --- CREATE / EDIT SCREEN (Reference 4 Style) --- */
 .editContainer {
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    animation: fadeIn 0.3s ease;
+    gap: 1rem;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .editHeader {
-    text-align: left;
-    border-bottom: 1px solid #333;
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+    text-align: center;
+    margin-bottom: 3rem;
 }
 
 .editTitle {
-    font-size: 4rem;
-    font-weight: 500;
+    font-size: 3.5rem;
+    font-weight: 600;
     margin: 0;
+    letter-spacing: -1px;
+    color: #fff;
 }
 
 .editContent {
     display: flex;
-    gap: 3rem;
-    align-items: flex-start;
-}
-
-/* Left Form */
-.editForm {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.inputGroup {
-    background: #333;
-    padding: 0.5rem 1rem;
-    border-radius: 0;
-    /* Boxy like ref */
-}
-
-.input {
-    background: #666;
-    border: none;
-    padding: 1rem;
-    color: #fff;
-    font-size: 1.2rem;
-    width: 100%;
-    outline: none;
-}
-
-.input::placeholder {
-    color: #ccc;
-}
-
-/* Right Avatar Preview */
-.editAvatarPreview {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    gap: 5rem;
     align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Right Side (Avatar) in Ref 4, but let's keep it visually balanced. Ref 4 has Avatar Right. */
+.editAvatarPreview {
     position: relative;
+    flex-shrink: 0;
 }
 
 .previewImage {
-    width: 180px;
-    height: 180px;
-    border-radius: 4px;
-    /* Square for edit preview as per ref? Ref implies square-ish. Let's stick to consistent circle if main is circle, but ref image 4 shows circle avatar. */
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    /* Circle */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     object-fit: cover;
+    border: 4px solid #1e293b;
+    /* Dark border to separate */
 }
 
 .editIcon {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    /* Or centered? Ref has green pencil. */
-    background: #fff;
-    color: #000;
+    background: #0ea5e9;
+    /* Sky 500 - Valid "Blue" */
+    color: #fff;
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s;
+    border: 3px solid #020617;
+    /* Match bg to cut out */
+}
+
+.editIcon:hover {
+    transform: scale(1.1);
+    background: #38bdf8;
+}
+
+/* Left Side (Form) in Ref 4 */
+.editForm {
+    flex: 1;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.inputGroup {
+    /* No background container, just the input */
+}
+
+.input {
+    background: rgba(30, 41, 59, 0.6);
+    /* Slate 800 glass */
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    /* Subtle border */
+    padding: 1.2rem;
+    border-radius: 12px;
+    /* Rounded corners */
+    color: #fff;
+    font-size: 1.1rem;
+    width: 100%;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input:focus {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: #0ea5e9;
+    /* Focus Blue */
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+}
+
+.input::placeholder {
+    color: #64748b;
 }
 
 .actionButtons {
     display: flex;
-    gap: 1.5rem;
-    margin-top: 2rem;
+    flex-direction: column;
+    /* Stacked buttons like Ref 4? Ref 4 has one distinct green button. Keep row or stack. */
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .saveButton {
     background: #fff;
-    color: #000;
-    padding: 0.8rem 2rem;
-    font-weight: 700;
+    /* White button for strong contrast as requested in Ref 1, or Blue? Ref 4 is Green. App is Blue. */
+    /* Let's go with Blue to match "Site Colors" user request */
+    background: #0ea5e9;
+    color: #fff;
+    padding: 1rem;
+    font-weight: 600;
     font-size: 1.1rem;
     border: none;
+    border-radius: 12px;
     cursor: pointer;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    transition: all 0.2s;
+    width: 100%;
+    letter-spacing: 0.5px;
 }
 
 .saveButton:hover {
-    background: #c00;
-    /* Maybe red? Or keep white. Ref has white/black. */
-    background: #e50914;
-    /* Netflix Red */
-    color: #fff;
+    background: #0284c7;
+    transform: translateY(-1px);
 }
 
 .cancelButton {
     background: transparent;
-    border: 1px solid #808080;
-    color: #808080;
-    padding: 0.8rem 2rem;
-    font-size: 1.1rem;
+    color: #94a3b8;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: none;
     cursor: pointer;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    transition: color 0.2s;
+    text-align: center;
 }
 
 .cancelButton:hover {
-    border-color: #fff;
     color: #fff;
+    text-decoration: underline;
 }
 
-/* Avatar Grid Overlay (Picker) */
+/* Avatar Picker Overlay */
 .pickerOverlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: #141414;
-    z-index: 200;
-    padding: 3rem;
+    background: rgba(2, 6, 23, 0.95);
+    /* High opacity dark blue */
+    backdrop-filter: blur(10px);
+    z-index: 300;
+    padding: 2rem;
     overflow-y: auto;
     animation: fadeIn 0.3s ease;
 }
 
 .pickerHeader {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 3rem;
-    border-bottom: 1px solid #333;
-    padding-bottom: 1rem;
+    gap: 2rem;
 }
 
 .pickerGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1px));
-    gap: 1.5rem;
-    justify-content: center;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1px));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 4rem;
 }
 
 .pickerItem {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
     border: 3px solid transparent;
 }
 
 .pickerItem:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
     border-color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Loading Helper */
+/* Loading Spinner */
 .loadingContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background: #141414;
+    background: #020617;
 }
 
 .spinner {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border: 4px solid rgba(255, 255, 255, 0.1);
-    border-left-color: #e50914;
+    border-left-color: #0ea5e9;
+    /* Blue spinner */
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -361,18 +394,38 @@
     }
 }
 
-/* Responsiveness */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
     .editContent {
         flex-direction: column-reverse;
-        align-items: center;
+        /* Form bottom, Avatar top */
+        gap: 2rem;
     }
 
-    .editAvatarPreview {
-        margin-bottom: 2rem;
-    }
-
-    .title {
+    .editTitle {
         font-size: 2.5rem;
+    }
+
+    .profileGrid {
+        gap: 1.5rem;
+    }
+
+    .profileCard,
+    .avatarWrapper,
+    .addButton {
+        width: 120px;
+        height: 120px;
     }
 }
