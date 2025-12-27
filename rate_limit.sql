@@ -1,4 +1,4 @@
--- Create table for rate limits
+-- 1. Create table for rate limits
 create table if not exists auth_rate_limits (
     id uuid primary key default gen_random_uuid(),
     ip_address text,
@@ -9,10 +9,18 @@ create table if not exists auth_rate_limits (
     blocked_until timestamptz
 );
 
+-- 2. Security & RLS
+-- Enable RLS to block all direct access by default
+alter table auth_rate_limits enable row level security;
+
+-- No policies are created, which means Default Deny for all roles (anon, authenticated).
+-- Access is ONLY possible via the SECURITY DEFINER functions below.
+
+-- Indexes for performance
 create index if not exists idx_rate_limits_ip on auth_rate_limits(ip_address);
 create index if not exists idx_rate_limits_email on auth_rate_limits(email);
 
--- RPC function to check and update rate limits
+-- 3. RPC Function (Secure)
 create or replace function check_and_update_rate_limit(
     request_ip text,
     request_email text,
@@ -22,7 +30,8 @@ create or replace function check_and_update_rate_limit(
 )
 returns json
 language plpgsql
-security definer
+security definer -- Execute as function creator (admin), bypassing RLS
+set search_path = public -- Prevent search_path hijacking
 as $$
 declare
     record_id uuid;
@@ -36,11 +45,6 @@ begin
     from auth_rate_limits
     where ip_address = request_ip
     and attempt_type = request_type
-    -- Optional: also check email if provided? For now mostly IP based for login attacks
-    -- but you could create separate rows for email. Let's stick to IP+Type for simplicity or User+Type.
-    -- To adhere to "4 tries per account", we should probably track email.
-    -- But attackers can spam multiple emails.
-    -- Let's stick to IP for now as it's more robust against botnets trying many emails.
     limit 1;
 
     -- 2. Check if currently blocked
@@ -60,12 +64,18 @@ begin
         return json_build_object('allowed', true);
     end if;
 
-    -- 4. If record exists, increment
-    -- If enough time passed since last block/attempt (e.g. 1 hour), maybe reset?
-    -- For this simple version, we mainly reset on success (handled by client/server logic calling a reset function)
-    -- or manually via DB.
-    -- Here we just increment.
+    -- 4. If record exists, increment logic
     
+    -- If enough time (e.g. block duration * 2) has passed since last attempt without being blocked, 
+    -- we could consider resetting, but for now we just strictly increment on failure 
+    -- and rely on the successful login reset to clear it. 
+    -- Or if the block_until has expired, we reset attempts to 1 (new failure chain).
+    
+    if current_blocked_until is not null and current_blocked_until <= now() then
+         -- Punishment over, reset counter to 1 for this new failure
+         current_failed := 0;
+    end if;
+
     current_failed := current_failed + 1;
 
     if current_failed > max_attempts then
@@ -85,7 +95,8 @@ begin
         update auth_rate_limits
         set failed_attempts = current_failed,
             last_attempt_at = now(),
-            blocked_until = null -- Clear block if it was expired
+            -- Clear blocked_until if it was set but expired, just to be clean
+            blocked_until = null 
         where id = record_id;
         
         return json_build_object('allowed', true);
@@ -93,7 +104,7 @@ begin
 end;
 $$;
 
--- Reset function (call this on successful login)
+-- 4. Reset function (Secure)
 create or replace function reset_rate_limit(
     request_ip text,
     request_type text
@@ -101,6 +112,7 @@ create or replace function reset_rate_limit(
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
     delete from auth_rate_limits
