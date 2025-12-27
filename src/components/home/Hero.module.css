@@ -304,8 +304,8 @@
 
 @media (max-width: 768px) {
     .hero {
-        height: 65vh;
-        /* Reduce height to reduce zoom/aliasing */
+        height: 80vh;
+        /* Restored "Big" look but with anti-aliasing */
         align-items: flex-end;
     }
 

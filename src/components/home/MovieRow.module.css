@@ -312,7 +312,8 @@
     }
 
     .card {
-        width: 140px;
+        width: 160px;
+        /* Slightly larger targets */
     }
 
     .top10List {

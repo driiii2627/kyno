@@ -169,9 +169,9 @@
 @media (max-width: 768px) {
     .card {
         /* Mobile: Show ~2.2 items for "peek" effect or just 2 items */
-        min-width: 160px;
+        min-width: 175px;
         /* Fixed readable width */
-        max-width: 160px;
+        max-width: 175px;
     }
 }
 
