@@ -125,7 +125,7 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                     setSuccess('Bem vindo de volta! Redirecionando...');
                     // Keep loading true to show overlay
                     setTimeout(() => {
-                        router.refresh();
+                        router.push('/');
                     }, 2000); // 2s delay as requested
                     return;
                 }
@@ -147,7 +147,7 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                     if (result.autoLogin) {
                         setSuccess('Bem vindo! Redirecionando...');
                         setTimeout(() => {
-                            router.refresh();
+                            router.push('/');
                         }, 2000);
                         return;
                     } else {
