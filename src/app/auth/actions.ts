@@ -8,6 +8,29 @@ export async function loginAction(formData: FormData) {
     const email = String(formData.get('email'));
     const password = String(formData.get('password'));
     const code = String(formData.get('code'));
+    const turnstileToken = String(formData.get('cf-turnstile-response'));
+
+    const headerList = await headers();
+    const ip = headerList.get('x-forwarded-for') || '127.0.0.1';
+
+    // 0. Verify Cloudflare Turnstile
+    const secretKey = process.env.TURNSTILE_SECRET_KEY;
+    if (!secretKey) return { error: 'Configuração de servidor inválida.' };
+
+    const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            secret: secretKey,
+            response: turnstileToken,
+            remoteip: ip,
+        }),
+    });
+
+    const verifyJson = await verifyRes.json();
+    if (!verifyJson.success) {
+        return { error: 'Falha na verificação de segurança (Captcha).' };
+    }
 
     // 1. Validate Credentials
     const cookieStore = await cookies();

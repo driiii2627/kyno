@@ -22,36 +22,69 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
     const [success, setSuccess] = useState<string | null>(null);
     const router = useRouter();
 
+    const calculatePasswordStrength = (pwd: string) => {
+        let score = 0;
+        if (!pwd) return { score, label: '', colorClass: '' };
+
+        if (pwd.length >= 6) score++;
+        if (pwd.length >= 10) score++;
+        if (/[A-Z]/.test(pwd)) score++;
+        if (/[0-9]/.test(pwd)) score++;
+        if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+        // Max score 5
+        if (score <= 2) return { score, label: 'Fraca', colorClass: styles.strengthWeak };
+        if (score <= 3) return { score, label: 'Média', colorClass: styles.strengthFair };
+        if (score <= 4) return { score, label: 'Boa', colorClass: styles.strengthGood };
+        return { score, label: 'Excelente', colorClass: styles.strengthPerfect };
+    };
+
+    const strength = calculatePasswordStrength(password);
+    const isPasswordStrongEnough = strength.score >= 3;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
         setLoading(true);
 
+        // Security Checks
+        if (!token) {
+            setError('Por favor, complete a verificação de segurança.');
+            setLoading(false);
+            return;
+        }
+
+        if (mode === 'register' && !isPasswordStrongEnough) {
+            setError('A senha precisa ser mais forte.');
+            setLoading(false);
+            return;
+        }
+
         const formData = new FormData();
         formData.append('email', email);
         formData.append('password', password);
         formData.append('code', loginCode);
+        if (token) formData.append('cf-turnstile-response', token);
 
         try {
             if (mode === 'login') {
                 const result = await onLogin(formData);
                 if (result.error) {
                     setError(result.error);
+                    // Reset token on error
+                    if (window.turnstile) {
+                        window.turnstile.reset();
+                        setToken('');
+                    }
                 } else {
-                    router.refresh();
+                    setSuccess('Bem vindo de volta! Redirecionando...');
+                    setTimeout(() => {
+                        router.refresh();
+                    }, 1000);
                 }
             } else {
                 // Register Mode
-                // Client-side Turnstile check for Register
-                if (!token) {
-                    setError('Por favor, complete a verificação de segurança.');
-                    setLoading(false);
-                    return;
-                }
-
-                if (token) formData.append('cf-turnstile-response', token);
-
                 const result = await onRegister(formData);
 
                 if (result.error) {
@@ -63,7 +96,10 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                 } else {
                     // Register success
                     if (result.autoLogin) {
-                        router.refresh();
+                        setSuccess('Bem vindo! Redirecionando...');
+                        setTimeout(() => {
+                            router.refresh();
+                        }, 1000);
                     } else {
                         // User needs to login manually
                         setMode('login');
@@ -78,9 +114,18 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
             }
         } catch (err) {
             setError('Ocorreu um erro inesperado. Tente novamente.');
-        } finally {
             setLoading(false);
+        } finally {
+            if (!success) setLoading(false);
         }
+    };
+
+    const handleModeSwitch = (newMode: 'login' | 'register') => {
+        setMode(newMode);
+        setError(null);
+        setSuccess(null);
+        setToken('');
+        if (window.turnstile) window.turnstile.reset();
     };
 
     return (
@@ -93,13 +138,13 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
             <div className={styles.tabs}>
                 <button
                     className={`${styles.tab} ${mode === 'login' ? styles.activeTab : ''}`}
-                    onClick={() => { setMode('login'); setError(null); setSuccess(null); }}
+                    onClick={() => handleModeSwitch('login')}
                 >
                     Entrar
                 </button>
                 <button
                     className={`${styles.tab} ${mode === 'register' ? styles.activeTab : ''}`}
-                    onClick={() => { setMode('register'); setError(null); setSuccess(null); }}
+                    onClick={() => handleModeSwitch('register')}
                 >
                     Criar Conta
                 </button>
@@ -129,18 +174,30 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                         required
                         minLength={6}
                     />
+
+                    {mode === 'register' && password.length > 0 && (
+                        <div className={styles.strengthMeter}>
+                            <div className={styles.strengthLabel}>
+                                <span>Força da senha</span>
+                                <span>{strength.label}</span>
+                            </div>
+                            <div className={styles.strengthBarBg}>
+                                <div
+                                    className={`${styles.strengthBarFill} ${strength.colorClass}`}
+                                    style={{ width: `${(strength.score / 5) * 100}%` }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Turnstile is Mandatory for Register, Contextual for Login (simulated here) */}
-                {(mode === 'register') && (
-                    <div className={styles.turnstileWrapper}>
-                        <Turnstile
-                            siteKey={siteKey}
-                            onVerify={(t) => setToken(t)}
-                            theme="dark"
-                        />
-                    </div>
-                )}
+                <div className={styles.turnstileWrapper}>
+                    <Turnstile
+                        siteKey={siteKey}
+                        onVerify={(t) => setToken(t)}
+                        theme="dark"
+                    />
+                </div>
 
                 {error && <div className={styles.error}>{error}</div>}
 
@@ -159,8 +216,16 @@ export default function AuthForm({ loginCode, onLogin, onRegister, siteKey }: Au
                     </div>
                 )}
 
-                <button type="submit" className={styles.submitButton} disabled={loading}>
-                    {loading ? 'Processando...' : (mode === 'login' ? 'Acessar Painel' : 'Criar Conta')}
+                <button
+                    type="submit"
+                    className={styles.submitButton}
+                    disabled={
+                        loading ||
+                        !token ||
+                        (mode === 'register' && !isPasswordStrongEnough)
+                    }
+                >
+                    {loading ? 'Processando...' : (mode === 'login' ? 'Entrar' : 'Criar Conta')}
                 </button>
 
                 <p className={styles.helperText}>
