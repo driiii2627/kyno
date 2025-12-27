@@ -120,3 +120,31 @@ begin
     and attempt_type = request_type;
 end;
 $$;
+
+-- 5. IP Registration Limit Function (3 accounts per IP)
+create or replace function check_ip_registration_rate_limit(
+    request_ip text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    account_count int;
+begin
+    -- Count how many accounts were registered by this IP
+    -- We assume 'kyno_user_security_logs' tracks registrations.
+    -- Ensure you have this table created.
+    select count(*)
+    into account_count
+    from kyno_user_security_logs
+    where registration_ip = request_ip;
+
+    if account_count >= 3 then
+        return false; -- Block
+    else
+        return true; -- Allow
+    end if;
+end;
+$$;
