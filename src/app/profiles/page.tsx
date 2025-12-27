@@ -6,11 +6,6 @@ import styles from './Profiles.module.css';
 import { getProfilesAction, createProfileAction, switchProfileAction, deleteProfileAction, updateProfileAction } from './actions';
 import Turnstile from '@/components/auth/Turnstile';
 import { User, Edit2, Plus, Trash2 } from 'lucide-react';
-import { useToast } from '@/components/ui/ToastContext';
-import { getDominantColor } from '@/utils/colors';
-
-// Feature Flag
-const ENABLE_DYNAMIC_THEME = true;
 
 interface Profile {
     id: string;
@@ -61,6 +56,9 @@ const AVATAR_CATEGORIES = {
 
 export default function ProfilesPage() {
     const router = useRouter();
+    const [profiles, setProfiles] = useState<Profile[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [isManaging, setIsManaging] = useState(false);
 
     // Check for ?manage=true
     useEffect(() => {
@@ -73,93 +71,19 @@ export default function ProfilesPage() {
     // View State: 'SELECT' | 'EDIT' | 'CREATE'
     const [view, setView] = useState<'SELECT' | 'EDIT' | 'CREATE'>('SELECT');
 
-    const [profiles, setProfiles] = useState<Profile[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [isManaging, setIsManaging] = useState(false);
-
     // Form State
     const [editProfile, setEditProfile] = useState<Profile | null>(null);
     const [newName, setNewName] = useState('');
     const [newAvatar, setNewAvatar] = useState(AVATAR_CATEGORIES['Original Kyno+'][0]);
     const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
-    // Dynamic Theme State
-    const [bgStyle, setBgStyle] = useState<React.CSSProperties>({});
-    const [profileColors, setProfileColors] = useState<Record<string, string>>({});
-
     // Auth/Status
     const [turnstileToken, setTurnstileToken] = useState('');
+    const [createError, setCreateError] = useState<string | null>(null);
     const [processing, setProcessing] = useState(false);
-    const toast = useToast();
 
     // Granular Loading
     const [enteringProfileId, setEnteringProfileId] = useState<string | null>(null);
-
-    // Effect for Dynamic Color / Background
-    useEffect(() => {
-        if (!ENABLE_DYNAMIC_THEME) return;
-
-        const updateBackground = async () => {
-            // 1. EDIT / CREATE MODE
-            if (view === 'CREATE' || view === 'EDIT') {
-                if (newAvatar) {
-                    const color = await getDominantColor(newAvatar);
-                    if (color) {
-                        setBgStyle({
-                            background: `radial-gradient(circle at center, ${color} 0%, #020617 100%)`
-                        });
-                        // Store single color for edit icon/accents
-                        setProfileColors({ temp: color });
-                    }
-                }
-            } else {
-                // 2. SELECT MODE: Blend colors from all profiles
-                if (profiles.length > 0) {
-                    const colorsMap: Record<string, string> = {};
-                    const colors = await Promise.all(
-                        profiles.map(async p => {
-                            const c = await getDominantColor(p.avatar_url);
-                            if (c) colorsMap[p.id] = c;
-                            return c;
-                        })
-                    );
-
-                    setProfileColors(colorsMap);
-
-                    const validColors = colors.filter(c => c !== null) as string[];
-
-                    if (validColors.length === 0) {
-                        setBgStyle({});
-                        return;
-                    }
-
-                    if (validColors.length === 1) {
-                        setBgStyle({
-                            background: `radial-gradient(circle at center, ${validColors[0]} 0%, #020617 100%)`
-                        });
-                    } else {
-                        // Create a mesh/blend of colors
-                        const positions = [
-                            'top left', 'top right', 'bottom left', 'bottom right', 'center'
-                        ];
-
-                        const gradients = validColors.map((color, i) => {
-                            const pos = positions[i % positions.length];
-                            return `radial-gradient(circle at ${pos}, ${color} 0%, transparent 60%)`;
-                        });
-
-                        setBgStyle({
-                            background: `${gradients.join(', ')}, #020617`
-                        });
-                    }
-                } else {
-                    setBgStyle({});
-                }
-            }
-        };
-
-        updateBackground();
-    }, [newAvatar, view, profiles]);
 
     useEffect(() => {
         loadProfiles();
@@ -194,13 +118,13 @@ export default function ProfilesPage() {
             router.push('/');
         } else {
             setEnteringProfileId(null);
-            toast.error('Erro ao acessar perfil.');
         }
     };
 
     const handleSave = async () => {
+        setCreateError(null);
         if (!newName.trim()) {
-            toast.error('Digite um nome para o perfil.');
+            setCreateError('Digite um nome para o perfil.');
             return;
         }
 
@@ -213,9 +137,8 @@ export default function ProfilesPage() {
             formData.append('id', editProfile.id);
             const result = await updateProfileAction(formData);
             if (result.error) {
-                toast.error(result.error);
+                setCreateError(result.error);
             } else {
-                toast.success('Perfil atualizado com sucesso!');
                 await loadProfiles();
                 setView('SELECT');
                 setIsManaging(false);
@@ -223,18 +146,17 @@ export default function ProfilesPage() {
         } else {
             // CREATE
             if (!turnstileToken) {
-                toast.error('Complete a verificação de segurança.');
+                setCreateError('Complete a verificação de segurança.');
                 setProcessing(false);
                 return;
             }
             formData.append('cf-turnstile-response', turnstileToken);
             const result = await createProfileAction(formData);
             if (result.error) {
-                toast.error(result.error);
+                setCreateError(result.error);
                 if (window.turnstile) window.turnstile.reset();
                 setTurnstileToken('');
             } else {
-                toast.success('Perfil criado com sucesso!');
                 await loadProfiles();
                 setView('SELECT');
             }
@@ -261,10 +183,8 @@ export default function ProfilesPage() {
     }
 
     if (view === 'CREATE' || view === 'EDIT') {
-        const accentColor = profileColors['temp'] || '#0ea5e9'; // Fallback to blue if needed
-
         return (
-            <div className={styles.container} style={bgStyle}>
+            <div className={styles.container}>
                 <div className={styles.editContainer}>
                     <div className={styles.editHeader}>
                         <h1 className={styles.editTitle}>
@@ -277,21 +197,10 @@ export default function ProfilesPage() {
 
                     <div className={styles.editContent}>
                         <div className={styles.editAvatarPreview}>
-                            <img
-                                src={newAvatar}
-                                alt="Avatar"
-                                className={styles.previewImage}
-                                crossOrigin="anonymous"
-                                style={{ borderColor: accentColor }}
-                            />
+                            <img src={newAvatar} alt="Avatar" className={styles.previewImage} />
                             <div
                                 className={styles.editIcon}
                                 onClick={() => setShowAvatarPicker(true)}
-                                style={{
-                                    background: accentColor,
-                                    borderColor: accentColor,
-                                    boxShadow: `0 0 20px ${accentColor}40` // Optional glow
-                                }}
                             >
                                 <Edit2 size={24} />
                             </div>
@@ -305,7 +214,6 @@ export default function ProfilesPage() {
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
                                     maxLength={20}
-                                    style={{ borderColor: newName ? accentColor : undefined }}
                                 />
                             </div>
 
@@ -319,12 +227,13 @@ export default function ProfilesPage() {
                                 </div>
                             )}
 
+                            {createError && <p style={{ color: '#ef4444', textAlign: 'center', fontSize: '0.9rem' }}>{createError}</p>}
+
                             <div className={styles.actionButtons}>
                                 <button
                                     className={styles.saveButton}
                                     onClick={handleSave}
                                     disabled={processing}
-                                    style={{ background: accentColor }}
                                 >
                                     {processing ? 'Salvando...' : 'Salvar'}
                                 </button>
@@ -332,6 +241,7 @@ export default function ProfilesPage() {
                                     className={styles.cancelButton}
                                     onClick={() => {
                                         setView('SELECT');
+                                        setCreateError(null);
                                     }}
                                 >
                                     Cancelar
@@ -361,12 +271,7 @@ export default function ProfilesPage() {
                         <div className={styles.pickerScrollContent}>
                             {Object.entries(AVATAR_CATEGORIES).map(([category, urls]) => (
                                 <div key={category} className={styles.categorySection}>
-                                    <h3
-                                        className={styles.categoryTitle}
-                                        style={{ borderLeftColor: accentColor }}
-                                    >
-                                        {category}
-                                    </h3>
+                                    <h3 className={styles.categoryTitle}>{category}</h3>
                                     <div className={styles.pickerGrid}>
                                         {urls.map((av, idx) => (
                                             <img
@@ -377,7 +282,6 @@ export default function ProfilesPage() {
                                                     setNewAvatar(av);
                                                     setShowAvatarPicker(false);
                                                 }}
-                                                style={{ borderColor: newAvatar === av ? accentColor : 'transparent' }}
                                             />
                                         ))}
                                     </div>
@@ -391,53 +295,40 @@ export default function ProfilesPage() {
     }
 
     return (
-        <div className={styles.container} style={bgStyle}>
+        <div className={styles.container}>
             <h1 className={styles.title}>Quem está assistindo?</h1>
 
             <div className={styles.profileGrid}>
-                {profiles.map(profile => {
-                    const pColor = profileColors[profile.id]; // Get dynamic color for this profile
-
-                    return (
-                        <div
-                            key={profile.id}
-                            className={styles.profileCard}
-                            onClick={() => handleSelectProfile(profile.id)}
-                            style={{ opacity: enteringProfileId && enteringProfileId !== profile.id ? 0.3 : 1 }}
-                        >
-                            <div
-                                className={styles.avatarWrapper}
-                                style={isManaging && pColor ? { borderColor: pColor } : {}}
-                            >
-                                <img src={profile.avatar_url} alt={profile.name} className={styles.avatar} />
-                                {isManaging && (
-                                    <div className={styles.editOverlay} style={{ color: pColor || '#fff' }}>
-                                        <Edit2 size={32} />
-                                    </div>
-                                )}
-                                {enteringProfileId === profile.id && (
-                                    <div className={styles.cardSpinner}>
-                                        <div className={styles.spinnerSmall}></div>
-                                    </div>
-                                )}
-                            </div>
-                            <span
-                                className={styles.profileName}
-                                style={enteringProfileId === profile.id ? { color: pColor } : {}}
-                            >
-                                {enteringProfileId === profile.id ? 'Entrando...' : profile.name}
-                            </span>
+                {profiles.map(profile => (
+                    <div
+                        key={profile.id}
+                        className={styles.profileCard}
+                        onClick={() => handleSelectProfile(profile.id)}
+                        style={{ opacity: enteringProfileId && enteringProfileId !== profile.id ? 0.3 : 1 }}
+                    >
+                        <div className={styles.avatarWrapper}>
+                            <img src={profile.avatar_url} alt={profile.name} className={styles.avatar} />
+                            {isManaging && (
+                                <div className={styles.editOverlay}>
+                                    <Edit2 size={32} />
+                                </div>
+                            )}
+                            {enteringProfileId === profile.id && (
+                                <div className={styles.cardSpinner}>
+                                    <div className={styles.spinnerSmall}></div>
+                                </div>
+                            )}
                         </div>
-                    );
-                })}
+                        <span className={styles.profileName}>{enteringProfileId === profile.id ? 'Entrando...' : profile.name}</span>
+                    </div>
+                ))}
 
                 {profiles.length < 3 && !isManaging && (
                     <div
                         className={styles.profileCard}
                         onClick={() => {
                             setNewName('');
-                            const defaultAvatar = AVATAR_CATEGORIES['Original Kyno+'][0];
-                            setNewAvatar(defaultAvatar);
+                            setNewAvatar(AVATAR_CATEGORIES['Original Kyno+'][0]);
                             setTurnstileToken('');
                             setView('CREATE');
                         }}

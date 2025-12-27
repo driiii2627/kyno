@@ -10,10 +10,6 @@ export const metadata: Metadata = {
   description: 'Filmes, Séries e TV ao Vivo',
 };
 
-import { ToastProvider } from '@/components/ui/ToastContext';
-
-// ... (Metadata stays same)
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,10 +18,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} font-sans antialiased text-white`}>
-        <ToastProvider>
-          <Navbar />
-          <main className="min-h-screen relative">{children}</main>
-        </ToastProvider>
+        <Navbar />
+        <main className="min-h-screen relative">{children}</main>
       </body>
     </html>
   );

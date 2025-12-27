@@ -226,6 +226,7 @@
     justify-content: center;
     background: transparent;
     border-radius: 12px;
+    overflow: hidden;
     margin: 0 auto;
     width: 100%;
 }
@@ -456,21 +457,14 @@
 
 @media (max-width: 768px) {
     .editContent {
-        flex-direction: column;
+        flex-direction: column-reverse;
         gap: 2rem;
-        align-items: center;
     }
 
     .editTitle {
         font-size: 2.5rem;
     }
 
-    /* Turnstile fix */
-    .turnstileWrapper {
-        overflow: visible;
-    }
-
-    /* Mobile Flex Wrapping */
     .profileGrid {
         gap: 1.5rem;
     }
@@ -478,10 +472,7 @@
     .profileCard,
     .avatarWrapper,
     .addButton {
-        width: 130px;
-        /* Slight adjust */
-        height: 130px;
-        flex-shrink: 0;
-        /* Prevent squashing */
+        width: 120px;
+        height: 120px;
     }
 }
