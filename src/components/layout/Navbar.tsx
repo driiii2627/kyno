@@ -124,8 +124,13 @@ function ProfileMenu() {
 
             {open && (
                 <>
-                    <div className={styles.dropdownOverlay} onClick={() => setOpen(false)} />
-                    <div className={`${styles.dropdown} ${switchingProfileId ? styles.fadeOut : ''}`}>
+                    <div
+                        className={styles.dropdownOverlay}
+                        onClick={() => {
+                            if (!switchingProfileId) setOpen(false);
+                        }}
+                    />
+                    <div className={styles.dropdown}>
                         <div className={styles.dropdownHeader}>
                             <span className={styles.dropdownLabel}>PERFIS</span>
                             <Link href="/profiles?manage=true" className={styles.manageLink}>
@@ -143,20 +148,25 @@ function ProfileMenu() {
                                         ${activeProfile.id === p.id ? styles.activeProfileItem : ''}
                                     `}
                                     onClick={(e) => {
-                                        // Quick hack to fix position for animation start if we wanted 
-                                        // exact coords, but CSS fixed transition is simpler/smoother for now.
                                         handleSwitch(p.id);
                                     }}
                                 >
-                                    <img
-                                        src={p.avatar_url}
-                                        className={`${styles.miniAvatar} ${switchingProfileId === p.id ? styles.flying : ''}`}
-                                        style={switchingProfileId === p.id ? {
-                                            position: 'fixed',
-                                            left: 'unset',
-                                            // We rely on the class adding top/right/transform
-                                        } : {}}
-                                    />
+                                    {/* Ghost Image for Animation */}
+                                    {switchingProfileId === p.id && (
+                                        <img
+                                            src={p.avatar_url}
+                                            className={`${styles.miniAvatar} ${styles.flying}`}
+                                            style={{
+                                                position: 'fixed',
+                                                left: `${(document.activeElement?.getBoundingClientRect().left || 0)}px`,
+                                                top: `${(document.activeElement?.getBoundingClientRect().top || 0)}px`,
+                                            }}
+                                        />
+                                    )}
+
+                                    {/* Static Image (Keeps layout stable) */}
+                                    <img src={p.avatar_url} className={styles.miniAvatar} />
+
                                     <span className={styles.profileNameList}>{p.name}</span>
                                     {activeProfile.id === p.id && <div className={styles.activeDot} />}
                                     {switchingProfileId === p.id && (
