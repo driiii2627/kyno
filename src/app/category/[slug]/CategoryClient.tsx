@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Search, ArrowLeft, Star } from 'lucide-react';
 import { CatalogItem } from '@/services/content';
 import { getImageUrl } from '@/services/tmdb';
@@ -66,9 +66,8 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                             className={styles.cardContent}
                         >
                             {/* Image */}
-                            <Image
-                                src={getImageUrl(item.poster_path, 'w780')}
-                                unoptimized={true}
+                            <OptimizedImage
+                                src={getImageUrl(item.poster_path, 'original')}
                                 alt={item.title || item.name || 'Cover'}
                                 fill
                                 className={styles.image}

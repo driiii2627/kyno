@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Play, ChevronDown, Clock } from 'lucide-react';
 import Link from 'next/link';
-import { SeasonDetails, Episode } from '@/services/tmdb';
+import { SeasonDetails, Episode, getImageUrl } from '@/services/tmdb';
 import { getSeason } from '@/app/actions';
 import styles from './SeasonBrowser.module.css';
 
@@ -106,12 +106,11 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
                                 {/* Thumbnail */}
                                 <div className={styles.thumbnailWrapper}>
                                     {ep.still_path ? (
-                                        <Image
-                                            src={`https://image.tmdb.org/t/p/w500${ep.still_path}`}
+                                        <OptimizedImage
+                                            src={getImageUrl(ep.still_path || '', 'original')}
                                             alt={ep.name}
                                             fill
                                             className={styles.thumbnailImage}
-                                            unoptimized
                                         />
                                     ) : (
                                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b' }}>

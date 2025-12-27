@@ -3,7 +3,7 @@ import { contentService } from '@/services/content';
 import { supabase } from '@/lib/supabase';
 import { tmdb } from '@/services/tmdb';
 import Link from 'next/link';
-import Image from 'next/image';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
 import styles from './Details.module.css';
 import SeasonBrowser from '@/components/details/SeasonBrowser';
@@ -153,13 +153,12 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             {/* Background Hero */}
             <div className={styles.heroBackground}>
                 {backdropUrl && (
-                    <Image
+                    <OptimizedImage
                         src={backdropUrl}
                         alt="Background"
                         fill
                         className={styles.heroImage}
                         priority
-                        unoptimized
                     />
                 )}
                 {/* CSS Gradients */}
@@ -228,12 +227,11 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                                 <div key={actor.id} className={styles.castItem}>
                                     <div className={styles.castAvatar}>
                                         {actor.profile_path ? (
-                                            <Image
-                                                src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
+                                            <OptimizedImage
+                                                src={`https://image.tmdb.org/t/p/w500${actor.profile_path}`}
                                                 alt={actor.name}
                                                 fill
                                                 style={{ objectFit: 'cover' }}
-                                                unoptimized
                                             />
                                         ) : (
                                             <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
