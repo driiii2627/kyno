@@ -123,7 +123,7 @@ export const tmdb = {
     return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
   },
   getVideos: async (id: number, type: 'movie' | 'tv') => {
-    return fetchFromTMDB<{ results: { key: string, site: string, type: string, iso_639_1: string }[] }>(`/${type}/${id}/videos?language=pt-BR,en-US`);
+    return fetchFromTMDB<{ results: { key: string, site: string, type: string, iso_639_1: string, name: string, official: boolean }[] }>(`/${type}/${id}/videos?language=pt-BR,en-US`);
   }
 };
 
