@@ -182,7 +182,7 @@ export default function Hero({ movies }: HeroProps) {
                         />
                     </div>
                 ))}
-                ))}
+
 
                 {/* Overlay with dynamic class for video mode */}
                 <div
