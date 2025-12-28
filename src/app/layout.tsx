@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
+import MobileNavbar from '@/components/layout/MobileNavbar';
 import { ToastProvider } from '@/components/ui/ToastContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased text-white`}>
         <ToastProvider>
           <Navbar />
+          <MobileNavbar />
           <main className="min-h-screen relative">{children}</main>
         </ToastProvider>
       </body>

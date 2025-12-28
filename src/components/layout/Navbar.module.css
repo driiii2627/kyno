@@ -329,6 +329,17 @@
     .navLinks {
         display: none;
     }
+
+    /* Hide generic icon buttons (Search, Bookmark) on mobile, keep Profile */
+    .desktopOnly {
+        display: none !important;
+    }
+
+    /* Ensure Profile Trigger is visible */
+    .profileMenuContainer {
+        margin-left: 0;
+        display: block;
+    }
 }
 
 /* Animation for switching profile */

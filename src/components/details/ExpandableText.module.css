@@ -1,0 +1,129 @@
+/* ExpandableText.module.css */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.truncatedText {
+    font-size: clamp(1rem, 1.3vw, 1.6rem);
+    line-height: 1.6;
+    color: #e2e8f0;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.readMoreBtn {
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.readMoreBtn:hover {
+    color: #fff;
+}
+
+/* Glass Popup Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.popup {
+    background: rgba(30, 41, 59, 0.7);
+    /* Slate 800 glass */
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.popupTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.fullText {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    white-space: pre-wrap;
+    /* Preserve paragraphs */
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.closeButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

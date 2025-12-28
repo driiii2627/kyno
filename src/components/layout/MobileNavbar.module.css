@@ -1,0 +1,66 @@
+/* MobileNavbar.module.css */
+.mobileNav {
+    display: none;
+    /* Hidden by default on desktop */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: rgba(15, 23, 42, 0.9);
+    /* Slate 900 Glass */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.5rem 1rem;
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.navItems {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.navItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    color: #94a3b8;
+    /* Slate 400 */
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 60px;
+    padding: 0.5rem 0;
+    transition: all 0.2s;
+}
+
+.navItem svg {
+    transition: transform 0.2s;
+}
+
+.navItem:active {
+    transform: scale(0.95);
+}
+
+.activeItem {
+    color: #fff;
+}
+
+.activeItem svg {
+    color: #38bdf8;
+    /* Sky 400 */
+    transform: translateY(-2px);
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.5));
+}
+
+@media (max-width: 768px) {
+    .mobileNav {
+        display: block;
+    }
+}

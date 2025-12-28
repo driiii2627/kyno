@@ -10,6 +10,7 @@ import SeasonBrowser from '@/components/details/SeasonBrowser';
 
 import DetailsTabs from '@/components/details/DetailsTabs';
 import TrackedLink from '@/components/ui/TrackedLink';
+import ExpandableText from '@/components/details/ExpandableText';
 
 export const dynamic = 'force-dynamic';
 
@@ -213,9 +214,8 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         </button>
                     </div>
 
-                    <p className={styles.overview}>
-                        {details.overview}
-                    </p>
+                    {/* Optimized Description with Read More */}
+                    <ExpandableText text={details.overview} className={styles.overview} />
                 </div>
 
                 {/* Interactive Details Tabs (Episodes / Recommendations) - Full Width */}

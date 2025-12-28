@@ -49,10 +49,10 @@ export default function Navbar() {
             {/* Icons - Hide on Category Pages */}
             {!isCategoryPage && (
                 <div className={styles.actions}>
-                    <button className={styles.iconBtn}>
+                    <button className={`${styles.iconBtn} ${styles.desktopOnly}`}>
                         <Search size={22} />
                     </button>
-                    <button className={styles.iconBtn}>
+                    <button className={`${styles.iconBtn} ${styles.desktopOnly}`}>
                         <Bookmark size={22} />
                     </button>
 
