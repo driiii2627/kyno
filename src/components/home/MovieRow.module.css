@@ -326,8 +326,8 @@
     }
 
     .card {
-        width: 160px;
-        /* Slightly larger targets */
+        width: 110px;
+        /* Compact mobile size */
     }
 
     .top10List {
