@@ -153,14 +153,6 @@ export default function Hero({ movies }: HeroProps) {
             </div>
 
             <div className={styles.content}>
-                <div className={styles.topBadges}>
-                    <div className={styles.originalLabel}>Kyno+ Destaques</div>
-                    {/* Progress Indicator */}
-                    <div className={styles.counterBadge}>
-                        {currentIndex + 1} / {movies.length}
-                    </div>
-                </div>
-
                 {/* LOGO or Title */}
                 {logoPath ? (
                     <div className={styles.logoContainer}>
@@ -175,6 +167,11 @@ export default function Hero({ movies }: HeroProps) {
                         {title}
                     </h1>
                 )}
+
+                {/* Counter Badge (Moved to bottom right via CSS) */}
+                <div className={styles.counterBadge}>
+                    {currentIndex + 1} / {movies.length}
+                </div>
 
                 <div className={styles.meta}>
                     <span className={styles.year}>{year}</span>
