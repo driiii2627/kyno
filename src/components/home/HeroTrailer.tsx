@@ -68,57 +68,38 @@ export default function HeroTrailer({ videoId, onEnded, onError }: HeroTrailerPr
     };
 
     return (
-        <div className={`absolute top-0 left-0 w-full h-full z-[5] overflow-hidden pointer-events-none`}>
-            {/* Pointer events none on wrapper, but we need buttons to be clickable. 
-                We will put buttons outside or ensure higher z-index for controls.
-                The iframe itself should interact? No, user said "video extremely clean". 
-                Usually background videos are non-interactive.
-            */}
-            <div className="relative w-[300%] h-[300%] -top-[100%] -left-[100%] pointer-events-none">
-                {/* 
-                     Scale up to remove black bars/controls even more if needed? 
-                     Actually standard 100% cover with object-fit is hard for iframes.
-                     The standard "Hero Video" trick is huge scale or specific aspect ratio containers.
-                     For now, let's try standard full size.
-                 */}
+        <div className={styles.trailerWrapper}>
+            <div className={styles.videoContainer}>
                 <YouTube
                     videoId={videoId}
                     opts={opts}
-                    className="w-full h-full absolute top-0 left-0" // This wrapper class
-                    iframeClassName="w-full h-full object-cover" // Passed to iframe
+                    className={styles.youtubePlayer} // Wrapper div
+                    iframeClassName={styles.iframe} // Actual iframe
                     onEnd={onEnded}
                     onError={onError}
                     onReady={onReady}
                 />
             </div>
 
-            {/* Custom Controls - Needs z-index > 10 to sit above content? 
-                Actually user said "Coloque do lado do botão de silenciar...".
-                These will be rendered by the PARENT (Hero) to integrate with UI.
-                Or rendered here?
-                Let's handle state here and expose controls?
-                The user wants buttons "no canto da tela". 
-                I'll render them here for encapsulation, absolute positioned.
-            */}
-            <div className="absolute bottom-8 right-8 z-50 flex items-center gap-4 pointer-events-auto">
+            <div className={styles.trailerControls}>
                 {/* Progress Bar (Mini) */}
-                <div className="w-32 h-1 bg-white/20 rounded-full overflow-hidden">
+                <div className={styles.progressBar}>
                     <div
-                        className="h-full bg-red-600 transition-all duration-300 ease-linear"
+                        className={styles.progressFill}
                         style={{ width: `${progress}%` }}
                     />
                 </div>
 
                 <button
                     onClick={toggleMute}
-                    className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all border border-white/10 text-white"
+                    className={styles.controlBtn}
                 >
                     {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                 </button>
 
                 <button
-                    onClick={onError} // Treat "Back to Player" as "Error/Skip" -> Switch to image
-                    className="p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 transition-all border border-white/10 text-white"
+                    onClick={onError}
+                    className={styles.controlBtn}
                     title="Voltar para Imagem"
                 >
                     <ImageIcon size={20} />
