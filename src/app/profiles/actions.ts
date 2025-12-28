@@ -88,37 +88,33 @@ export async function createProfileAction(formData: FormData) {
         }
     }
 
-});
 
-if (error) {
-    return { error: 'Erro ao criar perfil: ' + error.message };
-}
 
-// [NEW] Init Recommendations
-// We don't await this blocking critical path, or we catch errors silently
-// But since it's a server action, let's just await it to be safe
-// Note: We need the inserted ID. "insert" above didn't return data.
+    // [NEW] Init Recommendations
+    // We don't await this blocking critical path, or we catch errors silently
+    // But since it's a server action, let's just await it to be safe
+    // Note: We need the inserted ID. "insert" above didn't return data.
 
-// Changing insert to select ID:
-const { data: newProfile, error: insertError } = await supabase
-    .from('profiles')
-    .insert({
-        user_id: user.id,
-        name,
-        avatar_url: avatar
-    })
-    .select('id')
-    .single();
+    // Changing insert to select ID:
+    const { data: newProfile, error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+            user_id: user.id,
+            name,
+            avatar_url: avatar
+        })
+        .select('id')
+        .single();
 
-if (insertError || !newProfile) {
-    return { error: 'Erro ao criar perfil: ' + (insertError?.message || 'Unknown') };
-}
+    if (insertError || !newProfile) {
+        return { error: 'Erro ao criar perfil: ' + (insertError?.message || 'Unknown') };
+    }
 
-// Init Recs
-await initRecommendations(newProfile.id);
+    // Init Recs
+    await initRecommendations(newProfile.id);
 
-revalidatePath('/profiles');
-return { success: true };
+    revalidatePath('/profiles');
+    return { success: true };
 }
 
 export async function updateProfileAction(formData: FormData) {

@@ -7,7 +7,7 @@ import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
 import styles from './Details.module.css';
 import SeasonBrowser from '@/components/details/SeasonBrowser';
-import SeasonBrowser from '@/components/details/SeasonBrowser';
+
 import DetailsTabs from '@/components/details/DetailsTabs';
 import TrackedLink from '@/components/ui/TrackedLink';
 
