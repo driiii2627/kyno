@@ -175,21 +175,7 @@ export default function Hero({ movies }: HeroProps) {
                         key={m.id}
                         className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
                     >
-                        {/* 
-                           FEATURE TEST: Background Trailer
-                           Only show for current index AND if we have a trailerId AND not showing image fallback 
-                        */}
-                        {index === currentIndex && trailerId && !showImageFallback ? (
-                            <HeroTrailer
-                                videoId={trailerId}
-                                isMuted={isMuted}
-                                onProgress={handleProgress}
-                                onEnded={handleVideoEnd}
-                                onError={handleVideoError}
-                            />
-                        ) : null}
-
-                        {/* Image Fallback (Always rendered behind or if trailer fails) */}
+                        {/* Image Fallback (Always rendered behind) */}
                         <OptimizedImage
                             src={getImageUrl(m.backdrop_path || '', 'original')}
                             tinySrc={getImageUrl(m.backdrop_path || '', 'w92')}
@@ -201,17 +187,12 @@ export default function Hero({ movies }: HeroProps) {
                             quality={100} // Force maximum quality to avoid compression artifacts
                             style={{
                                 objectFit: 'cover',
-                                // If trailer is playing, hide image? Or keep behind? 
-                                // Keep behind strictly to avoid flicker. 
-                                // But if trailer is opaque, fine.
-                                // If trailer is playing, we might want to fade image out? 
-                                // For now, simple stacking.
-                                zIndex: (index === currentIndex && trailerId && !showImageFallback) ? 0 : 1
+                                // If trailer is playing, image stays behind (z-index 0)
+                                zIndex: 0
                             }}
                         />
                     </div>
                 ))}
-
 
                 {/* Overlay with dynamic class for video mode */}
                 <div
