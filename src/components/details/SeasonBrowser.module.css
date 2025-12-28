@@ -193,8 +193,8 @@
     }
 
     .thumbnailWrapper {
-        width: 130px;
-        min-width: 130px;
+        width: 145px;
+        min-width: 145px;
         aspect-ratio: 16 / 9;
         border-radius: 0.25rem;
     }

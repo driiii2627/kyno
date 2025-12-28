@@ -97,7 +97,7 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
                     </button>
 
                     <div id="episodes-grid" className={styles.grid}>
-                        {episodes.map(ep => (
+                        {episodes.map((ep, index) => (
                             <Link
                                 key={ep.id}
                                 href={`/serie/${uuid}?s=${ep.season_number}&e=${ep.episode_number}`}
@@ -107,10 +107,11 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
                                 <div className={styles.thumbnailWrapper}>
                                     {ep.still_path ? (
                                         <OptimizedImage
-                                            src={getImageUrl(ep.still_path || '', 'w780')}
+                                            src={getImageUrl(ep.still_path || '', 'w300')}
                                             tinySrc={getImageUrl(ep.still_path || '', 'w92')}
                                             alt={ep.name}
                                             fill
+                                            priority={index < 4} // Load first 4 instantly
                                             className={styles.thumbnailImage}
                                         />
                                     ) : (
