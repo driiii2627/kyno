@@ -81,12 +81,13 @@ export default function MovieRow({ title, movies, priority = false, variant = 'd
 
                                 <div className={styles.imageWrapper}>
                                     <OptimizedImage
-                                        src={getImageUrl(movie.poster_path, 'w1280')} // Limited to ~2K equivalent for cards
+                                        src={getImageUrl(movie.poster_path, 'original')} // Max resolution
                                         tinySrc={getImageUrl(movie.poster_path, 'w92')} // Blur placeholder
                                         alt={movie.title || movie.name || 'Movie'}
                                         fill
                                         className={styles.image}
                                         sizes="(max-width: 768px) 150px, 300px"
+                                        quality={100} // Zero compression
                                         priority={priority && index < 6}
                                     />
                                     {/* Overlay on Hover */}

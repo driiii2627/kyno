@@ -163,6 +163,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         fill
                         className={styles.heroImage}
                         priority
+                        quality={100} // Max quality for details background
                     />
                 )}
                 {/* CSS Gradients */}
