@@ -23,6 +23,7 @@ export default async function AdminDashboard() {
   // Fetch profiles for these users to show names if available
   // Assuming 'profiles' table has 'id' matching 'auth.users.id'
   // Fetch profiles
+  const userIds = users?.map(u => u.id) || []
   let profiles: any[] = []
   if (userIds.length > 0) {
     const { data } = await admin
