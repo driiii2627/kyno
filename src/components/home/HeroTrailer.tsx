@@ -63,6 +63,12 @@ function HeroTrailer({ videoId, isMuted, onProgress, onEnded, onError }: HeroTra
 
     const onReady = (event: any) => {
         playerRef.current = event.target;
+
+        // Force high quality if possible
+        if (typeof event.target.setPlaybackQuality === 'function') {
+            event.target.setPlaybackQuality('hd1080');
+        }
+
         event.target.playVideo();
         if (isMuted) {
             event.target.mute();
