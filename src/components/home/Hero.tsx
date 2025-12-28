@@ -169,7 +169,24 @@ export default function Hero({ movies }: HeroProps) {
         <section className={styles.hero}>
             {/* Background logic in other replace call */}
             {/* Background with Crossfade Images */}
+            {/* Background with Crossfade Images */}
             <div className={styles.heroBackground}>
+                {/* 
+                    SINGLETON TRAILER PLAYER
+                    Moved outside the map to prevent re-mounting/looping bugs during state changes.
+                    Key added to force remount ONLY when video changes.
+                */}
+                {trailerId && !showImageFallback && (
+                    <HeroTrailer
+                        key={trailerId}
+                        videoId={trailerId}
+                        isMuted={isMuted}
+                        onProgress={handleProgress}
+                        onEnded={handleVideoEnd}
+                        onError={handleVideoError}
+                    />
+                )}
+
                 {movies.map((m, index) => (
                     <div
                         key={m.id}
