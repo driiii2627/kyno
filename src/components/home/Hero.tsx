@@ -5,7 +5,7 @@ import styles from './Hero.module.css';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Movie, MovieDetails, getImageUrl, tmdb } from '@/services/tmdb';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { CatalogItem } from '@/services/content'; // Import CatalogItem to know about supabase_id
 import TrackedLink from '@/components/ui/TrackedLink';
@@ -35,6 +35,20 @@ export default function Hero({ movies }: HeroProps) {
     const [isMuted, setIsMuted] = useState(true);
     const [trailerProgress, setTrailerProgress] = useState(0);
 
+    // Stable Handlers to prevent HeroTrailer re-renders (Fixes Looping)
+    const handleVideoEnd = useCallback(() => {
+        const nextIndex = (currentIndex + 1) % movies.length;
+        fetchAndSetData(movies[nextIndex] as CatalogItem, nextIndex);
+    }, [currentIndex, movies]);
+
+    const handleVideoError = useCallback(() => {
+        setShowImageFallback(true);
+    }, []);
+
+    const handleProgress = useCallback((p: number) => {
+        setTrailerProgress(p);
+    }, []);
+
     // Helper to fetch data
     const fetchAndSetData = async (movie: CatalogItem, index: number) => {
         try {
@@ -52,17 +66,34 @@ export default function Hero({ movies }: HeroProps) {
                 tmdb.getVideos(movie.id, type)
             ]);
 
-            // Filter Videos: Strict PT-BR Preference
-            // User: "Só daremos preferência a trailers em pt-br, não tem tem pt-br? Continua apenas com a imagem"
-            const ptTrailer = videos.results.find(v =>
+            // Filter Videos: Strict "Dublado" Preference
+            // User complained that generic 'pt' videos are often just subtitled.
+            // We search explicitly for "Dublado" in the title.
+            const ptVideos = videos.results.filter(v =>
                 v.iso_639_1 === 'pt' &&
                 v.site === 'YouTube' &&
                 v.type === 'Trailer'
             );
 
-            // If PT trailer found, set it. Else, null (remains null -> image only)
-            if (ptTrailer) {
-                setTrailerId(ptTrailer.key);
+            let bestTrailer = ptVideos.find(v => v.name.toLowerCase().includes('dublado'));
+
+            // Search Fallback: If no "Dublado" explicit, but we have PT results, 
+            // check against generic terms or try to filter out "Legendado'.
+            if (!bestTrailer) {
+                // Try find one that is NOT "Legendado" and IS "Official"
+                bestTrailer = ptVideos.find(v =>
+                    !v.name.toLowerCase().includes('legendado') &&
+                    (v.name.toLowerCase().includes('trailer oficial') || v.name.toLowerCase().includes('teaser'))
+                );
+            }
+
+            // Final fallback: If user REALLY wants dubbed, maybe we skip if we aren't sure?
+            // User said: "só daremos preferência a trailers em pt-br, não tem? cotinua com imagem"
+            // And complained about "English with subtitles". 
+            // So if we didn't find "Dublado" or a clean PT candidate, we leave bestTrailer undefined.
+
+            if (bestTrailer) {
+                setTrailerId(bestTrailer.key);
             }
 
             const ptLogo = images.logos.find(l => l.iso_639_1 === 'pt');
@@ -78,13 +109,6 @@ export default function Hero({ movies }: HeroProps) {
             // Even if details fail, switching index ensures we don't get stuck
             setCurrentIndex(index);
         }
-    };
-
-    // Video End Handler
-    const handleVideoEnd = () => {
-        // Force rotation
-        const nextIndex = (currentIndex + 1) % movies.length;
-        fetchAndSetData(movies[nextIndex] as CatalogItem, nextIndex);
     };
 
     // Initial load
@@ -159,9 +183,9 @@ export default function Hero({ movies }: HeroProps) {
                             <HeroTrailer
                                 videoId={trailerId}
                                 isMuted={isMuted}
-                                onProgress={setTrailerProgress}
+                                onProgress={handleProgress}
                                 onEnded={handleVideoEnd}
-                                onError={() => setShowImageFallback(true)}
+                                onError={handleVideoError}
                             />
                         ) : null}
 
@@ -217,7 +241,7 @@ export default function Hero({ movies }: HeroProps) {
                     </button>
 
                     <button
-                        onClick={() => setShowImageFallback(true)}
+                        onClick={handleVideoError}
                         className={styles.controlBtn}
                         title="Voltar para Imagem"
                     >
