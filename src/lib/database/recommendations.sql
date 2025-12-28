@@ -66,7 +66,7 @@ begin
       raise exception 'Unauthorized';
   end if;
 
-  -- Loop through genres and atomically increment
+  -- Loop through genres and atomically increment (Capped at 100)
   foreach genre in array p_genres
   loop
     update public.profile_recommendations
@@ -74,7 +74,7 @@ begin
       genre_scores = jsonb_set(
         case when genre_scores is null then '{}'::jsonb else genre_scores end,
         array[genre],
-        (coalesce((genre_scores->>genre)::int, 0) + 1)::text::jsonb
+        (LEAST(coalesce((genre_scores->>genre)::int, 0) + 1, 100))::text::jsonb
       ),
       updated_at = now()
     where profile_id = p_profile_id;
