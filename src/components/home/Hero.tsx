@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, Pause, FastForward, Info, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, FastForward, Info, Volume2, VolumeX, Tv } from 'lucide-react';
 import styles from './Hero.module.css';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -15,6 +15,8 @@ interface HeroProps {
 }
 
 import HeroTrailer from './HeroTrailer';
+
+const PREFERENCE_KEY = 'kyno_hero_trailer_pref';
 
 export default function Hero({ movies }: HeroProps) {
     // ... existing state
@@ -36,6 +38,32 @@ export default function Hero({ movies }: HeroProps) {
     const [trailerProgress, setTrailerProgress] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
     const [isAutoPaused, setIsAutoPaused] = useState(false);
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const [userTrailerPref, setUserTrailerPref] = useState<boolean | null>(null);
+    const [isDubbed, setIsDubbed] = useState(false);
+
+    // Initial hardware/preference check
+    useEffect(() => {
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        setIsTouchDevice(isTouch);
+
+        const savedPref = localStorage.getItem(PREFERENCE_KEY);
+        if (savedPref !== null) {
+            setUserTrailerPref(savedPref === 'true');
+        } else {
+            // Default: Image on touch, Trailer on PC
+            setUserTrailerPref(!isTouch);
+        }
+    }, []);
+
+    const toggleTrailerPreference = () => {
+        const newPref = !userTrailerPref;
+        setUserTrailerPref(newPref);
+        localStorage.setItem(PREFERENCE_KEY, String(newPref));
+
+        // If enabling, reset fallback
+        if (newPref) setShowImageFallback(false);
+    };
 
     // Skip to next slide
     const handleSkip = useCallback(() => {
@@ -119,8 +147,14 @@ export default function Hero({ movies }: HeroProps) {
 
             const bestTrailer = candidates[0];
 
-            if (bestTrailer) {
+            // Stricter Guard: Only set trailer if it has a decent score (likely PT-BR or high quality)
+            // If the best candidate is still weak (e.g. score < 30), we might be looking at a random EN result
+            if (bestTrailer && bestTrailer.score >= 30) {
                 setTrailerId(bestTrailer.key);
+                setIsDubbed(bestTrailer.score >= 90);
+            } else {
+                setTrailerId(null);
+                setIsDubbed(false);
             }
 
             const ptLogo = images.logos.find(l => l.iso_639_1 === 'pt');
@@ -203,7 +237,14 @@ export default function Hero({ movies }: HeroProps) {
                     Moved outside the map to prevent re-mounting/looping bugs during state changes.
                     Key added to force remount ONLY when video changes.
                 */}
-                {trailerId && !showImageFallback && (
+                {/* 
+                    SINGLETON TRAILER PLAYER
+                    Show only if:
+                    1. We have a trailerId
+                    2. User preference allows it (on PC default true, on Mobile default false)
+                    3. No error fallback
+                */}
+                {trailerId && userTrailerPref && !showImageFallback && (
                     <HeroTrailer
                         key={trailerId}
                         videoId={trailerId}
@@ -241,7 +282,7 @@ export default function Hero({ movies }: HeroProps) {
 
                 {/* Overlay with dynamic class for video mode */}
                 <div
-                    className={`${styles.gradientOverlay} ${(trailerId && !showImageFallback) ? styles.videoMode : ''}`}
+                    className={`${styles.gradientOverlay} ${(trailerId && userTrailerPref && !showImageFallback) ? styles.videoMode : ''}`}
                 />
 
                 <div className={styles.leftVignette} />
@@ -249,39 +290,47 @@ export default function Hero({ movies }: HeroProps) {
             </div>
 
             {/* TRAILER CONTROLS (Lifted to Parent for Z-Index Fix) */}
-            {trailerId && !showImageFallback && (
+            {trailerId && userTrailerPref && !showImageFallback && (
                 <div className={styles.trailerControls}>
-                    {/* Progress Bar (Mini) */}
-                    <div className={styles.progressBar}>
-                        <div
-                            className={styles.progressFill}
-                            style={{ width: `${trailerProgress}%` }}
-                        />
+                    {/* Glassmorphism Logic in CSS */}
+                    <div className={styles.controlBar}>
+                        {/* Status Badge */}
+                        {isDubbed && <div className={styles.dubBadge}>DUB</div>}
+
+                        <button
+                            onClick={() => setIsPlaying(!isPlaying)}
+                            className={styles.controlBtnMain}
+                            title={isPlaying ? "Pausar" : "Reproduzir"}
+                        >
+                            {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
+                        </button>
+
+                        {/* Progress Bar (Integrated) */}
+                        <div className={styles.progressBarWrapper}>
+                            <div
+                                className={styles.progressFill}
+                                style={{ width: `${trailerProgress}%` }}
+                            />
+                        </div>
+
+                        <div className={styles.secondaryControls}>
+                            <button
+                                onClick={() => setIsMuted(!isMuted)}
+                                className={styles.iconBtn}
+                                title={isMuted ? "Ativar Áudio" : "Mutar"}
+                            >
+                                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                            </button>
+
+                            <button
+                                onClick={handleSkip}
+                                className={styles.iconBtn}
+                                title="Próximo"
+                            >
+                                <FastForward size={18} />
+                            </button>
+                        </div>
                     </div>
-
-                    <button
-                        onClick={() => setIsPlaying(!isPlaying)}
-                        className={styles.controlBtn}
-                        title={isPlaying ? "Pausar" : "Reproduzir"}
-                    >
-                        {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-                    </button>
-
-                    <button
-                        onClick={() => setIsMuted(!isMuted)}
-                        className={styles.controlBtn}
-                        title={isMuted ? "Ativar Áudio" : "Mutar"}
-                    >
-                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                    </button>
-
-                    <button
-                        onClick={handleSkip}
-                        className={styles.controlBtn}
-                        title="Pular Trailer"
-                    >
-                        <FastForward size={20} />
-                    </button>
                 </div>
             )}
 
@@ -326,6 +375,17 @@ export default function Hero({ movies }: HeroProps) {
                             Assistir
                         </button>
                     </TrackedLink>
+
+                    {/* Manual Trailer Trigger (For Mobile or Opt-out) */}
+                    {trailerId && (!userTrailerPref || showImageFallback) && (
+                        <button
+                            onClick={toggleTrailerPreference}
+                            className={styles.trailerTriggerBtn}
+                        >
+                            <Tv size={20} />
+                            Assistir Trailer
+                        </button>
+                    )}
 
                     <Link href={linkHref} className={styles.infoBtn}>
                         <Info size={24} />

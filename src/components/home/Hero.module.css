@@ -516,14 +516,14 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(1.35);
-    /* Scale further increased to eliminate any remaining black borders */
-    width: 100vw;
-    height: 56.25vw;
-    /* 16:9 Aspect Ratio based on width */
+    transform: translate(-50%, -50%);
+    /* Use physical dimensions instead of scale to force YouTube HD */
+    width: 135vw;
+    height: 75.93vw;
+    /* 135 * 9 / 16 */
     min-height: 100vh;
     min-width: 177.77vh;
-    /* 16:9 Aspect Ratio based on height */
+    /* 100 * 16 / 9 */
     pointer-events: none;
 }
 
@@ -541,51 +541,159 @@
     object-fit: cover;
 }
 
-/* Controls */
+/* Premium Controls */
 .trailerControls {
     position: absolute;
-    bottom: 2rem;
-    right: 4rem;
+    bottom: 40px;
+    right: 40px;
     z-index: 100 !important;
-    /* Force above everything */
+    pointer-events: auto;
+}
+
+.controlBar {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    pointer-events: auto;
-    /* Re-enable clicks */
-}
-
-.progressBar {
-    width: 8rem;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.2);
+    gap: 16px;
+    padding: 8px 16px;
+    background: rgba(20, 20, 20, 0.4);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 99px;
-    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.progressFill {
-    height: 100%;
+.controlBar:hover {
+    transform: translateY(-2px);
+    background: rgba(30, 30, 30, 0.6);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.dubBadge {
+    padding: 2px 8px;
     background: #e50914;
-    /* Netflix Red or Brand Color */
-    transition: width 0.1s linear;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(229, 9, 20, 0.4);
 }
 
-.controlBtn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.controlBtnMain {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.2s;
+    padding: 4px;
+    transition: transform 0.2s;
 }
 
-.controlBtn:hover {
+.controlBtnMain:hover {
+    transform: scale(1.15);
+}
+
+.progressBarWrapper {
+    width: 120px;
+    height: 4px;
     background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.progressFill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #e50914;
+    transition: width 0.3s linear;
+}
+
+.secondaryControls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding-left: 12px;
+}
+
+.iconBtn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconBtn:hover {
+    color: white;
     transform: scale(1.1);
+}
+
+/* Mobile Trigger Button */
+.trailerTriggerBtn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.trailerTriggerBtn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.trailerTriggerBtn svg {
+    color: #e50914;
+}
+
+@media (max-width: 768px) {
+    .trailerControls {
+        bottom: 120px;
+        /* Above content overlap */
+        right: 20px;
+        left: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .controlBar {
+        width: 100%;
+        max-width: 440px;
+        gap: 12px;
+        padding: 6px 12px;
+    }
+
+    .progressBarWrapper {
+        flex: 1;
+        width: auto;
+    }
+
+    .trailerTriggerBtn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+    }
 }

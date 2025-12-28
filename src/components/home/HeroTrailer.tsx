@@ -74,16 +74,35 @@ function HeroTrailer({ videoId, isMuted, isPlaying, onProgress, onEnded, onError
     const onReady = (event: any) => {
         playerRef.current = event.target;
 
-        // Force high quality if possible
-        if (typeof event.target.setPlaybackQuality === 'function') {
-            event.target.setPlaybackQuality('hd1080');
-        }
+        // Force high quality
+        try {
+            if (typeof event.target.setPlaybackQuality === 'function') {
+                event.target.setPlaybackQuality('hd1080');
+            }
+        } catch (e) { }
 
-        event.target.playVideo();
         if (isMuted) {
             event.target.mute();
         } else {
             event.target.unMute();
+            event.target.setVolume(100);
+        }
+
+        if (isPlaying) {
+            event.target.playVideo();
+        } else {
+            event.target.pauseVideo();
+        }
+    };
+
+    const onStateChange = (event: any) => {
+        // Double check quality when video starts playing (State 1 = Playing)
+        if (event.data === 1) {
+            try {
+                if (typeof event.target.setPlaybackQuality === 'function') {
+                    event.target.setPlaybackQuality('hd1080');
+                }
+            } catch (e) { }
         }
     };
 
@@ -98,9 +117,9 @@ function HeroTrailer({ videoId, isMuted, isPlaying, onProgress, onEnded, onError
                     onEnd={onEnded}
                     onError={onError}
                     onReady={onReady}
+                    onStateChange={onStateChange}
                 />
             </div>
-            {/* Controls moved to Parent */}
         </div>
     );
 }
