@@ -16,6 +16,17 @@ interface HeroTrailerProps {
 
 function HeroTrailer({ videoId, isMuted, isPlaying, onProgress, onEnded, onError }: HeroTrailerProps) {
     const playerRef = useRef<any>(null);
+    const [isShocking, setIsShocking] = useState(false);
+
+    // YouTube Quality "Shock" Strategy
+    // Temporarily expand DOM to 200% to trick auto-bitrate into 1080p Profile
+    useEffect(() => {
+        if (videoId) {
+            setIsShocking(true);
+            const timer = setTimeout(() => setIsShocking(false), 2000); // 2 seconds of huge DOM
+            return () => clearTimeout(timer);
+        }
+    }, [videoId]);
 
     // Sync Play/Pause and Mute State
     useEffect(() => {
@@ -108,7 +119,7 @@ function HeroTrailer({ videoId, isMuted, isPlaying, onProgress, onEnded, onError
 
     return (
         <div className={styles.trailerWrapper}>
-            <div className={styles.videoContainer}>
+            <div className={`${styles.videoContainer} ${isShocking ? styles.shock : ''}`}>
                 <YouTube
                     videoId={videoId}
                     opts={opts}

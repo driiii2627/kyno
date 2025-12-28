@@ -544,10 +544,18 @@
 /* Premium Controls */
 .trailerControls {
     position: absolute;
-    bottom: 40px;
+    bottom: 90px;
+    /* Lifted higher per request */
     right: 40px;
     z-index: 100 !important;
     pointer-events: auto;
+}
+
+/* Quality Shock Classes */
+.videoContainer.shock {
+    width: 200vw;
+    height: 112.5vw;
+    transition: width 0.3s ease, height 0.3s ease;
 }
 
 .controlBar {

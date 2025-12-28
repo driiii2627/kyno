@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, Pause, FastForward, Info, Volume2, VolumeX, Tv } from 'lucide-react';
+import { Play, Pause, FastForward, Info, Volume2, VolumeX } from 'lucide-react';
 import styles from './Hero.module.css';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -375,17 +375,6 @@ export default function Hero({ movies }: HeroProps) {
                             Assistir
                         </button>
                     </TrackedLink>
-
-                    {/* Manual Trailer Trigger (For Mobile or Opt-out) */}
-                    {trailerId && (!userTrailerPref || showImageFallback) && (
-                        <button
-                            onClick={toggleTrailerPreference}
-                            className={styles.trailerTriggerBtn}
-                        >
-                            <Tv size={20} />
-                            Assistir Trailer
-                        </button>
-                    )}
 
                     <Link href={linkHref} className={styles.infoBtn}>
                         <Info size={24} />
