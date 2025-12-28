@@ -154,16 +154,18 @@ export async function resolveTmdbContent(tmdbId: number, type: 'movie' | 'tv') {
             return null;
         }
 
-        // 3. Sync to Supabase
-        if (type === 'movie') {
-            await contentService.syncMovies([details]);
-        } else {
-            await contentService.syncSeries([details]);
-        }
+        // 3. Sync to Supabase - DISABLED by user request
+        // Content must be manually added to the database now.
+        // if (type === 'movie') {
+        //     await contentService.syncMovies([details]);
+        // } else {
+        //     await contentService.syncSeries([details]);
+        // }
 
         // 4. Fetch the newly created item
+        // Since we disabled sync, this will return null unless it was added concurrently
         const { data: newItem } = await contentService.getItemByTmdbId(tmdbId, type);
-        return newItem?.id;
+        return newItem?.id || null;
 
     } catch (e) {
         console.error("Failed to resolve content", e);

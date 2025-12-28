@@ -117,93 +117,17 @@ export const contentService = {
      * Uses Service Role to bypass RLS for inserts
      */
     async syncMovies(movies: Movie[]) {
-        if (!movies.length) return;
-
-        try {
-            const adminClient = getServiceSupabase();
-            const baseUrl = await this.getAppConfig('superflix_base_url', 'https://superflixapi.buzz');
-
-            const payload = movies.map(m => {
-                let year = 2025;
-                const dateStr = m.release_date || m.first_air_date;
-                if (dateStr) {
-                    const parsed = new Date(dateStr);
-                    if (!isNaN(parsed.getTime())) year = parsed.getFullYear();
-                }
-
-                const details = m as MovieDetails;
-                const genreStr = details.genres ? details.genres.map(g => g.name).join(', ') : '';
-                const duration = details.runtime || 0;
-                const generatedUrl = `${baseUrl}/filme/${m.id}`;
-
-                return {
-                    tmdb_id: m.id,
-                    video_url: generatedUrl,
-                    title: m.title || m.name || 'Sem Título',
-                    description: m.overview || '',
-                    poster_url: m.poster_path || '',
-                    backdrop_url: m.backdrop_path || '',
-                    release_year: year,
-                    rating: typeof m.vote_average === 'number' ? m.vote_average : 0,
-                    genre: genreStr,
-                    duration: duration,
-                    type: 'movie'
-                };
-            });
-
-            const { error } = await adminClient
-                .from('movies')
-                .upsert(payload, { onConflict: 'tmdb_id', ignoreDuplicates: false });
-
-            if (error) console.error("Sync Movies Error:", error);
-        } catch (e) {
-            console.error("Sync Movies Exception:", e);
-        }
+        // DISABLED by User Request. 
+        // Automatic syncing prevents deletion of content.
+        return;
     },
 
     /**
      * Syncs a list of TMDB series to Supabase
      */
     async syncSeries(series: Movie[]) {
-        if (!series.length) return;
-
-        try {
-            const adminClient = getServiceSupabase();
-            const baseUrl = await this.getAppConfig('superflix_base_url', 'https://superflixapi.buzz');
-
-            const payload = series.map(s => {
-                let year = 2025;
-                const dateStr = s.first_air_date || s.release_date;
-                if (dateStr) {
-                    const parsed = new Date(dateStr);
-                    if (!isNaN(parsed.getTime())) year = parsed.getFullYear();
-                }
-
-                const details = s as MovieDetails;
-                const genreStr = details.genres ? details.genres.map(g => g.name).join(', ') : '';
-                const generatedUrl = `${baseUrl}/serie/${s.id}`;
-
-                return {
-                    tmdb_id: s.id,
-                    video_url: generatedUrl,
-                    title: s.name || s.title || 'Sem Título',
-                    description: s.overview || '',
-                    poster_url: s.poster_path || '',
-                    backdrop_url: s.backdrop_path || '',
-                    release_year: year,
-                    rating: typeof s.vote_average === 'number' ? s.vote_average : 0,
-                    genre: genreStr
-                };
-            });
-
-            const { error } = await adminClient
-                .from('series')
-                .upsert(payload, { onConflict: 'tmdb_id', ignoreDuplicates: false });
-
-            if (error) console.error("Sync Series Error:", error);
-        } catch (e) {
-            console.error("Sync Series Exception:", e);
-        }
+        // DISABLED by User Request. 
+        return;
     },
 
     /**
