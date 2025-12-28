@@ -42,6 +42,12 @@ export default function Hero({ movies }: HeroProps) {
     useEffect(() => {
         if (!movie) return;
 
+        // Reset state immediately to prevent "desync" (showing old logo on new bg)
+        setLogoPath(null);
+        // setMovieDetails(null); // Optional: keep old details or reset? Resetting avoids mismatch but causes blink.
+        // Let's reset details too for correctness, or at least be aware. 
+        // Better to have a 'loading' flash than wrong data.
+
         const fetchDetails = async () => {
             try {
                 // Determine type based on properties (fallback logic)

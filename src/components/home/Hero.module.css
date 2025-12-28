@@ -378,66 +378,74 @@
     }
 
     .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        /* Push to bottom */
         align-items: center;
-        /* Center everything */
         text-align: center;
         width: 100%;
+        height: 100%;
+        /* Take full height to allow justify-end to work */
         padding-bottom: 25vh;
-        /* Push content up from bottom nav */
+        /* Keep space for bottom nav */
+        padding-top: 10vh;
+        /* clear top header area */
+        background: linear-gradient(to top, #02040a 10%, transparent 80%);
+        /* darkened bottom for readability */
     }
 
     .originalLabel {
         display: none !important;
-        /* Hide "Kyno+ Destaques" on mobile */
     }
 
     .logoContainer {
         justify-content: center;
-        /* Center logo */
-        min-height: auto;
-        /* Allow flexible height */
-        height: auto;
-        margin-bottom: 2rem;
+        width: 100%;
+        flex: 0 0 auto;
+        /* Don't shrink */
+        min-height: 100px;
+        margin-bottom: 1rem;
     }
 
     .heroLogo {
-        max-height: 120px;
-        /* Smaller max height for mobile */
+        max-height: 100px;
+        /* Bit smaller to fit better */
+        width: auto;
     }
 
     .topBadges {
-        justify-content: center;
-        /* Center badges */
+        order: -1;
+        /* Ensure badges are above logo if visible, or hiding them */
         margin-bottom: 0.5rem;
     }
 
     .meta {
         justify-content: center;
-        /* Center meta tags */
-        flex-wrap: wrap;
-        margin-bottom: 1.5rem;
-    }
-
-    .title {
-        font-size: 3rem;
         margin-bottom: 1rem;
     }
 
+    .title {
+        display: none;
+        /* Hide text title if we have logo, logic handled in JSX but good to ensure */
+    }
+
     .description {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        /* 2 lines max */
-        line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-align: center;
-        font-size: 0.9rem;
+        order: 10;
+        /* Description at very bottom */
+        margin-top: 1rem;
+        -webkit-line-clamp: 3;
+        font-size: 0.85rem;
+        padding: 0 1rem;
     }
 
     .buttons {
         gap: 1rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+        justify-content: center;
+        /* Explicit centering */
+        width: 100%;
+        display: flex;
     }
 
     .watchBtn {
