@@ -331,9 +331,7 @@
     }
 
     /* Hide Desktop Navigation Arrows & Gradients on Mobile */
-    .handle,
-    .sliderMaskLeft,
-    .sliderMaskRight {
+    .navBtn {
         display: none !important;
     }
 
