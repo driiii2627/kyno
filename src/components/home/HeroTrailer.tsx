@@ -13,7 +13,7 @@ interface HeroTrailerProps {
     onError: () => void;
 }
 
-export default function HeroTrailer({ videoId, isMuted, onProgress, onEnded, onError }: HeroTrailerProps) {
+function HeroTrailer({ videoId, isMuted, onProgress, onEnded, onError }: HeroTrailerProps) {
     const playerRef = useRef<any>(null);
 
     // Sync Mute State
