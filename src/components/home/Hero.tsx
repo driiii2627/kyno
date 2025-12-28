@@ -142,6 +142,7 @@ export default function Hero({ movies }: HeroProps) {
                             className={styles.image}
                             priority={index === 0} // Only prioritize the first one
                             sizes="100vw"
+                            quality={100} // Force maximum quality to avoid compression artifacts
                             style={{ objectFit: 'cover' }}
                         />
                     </div>
