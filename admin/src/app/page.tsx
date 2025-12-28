@@ -13,6 +13,16 @@ export default async function AdminDashboard() {
 
   const admin = await createAdminClient()
 
+  // [DEBUG] Check Environment Keys
+  // Common mistake: Putting the Anon Key in the Service Role Key variable.
+  const serviceKeyInfo = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  const anonKeyInfo = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  const isKeyConfigError = !serviceKeyInfo || serviceKeyInfo === anonKeyInfo || !serviceKeyInfo.startsWith('eyJ')
+
+  // Also check if admin client has a user session attached which implies it might be using the cookie session + anon key
+  const { data: adminSession } = await admin.auth.getSession()
+  // If we have a session AND the key is suspect, it confirms the issue.
+
   // Fetch columns: ID, Email, Last Sign In, Created At
   // Pagination? For now, list first 1000 to catch everyone.
   const { data: { users }, error } = await admin.auth.admin.listUsers({
@@ -88,22 +98,37 @@ export default async function AdminDashboard() {
           </div>
         </header>
 
-        {(profileError || logsError) && (
+        {(profileError || logsError || isKeyConfigError) && (
           <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl mb-6 text-red-200">
-            <h3 className="font-bold mb-2 flex items-center gap-2">⚠️ Erro de Depuração (Debug)</h3>
+            <h3 className="font-bold mb-2 flex items-center gap-2">⚠️ Diagnóstico do Sistema</h3>
+
+            {isKeyConfigError && (
+              <div className="mb-4 bg-red-900/40 p-3 rounded border border-red-500/30">
+                <strong className="text-red-100 block mb-1">ERRO DE CONFIGURAÇÃO (Variáveis de Ambiente):</strong>
+                <p className="text-sm mb-2">
+                  O painel está rodando com permissões limitadas de usuário, não como Admin.
+                  Isso acontece quando a chave <code>SUPABASE_SERVICE_ROLE_KEY</code> na Vercel está incorreta (igual à Anon Key).
+                </p>
+                <div className="text-xs font-mono bg-black/50 p-2 rounded mb-2 space-y-1">
+                  <p>Service Key Configurada: {serviceKeyInfo ? serviceKeyInfo.substring(0, 10) + '...' : 'NÃO DEFINIDA'}</p>
+                  <p>Anon Key Configurada: {anonKeyInfo ? anonKeyInfo.substring(0, 10) + '...' : 'NÃO DEFINIDA'}</p>
+                </div>
+                <p className="text-xs text-yellow-300">
+                  SOLUÇÃO: Vá em Vercel Configuration {'>'} Environment Variables e defina a `SUPABASE_SERVICE_ROLE_KEY` correta (pegue no Supabase Dashboard).
+                </p>
+              </div>
+            )}
+
             {profileError && (
               <div className="mb-2">
-                <strong>Profiles Error:</strong> {JSON.stringify(profileError)}
+                <strong>Erro ao buscar Perfis:</strong> {JSON.stringify(profileError)}
               </div>
             )}
             {logsError && (
               <div>
-                <strong>Logs Error:</strong> {JSON.stringify(logsError)}
+                <strong>Erro ao buscar Logs:</strong> {JSON.stringify(logsError)}
               </div>
             )}
-            <p className="mt-2 text-xs text-red-300">
-              *Isso geralmente indica falta de permissões ou Variáveis de Ambiente incorretas na Vercel (SUPABASE_SERVICE_ROLE_KEY).
-            </p>
           </div>
         )}
 
