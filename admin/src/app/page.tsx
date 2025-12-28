@@ -29,17 +29,20 @@ export default async function AdminDashboard() {
     const { data } = await admin
       .from('profiles')
       .select('*')
-      .in('id', userIds)
+      .in('user_id', userIds) // Matching auth.uid with profiles.user_id
 
     profiles = data || []
   }
 
   // Merge data
   const mergedUsers = users?.map(u => {
-    const profile = profiles.find(p => p.id === u.id)
+    // There might be multiple profiles per user (based on createProfileAction limit check), 
+    // or maybe just one active one. The schema check implies 1-to-many but let's assume we want to show the lists or the first one.
+    // user_id is the foreign key in profiles table.
+    const userProfiles = profiles.filter(p => p.user_id === u.id)
     return {
       ...u,
-      profile // Access via .profile
+      profiles: userProfiles // Pass all profiles
     }
   }) || []
 
