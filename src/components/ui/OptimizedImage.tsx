@@ -32,14 +32,14 @@ export default function OptimizedImage({ src, tinySrc, alt, className, style, ..
                 />
             )}
 
-            {/* Main High-Res Image */}
+            {/* Main High-Res Image (Optimized by Next.js) */}
             <Image
                 {...props}
                 src={src}
                 alt={alt || ''}
                 decoding="async"
                 onLoad={() => setIsLoaded(true)}
-                unoptimized={true}
+                // unoptimized={true} <--- REMOVED to enable Next.js optimization (WebP/AVIF + Resize)
                 style={{
                     objectFit: style?.objectFit || 'cover',
                     opacity: isLoaded ? 1 : 0,

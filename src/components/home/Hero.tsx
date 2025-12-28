@@ -119,7 +119,7 @@ export default function Hero({ movies }: HeroProps) {
                         className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
                     >
                         <OptimizedImage
-                            src={getImageUrl(m.backdrop_path || '', 'w1280')}
+                            src={getImageUrl(m.backdrop_path || '', 'original')}
                             tinySrc={getImageUrl(m.backdrop_path || '', 'w92')}
                             alt={m.title || m.name || 'Hero Background'}
                             fill
