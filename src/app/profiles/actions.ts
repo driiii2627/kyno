@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { initRecommendations } from '@/app/actions/recommendations';
 
 export async function getProfilesAction() {
     const supabase = await createClient();
@@ -87,20 +88,37 @@ export async function createProfileAction(formData: FormData) {
         }
     }
 
-    const { error } = await supabase
-        .from('profiles')
-        .insert({
-            user_id: user.id,
-            name,
-            avatar_url: avatar
-        });
+});
 
-    if (error) {
-        return { error: 'Erro ao criar perfil: ' + error.message };
-    }
+if (error) {
+    return { error: 'Erro ao criar perfil: ' + error.message };
+}
 
-    revalidatePath('/profiles');
-    return { success: true };
+// [NEW] Init Recommendations
+// We don't await this blocking critical path, or we catch errors silently
+// But since it's a server action, let's just await it to be safe
+// Note: We need the inserted ID. "insert" above didn't return data.
+
+// Changing insert to select ID:
+const { data: newProfile, error: insertError } = await supabase
+    .from('profiles')
+    .insert({
+        user_id: user.id,
+        name,
+        avatar_url: avatar
+    })
+    .select('id')
+    .single();
+
+if (insertError || !newProfile) {
+    return { error: 'Erro ao criar perfil: ' + (insertError?.message || 'Unknown') };
+}
+
+// Init Recs
+await initRecommendations(newProfile.id);
+
+revalidatePath('/profiles');
+return { success: true };
 }
 
 export async function updateProfileAction(formData: FormData) {

@@ -8,6 +8,7 @@ import { Movie, MovieDetails, getImageUrl, tmdb } from '@/services/tmdb';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { CatalogItem } from '@/services/content'; // Import CatalogItem to know about supabase_id
+import TrackedLink from '@/components/ui/TrackedLink';
 
 interface HeroProps {
     movies: Movie[]; // In practice, these are CatalogItems
@@ -149,12 +150,15 @@ export default function Hero({ movies }: HeroProps) {
                 </div>
 
                 <div className={styles.buttons}>
-                    <Link href={linkHref} passHref>
+                    <TrackedLink
+                        href={linkHref}
+                        genres={movieDetails?.genres?.map(g => g.name) || []}
+                    >
                         <button className={styles.watchBtn}>
                             <Play className="fill-black" size={20} />
                             Assistir
                         </button>
-                    </Link>
+                    </TrackedLink>
 
                     <button className={styles.actionBtn}>
                         <Plus size={24} />

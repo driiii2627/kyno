@@ -7,7 +7,9 @@ import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
 import styles from './Details.module.css';
 import SeasonBrowser from '@/components/details/SeasonBrowser';
+import SeasonBrowser from '@/components/details/SeasonBrowser';
 import DetailsTabs from '@/components/details/DetailsTabs';
+import TrackedLink from '@/components/ui/TrackedLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -194,10 +196,14 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                     </div>
 
                     <div className={styles.actions}>
-                        <Link href={playerRoute} className={styles.playButton}>
+                        <TrackedLink
+                            href={playerRoute}
+                            className={styles.playButton}
+                            genres={details.genres?.map(g => g.name) || []}
+                        >
                             <Play fill="currentColor" size={24} />
                             Assistir
-                        </Link>
+                        </TrackedLink>
 
                         <button className={styles.actionIconBtn}>
                             <Plus size={22} />

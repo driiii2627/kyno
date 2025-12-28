@@ -127,7 +127,7 @@ export default async function Home() {
         {recommendations.length > 0 && (
           <MovieRow
             title="Recomendados para Você"
-            movies={finalRecommendations.slice(0, 15)}
+            movies={recommendations.slice(0, 15)}
             priority={true}
             // Recommendations usually don't have a clean "View All" category, but we could link to 'filmes' or just leave it
             viewAllLink="/category/filmes"
