@@ -133,6 +133,17 @@
     gap: 1.5rem;
 }
 
+@media (max-width: 768px) {
+    .listContainer {
+        margin-top: 0;
+        /* Reset negative margin on mobile to prevent overlap */
+        margin-bottom: 0;
+        padding-top: 1rem;
+        /* Less top padding */
+        padding-bottom: 2rem;
+    }
+}
+
 .listContainer::-webkit-scrollbar {
     display: none;
 }

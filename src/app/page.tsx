@@ -68,9 +68,26 @@ export default async function Home() {
   const seriesSeed = getTimeSeed(5, 'series_v2');
   const dynamicSeries = hashedSort(catalogSeries, seriesSeed);
 
-  // 4. "Recomendações" (Recommendations): True Random (Pure Variety)
-  // Ensures a mix of Movies and Series every time
-  const recommendations = randomShuffle(allContent).slice(0, 20);
+  // 4. "Recomendações" (Recommendations): Smart Weighted Random
+  // Goal: Prioritize "Good" content (Rule of thumb: Rating > 6) to avoid "bad" random picks (e.g. obscure/low quality)
+  // User feedback: "melhora a randomização... sem filmes realmente bons"
+
+  const highQuality = allContent.filter(item => (item.vote_average || 0) >= 7.0);
+  const midQuality = allContent.filter(item => (item.vote_average || 0) >= 5.0 && (item.vote_average || 0) < 7.0);
+
+  // Mix: 70% High Quality, 30% Mid Quality (Variety)
+  // We shuffle both pools first
+  const shuffledHigh = randomShuffle(highQuality);
+  const shuffledMid = randomShuffle(midQuality);
+
+  // Take mostly good stuff, sprinkle some mid for discovery
+  const recommendations = [
+    ...shuffledHigh.slice(0, 14),
+    ...shuffledMid.slice(0, 6)
+  ];
+
+  // Final shuffle of the mix so clarity isn't obvious (e.g. all good first)
+  const finalRecommendations = randomShuffle(recommendations);
 
   // 5. "Top 10" (Weekly): Changes every 7 days (168 hours)
   // We first take the actual top rated (Quality Control)
@@ -110,7 +127,7 @@ export default async function Home() {
         {recommendations.length > 0 && (
           <MovieRow
             title="Recomendados para Você"
-            movies={recommendations.slice(0, 15)}
+            movies={finalRecommendations.slice(0, 15)}
             priority={true}
             // Recommendations usually don't have a clean "View All" category, but we could link to 'filmes' or just leave it
             viewAllLink="/category/filmes"
