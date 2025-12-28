@@ -59,3 +59,31 @@ export async function updateUserEmailAction(userId: string, newEmail: string) {
         return { error: err.message || 'Erro interno ao atualizar email.' };
     }
 }
+
+/**
+ * Deletes a specific profile by ID.
+ */
+export async function deleteProfileAction(profileId: string) {
+    if (!profileId) return { error: 'ID do perfil inválido.' };
+
+    try {
+        const admin = await createAdminClient();
+
+        // Delete the profile from the 'profiles' table
+        // Since we are admin, we bypass RLS policies that might restrict this
+        const { error } = await admin
+            .from('profiles')
+            .delete()
+            .eq('id', profileId);
+
+        if (error) {
+            console.error('Error deleting profile:', error);
+            return { error: error.message };
+        }
+
+        revalidatePath('/');
+        return { success: true };
+    } catch (err: any) {
+        return { error: err.message || 'Erro interno ao deletar perfil.' };
+    }
+}

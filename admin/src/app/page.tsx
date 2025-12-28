@@ -2,6 +2,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { UsersTable } from '@/components/admin/UsersTable'
+import { AdminHeader } from '@/components/admin/AdminHeader'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -80,26 +81,14 @@ export default async function AdminDashboard() {
   }) || []
 
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Painel Admin</h1>
-            <p className="text-gray-400">Gerenciamento de Usuários e Conteúdo</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-300">{user.email}</span>
-            <form action="/auth/signout" method="post">
-              <button className="glass-button px-4 py-2 rounded-lg text-sm text-white hover:bg-red-500/20 hover:text-red-200">
-                Sair
-              </button>
-              {/* Note: Need to implement signout action or just use client supabase.auth.signOut() */}
-            </form>
-          </div>
-        </header>
+  return (
+    <main className="min-h-screen bg-[#0a0a0a] text-gray-100">
+      <AdminHeader userEmail={user.email} />
+
+      <div className="pt-24 px-6 md:px-12 max-w-[1600px] mx-auto pb-20">
 
         {(profileError || logsError || isKeyConfigError) && (
-          <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl mb-6 text-red-200">
+          <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl mb-8 text-red-200">
             <h3 className="font-bold mb-2 flex items-center gap-2">⚠️ Diagnóstico do Sistema</h3>
 
             {isKeyConfigError && (
@@ -133,7 +122,11 @@ export default async function AdminDashboard() {
         )}
 
         {/* Create Tabs UI in Client Component */}
-        <section className="glass-panel rounded-2xl p-6 min-h-[600px]">
+        <section>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-white mb-2">Gerenciamento de Usuários</h2>
+            <p className="text-gray-400 text-sm">Visualize, edite e monitore os usuários da plataforma.</p>
+          </div>
           <UsersTable users={mergedUsers} />
         </section>
       </div>
