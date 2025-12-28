@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Bookmark, User, Edit2 } from 'lucide-react';
+import { Search, Bookmark, User, Edit2, Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
@@ -29,7 +29,14 @@ export default function Navbar() {
 
     return (
         <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`} style={isCategoryPage ? { padding: '1rem', justifyContent: 'center' } : {}}>
-            {/* Logo - Hide on Category Pages */}
+            {/* Mobile Left: Novidades (News) */}
+            {!isCategoryPage && (
+                <Link href="/category/new" className={`${styles.iconBtn} ${styles.mobileOnly} ${styles.newsBtn}`}>
+                    <Bell size={20} />
+                </Link>
+            )}
+
+            {/* Logo - Centered on Mobile via CSS */}
             {!isCategoryPage && (
                 <div className={styles.brand}>
                     <Link href="/" className={styles.logo}>
@@ -38,7 +45,7 @@ export default function Navbar() {
                 </div>
             )}
 
-            {/* Navigation Links */}
+            {/* Desktop Nav Links */}
             <div className={styles.navLinks}>
                 <Link href="/" className={`${styles.link} ${pathname === '/' ? styles.active : ''}`}>Home</Link>
                 <Link href="/category/filmes" className={`${styles.link} ${pathname?.includes('/category/filmes') ? styles.active : ''}`}>Filmes</Link>

@@ -335,11 +335,46 @@
         display: none !important;
     }
 
+    /* Show Mobile Only Items */
+    .mobileOnly {
+        display: flex !important;
+    }
+
+    /* Centered Logo Layout */
+    .brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        /* Slightly smaller on mobile */
+    }
+
+    /* News Button Styling */
+    .newsBtn {
+        width: 36px;
+        height: 36px;
+        background: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .newsBtn svg {
+        color: #fff;
+    }
+
     /* Ensure Profile Trigger is visible */
     .profileMenuContainer {
         margin-left: 0;
         display: block;
     }
+}
+
+/* Default state for mobileOnly - hidden on desktop */
+.mobileOnly {
+    display: none;
 }
 
 /* Animation for switching profile */

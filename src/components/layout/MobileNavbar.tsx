@@ -18,25 +18,22 @@ export default function MobileNavbar() {
             label: 'Home',
             icon: Home,
             href: '/',
-            isActive: pathname === '/'
+            isActive: pathname === '/',
+            isFeatured: false
         },
         {
             label: 'Buscar',
             icon: Search,
-            href: '/search', // Assuming /search route exists or will be created/redirected
-            isActive: pathname === '/search'
+            href: '/search',
+            isActive: pathname === '/search',
+            isFeatured: true
         },
         {
             label: 'Favoritos',
             icon: Heart,
-            href: '/my-list', // Placeholder, using profiles for now or just generic
-            isActive: pathname === '/my-list'
-        },
-        {
-            label: 'Novidades',
-            icon: Sparkles,
-            href: '/category/new',
-            isActive: pathname === '/category/new'
+            href: '/my-list',
+            isActive: pathname === '/my-list',
+            isFeatured: false
         }
     ];
 
@@ -47,9 +44,12 @@ export default function MobileNavbar() {
                     <Link
                         key={item.label}
                         href={item.href}
-                        className={`${styles.navItem} ${item.isActive ? styles.activeItem : ''}`}
+                        className={`
+                            ${item.isFeatured ? styles.featuredItem : styles.navItem} 
+                            ${item.isActive ? styles.activeItem : ''}
+                        `}
                     >
-                        <item.icon size={24} strokeWidth={item.isActive ? 2.5 : 2} />
+                        <item.icon size={item.isFeatured ? 28 : 24} strokeWidth={item.isActive ? 2.5 : 2} />
                         <span>{item.label}</span>
                     </Link>
                 ))}
