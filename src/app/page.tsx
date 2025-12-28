@@ -42,21 +42,29 @@ export default async function Home() {
 
   // --- Dynamic Categorization Logic ---
 
-  // 1. Hero: Pure Random on Refresh (Requested "Aleatorio")
+  // 1. Hero: Balanced Mix (3 Movies + 3 Series) for Variety
   const allContent = [...catalogMovies, ...catalogSeries];
 
-  // Filters: Year >= 2001, Rating >= 5.
-  const heroCandidates = allContent.filter(item => {
-    const date = item.release_date || item.first_air_date;
+  const heroMovieCandidates = catalogMovies.filter(item => {
+    const date = item.release_date;
     const year = date ? new Date(date).getFullYear() : 0;
     const rating = item.vote_average || 0;
-    return year >= 2001 && rating >= 5;
+    return year >= 2005 && rating >= 5.5; // Slightly stricter criteria for Hero
   });
 
-  // Use robust Fisher-Yates shuffle for Hero
-  // This ensures better randomness than .sort(random - 0.5)
-  // And it will change on every render (force-dynamic)
-  const heroMovies = randomShuffle(heroCandidates).slice(0, 6);
+  const heroSeriesCandidates = catalogSeries.filter(item => {
+    const date = item.first_air_date;
+    const year = date ? new Date(date).getFullYear() : 0;
+    const rating = item.vote_average || 0;
+    return year >= 2005 && rating >= 5.5;
+  });
+
+  // Take 3 from each pool randomly
+  const selectedMovies = randomShuffle(heroMovieCandidates).slice(0, 3);
+  const selectedSeries = randomShuffle(heroSeriesCandidates).slice(0, 3);
+
+  // Combine and final shuffle so they aren't grouped (e.g. all movies first)
+  const heroMovies = randomShuffle([...selectedMovies, ...selectedSeries]);
 
   // 2. "Filmes" (Movies): Changes every 6 hours
   // Use hashedSort so adding new movies doesn't reshuffle the old ones completely

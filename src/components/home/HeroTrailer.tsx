@@ -8,24 +8,33 @@ import { Volume2, VolumeX, Image as ImageIcon } from 'lucide-react';
 interface HeroTrailerProps {
     videoId: string;
     isMuted: boolean;
+    isPlaying: boolean;
     onProgress: (progress: number) => void;
     onEnded: () => void;
     onError: () => void;
 }
 
-function HeroTrailer({ videoId, isMuted, onProgress, onEnded, onError }: HeroTrailerProps) {
+function HeroTrailer({ videoId, isMuted, isPlaying, onProgress, onEnded, onError }: HeroTrailerProps) {
     const playerRef = useRef<any>(null);
 
-    // Sync Mute State
+    // Sync Play/Pause and Mute State
     useEffect(() => {
         if (playerRef.current) {
+            // Mute
             if (isMuted) {
                 playerRef.current.mute();
             } else {
                 playerRef.current.unMute();
             }
+
+            // Play/Pause
+            if (isPlaying) {
+                playerRef.current.playVideo();
+            } else {
+                playerRef.current.pauseVideo();
+            }
         }
-    }, [isMuted]);
+    }, [isMuted, isPlaying]);
 
     const opts: YouTubeProps['opts'] = {
         height: '100%',

@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, Plus, Tv, Info, Volume2, VolumeX, Image as ImageIcon } from 'lucide-react';
+import { Play, Pause, FastForward, Info, Volume2, VolumeX } from 'lucide-react';
 import styles from './Hero.module.css';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -34,6 +34,34 @@ export default function Hero({ movies }: HeroProps) {
     const [showImageFallback, setShowImageFallback] = useState(false);
     const [isMuted, setIsMuted] = useState(true);
     const [trailerProgress, setTrailerProgress] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [isAutoPaused, setIsAutoPaused] = useState(false);
+
+    // Skip to next slide
+    const handleSkip = useCallback(() => {
+        const nextIndex = (currentIndex + 1) % movies.length;
+        fetchAndSetData(movies[nextIndex] as CatalogItem, nextIndex);
+    }, [currentIndex, movies]);
+
+    // Scroll-to-pause logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const heroHeight = window.innerHeight * 1.05; // 105vh
+            const threshold = heroHeight * 0.35;
+            const scrollPos = window.scrollY;
+
+            if (scrollPos > threshold && isPlaying && !isAutoPaused) {
+                setIsPlaying(false);
+                setIsAutoPaused(true);
+            } else if (scrollPos <= threshold && isAutoPaused) {
+                setIsPlaying(true);
+                setIsAutoPaused(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isPlaying, isAutoPaused]);
 
     // Stable Handlers to prevent HeroTrailer re-renders (Fixes Looping)
     const handleVideoEnd = useCallback(() => {
@@ -69,28 +97,25 @@ export default function Hero({ movies }: HeroProps) {
             // Filter Videos: Strict "Dublado" Preference
             // User complained that generic 'pt' videos are often just subtitled.
             // We search explicitly for "Dublado" in the title.
-            const ptVideos = videos.results.filter(v =>
-                v.iso_639_1 === 'pt' &&
-                v.site === 'YouTube' &&
-                v.type === 'Trailer'
-            );
+            // Filter and Score Videos: Prioritize PT-BR with Quality
+            const candidates = videos.results
+                .filter(v => v.iso_639_1 === 'pt' && v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser'))
+                .map(v => {
+                    let score = 0;
+                    const name = v.name.toLowerCase();
 
-            let bestTrailer = ptVideos.find(v => v.name.toLowerCase().includes('dublado'));
+                    if (name.includes('dublado')) score += 100;
+                    if (v.official) score += 50;
+                    if (name.includes('oficial') || name.includes('official')) score += 30;
+                    if (name.includes('4k') || name.includes('1080')) score += 20;
+                    if (v.type === 'Trailer') score += 10;
+                    if (name.includes('legendado')) score -= 80;
 
-            // Search Fallback: If no "Dublado" explicit, but we have PT results, 
-            // check against generic terms or try to filter out "Legendado'.
-            if (!bestTrailer) {
-                // Try find one that is NOT "Legendado" and IS "Official"
-                bestTrailer = ptVideos.find(v =>
-                    !v.name.toLowerCase().includes('legendado') &&
-                    (v.name.toLowerCase().includes('trailer oficial') || v.name.toLowerCase().includes('teaser'))
-                );
-            }
+                    return { ...v, score };
+                })
+                .sort((a, b) => b.score - a.score);
 
-            // Final fallback: If user REALLY wants dubbed, maybe we skip if we aren't sure?
-            // User said: "só daremos preferência a trailers em pt-br, não tem? cotinua com imagem"
-            // And complained about "English with subtitles". 
-            // So if we didn't find "Dublado" or a clean PT candidate, we leave bestTrailer undefined.
+            const bestTrailer = candidates[0];
 
             if (bestTrailer) {
                 setTrailerId(bestTrailer.key);
@@ -181,6 +206,7 @@ export default function Hero({ movies }: HeroProps) {
                         key={trailerId}
                         videoId={trailerId}
                         isMuted={isMuted}
+                        isPlaying={isPlaying}
                         onProgress={handleProgress}
                         onEnded={handleVideoEnd}
                         onError={handleVideoError}
@@ -232,18 +258,27 @@ export default function Hero({ movies }: HeroProps) {
                     </div>
 
                     <button
+                        onClick={() => setIsPlaying(!isPlaying)}
+                        className={styles.controlBtn}
+                        title={isPlaying ? "Pausar" : "Reproduzir"}
+                    >
+                        {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                    </button>
+
+                    <button
                         onClick={() => setIsMuted(!isMuted)}
                         className={styles.controlBtn}
+                        title={isMuted ? "Ativar Áudio" : "Mutar"}
                     >
                         {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                     </button>
 
                     <button
-                        onClick={handleVideoError}
+                        onClick={handleSkip}
                         className={styles.controlBtn}
-                        title="Voltar para Imagem"
+                        title="Pular Trailer"
                     >
-                        <ImageIcon size={20} />
+                        <FastForward size={20} />
                     </button>
                 </div>
             )}
