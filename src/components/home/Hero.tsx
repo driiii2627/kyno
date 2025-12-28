@@ -18,65 +18,69 @@ export default function Hero({ movies }: HeroProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
     const [logoPath, setLogoPath] = useState<string | null>(null);
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
-    const movie = movies[currentIndex] as CatalogItem; // Cast for TS
+    // Helper to fetch data
+    const fetchAndSetData = async (movie: CatalogItem, index: number) => {
+        try {
+            const isTv = !!movie.first_air_date;
+            const type = isTv ? 'tv' : 'movie';
 
-    // Auto-rotation with variable timer
+            const [details, images] = await Promise.all([
+                tmdb.getDetails(movie.id, type),
+                tmdb.getImages(movie.id, type)
+            ]);
+
+            const ptLogo = images.logos.find(l => l.iso_639_1 === 'pt');
+            const enLogo = images.logos.find(l => l.iso_639_1 === 'en');
+            const bestLogo = ptLogo || enLogo || images.logos[0];
+
+            // Batch updates (React 18 does this auto, but careful order helps mental model)
+            setMovieDetails(details);
+            setLogoPath(bestLogo ? bestLogo.file_path : null);
+            setCurrentIndex(index);
+        } catch (error) {
+            console.error("Failed to fetch data", error);
+            // Even if details fail, switching index ensures we don't get stuck
+            setCurrentIndex(index);
+        }
+    };
+
+    // Initial load
+    useEffect(() => {
+        const loadInitial = async () => {
+            if (movies.length > 0) {
+                await fetchAndSetData(movies[0] as CatalogItem, 0);
+            }
+        };
+        loadInitial();
+    }, [movies]); // Run once on mount/movies change
+
+    // Auto-rotation with pre-fetch
     useEffect(() => {
         let timeoutId: NodeJS.Timeout;
 
-        const rotate = () => {
-            const delay = Math.floor(Math.random() * (8000 - 5000 + 1) + 5000); // 5s to 8s
-            timeoutId = setTimeout(() => {
-                setCurrentIndex((prev) => (prev + 1) % movies.length);
+        const rotate = async () => {
+            const delay = Math.floor(Math.random() * (8000 - 5000 + 1) + 5000);
+
+            timeoutId = setTimeout(async () => {
+                const nextIndex = (currentIndex + 1) % movies.length;
+                await fetchAndSetData(movies[nextIndex] as CatalogItem, nextIndex);
                 rotate(); // Schedule next
             }, delay);
         };
 
-        rotate(); // Start loop
+        // Only start rotation if movies are loaded and we're not in the middle of an initial load
+        if (movies.length > 0 && movieDetails) {
+            rotate();
+        }
 
         return () => clearTimeout(timeoutId);
-    }, [movies.length]);
+    }, [currentIndex, movies, movieDetails]); // Re-run when index changes to schedule NEXT step, or movies/movieDetails change
 
-    // Fetch details and LOGO when movie changes
-    useEffect(() => {
-        if (!movie) return;
+    if (!movies[currentIndex]) return null;
 
-        // Reset state immediately to prevent "desync" (showing old logo on new bg)
-        setLogoPath(null);
-        // setMovieDetails(null); // Optional: keep old details or reset? Resetting avoids mismatch but causes blink.
-        // Let's reset details too for correctness, or at least be aware. 
-        // Better to have a 'loading' flash than wrong data.
-
-        const fetchDetails = async () => {
-            try {
-                // Determine type based on properties (fallback logic)
-                const isTv = !!movie.first_air_date;
-                const type = isTv ? 'tv' : 'movie';
-
-                const [details, images] = await Promise.all([
-                    tmdb.getDetails(movie.id, type),
-                    tmdb.getImages(movie.id, type)
-                ]);
-
-                setMovieDetails(details);
-
-                // Find best logo: PT > EN > First
-                const ptLogo = images.logos.find(l => l.iso_639_1 === 'pt');
-                const enLogo = images.logos.find(l => l.iso_639_1 === 'en');
-                const bestLogo = ptLogo || enLogo || images.logos[0];
-
-                setLogoPath(bestLogo ? bestLogo.file_path : null);
-
-            } catch (error) {
-                console.error("Failed to fetch details", error);
-            }
-        };
-
-        fetchDetails();
-    }, [movie]);
-
-    if (!movie) return null;
+    const movie = movies[currentIndex] as CatalogItem;
 
     const year = new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear();
     const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';

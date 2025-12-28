@@ -377,75 +377,82 @@
         align-items: flex-end;
     }
 
-    .content {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        /* Push to bottom */
-        align-items: center;
-        text-align: center;
-        width: 100%;
-        height: 100%;
-        /* Take full height to allow justify-end to work */
-        padding-bottom: 25vh;
-        /* Keep space for bottom nav */
-        padding-top: 10vh;
-        /* clear top header area */
-        background: linear-gradient(to top, #02040a 10%, transparent 80%);
-        /* darkened bottom for readability */
-    }
+    @media (max-width: 768px) {
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* Push to bottom */
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            /* Take full height */
+            /* Adjusted padding to be lower but safe */
+            padding-bottom: 8rem;
+            padding-top: 5rem;
+            /* Removed background override to restore original vignette/gradient flow */
+            background: transparent;
+            z-index: 10;
+        }
 
-    .originalLabel {
-        display: none !important;
-    }
+        /* Ensure Vignettes are powerful on mobile */
+        .bottomVignette {
+            height: 50% !important;
+            /* Taller fade on mobile */
+            background: linear-gradient(to top, #02040a 10%, transparent 100%) !important;
+            opacity: 1 !important;
+            z-index: 5;
+        }
 
-    .logoContainer {
-        justify-content: center;
-        width: 100%;
-        flex: 0 0 auto;
-        /* Don't shrink */
-        min-height: 100px;
-        margin-bottom: 1rem;
-    }
+        .originalLabel {
+            display: none !important;
+        }
 
-    .heroLogo {
-        max-height: 100px;
-        /* Bit smaller to fit better */
-        width: auto;
-    }
+        .logoContainer {
+            justify-content: center;
+            width: 100%;
+            flex: 0 0 auto;
+            min-height: auto;
+            margin-bottom: 1rem;
+        }
 
-    .topBadges {
-        order: -1;
-        /* Ensure badges are above logo if visible, or hiding them */
-        margin-bottom: 0.5rem;
-    }
+        .heroLogo {
+            max-height: 100px;
+            width: auto;
+        }
 
-    .meta {
-        justify-content: center;
-        margin-bottom: 1rem;
-    }
+        .topBadges {
+            order: -1;
+            margin-bottom: 0.5rem;
+        }
 
-    .title {
-        display: none;
-        /* Hide text title if we have logo, logic handled in JSX but good to ensure */
-    }
+        .meta {
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
 
-    .description {
-        order: 10;
-        /* Description at very bottom */
-        margin-top: 1rem;
-        -webkit-line-clamp: 3;
-        font-size: 0.85rem;
-        padding: 0 1rem;
-    }
+        .title {
+            display: none;
+        }
 
-    .buttons {
-        gap: 1rem;
-        margin-bottom: 0.5rem;
-        justify-content: center;
-        /* Explicit centering */
-        width: 100%;
-        display: flex;
+        .description {
+            order: 10;
+            margin-top: 0.5rem;
+            -webkit-line-clamp: 2;
+            /* 2 lines max */
+            line-clamp: 2;
+            font-size: 0.85rem;
+            padding: 0 1rem;
+        }
+
+        .buttons {
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            justify-content: center;
+            width: 100%;
+            display: flex;
+        }
     }
 
     .watchBtn {
