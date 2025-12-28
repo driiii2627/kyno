@@ -105,11 +105,13 @@ export default function Hero({ movies }: HeroProps) {
                     const name = v.name.toLowerCase();
 
                     if (name.includes('dublado')) score += 100;
+                    if (name.includes('[dub]') || name.includes('| dub') || name.includes('(dub)') || name.includes('dub ')) score += 90;
                     if (v.official) score += 50;
+                    if (name.includes('brasil') || name.includes(' br ') || name.endsWith(' br')) score += 40;
                     if (name.includes('oficial') || name.includes('official')) score += 30;
                     if (name.includes('4k') || name.includes('1080')) score += 20;
                     if (v.type === 'Trailer') score += 10;
-                    if (name.includes('legendado')) score -= 80;
+                    if (name.includes('legendado')) score -= 100; // Even heavier penalty for subtitles
 
                     return { ...v, score };
                 })

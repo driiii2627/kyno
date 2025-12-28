@@ -516,8 +516,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(1.25);
-    /* Scale increased to hide black bars better */
+    transform: translate(-50%, -50%) scale(1.35);
+    /* Scale further increased to eliminate any remaining black borders */
     width: 100vw;
     height: 56.25vw;
     /* 16:9 Aspect Ratio based on width */

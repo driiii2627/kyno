@@ -52,6 +52,7 @@ function HeroTrailer({ videoId, isMuted, isPlaying, onProgress, onEnded, onError
             fs: 0,
             disablekb: 1, // Disable keyboard to prevent focus stealing scroll?
             playsinline: 1,
+            vq: 'hd1080', // Legacy, but sometimes used by internal player logic
         },
     };
 
