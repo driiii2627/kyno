@@ -14,7 +14,23 @@ interface HeroProps {
     movies: Movie[]; // In practice, these are CatalogItems
 }
 
+import { repairImagePaths } from '@/app/actions/maintenance';
+
 export default function Hero({ movies }: HeroProps) {
+    // ... existing state
+
+    // MAINTENANCE: Auto-repair images once
+    useEffect(() => {
+        const hasRepaired = localStorage.getItem('kyno_img_repair_v1');
+        if (!hasRepaired) {
+            console.log("Running one-time image DB repair...");
+            repairImagePaths().then(() => {
+                console.log("DB Repair finished.");
+                localStorage.setItem('kyno_img_repair_v1', 'true');
+            });
+        }
+    }, []);
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
     const [logoPath, setLogoPath] = useState<string | null>(null);
