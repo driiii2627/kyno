@@ -289,14 +289,16 @@
 }
 
 /* Top 10 Gradient Title (Replaces Badge) */
+/* Top 10 Gradient Title (Replaces Badge) */
 .top10Prefix {
-    background: linear-gradient(135deg, #FFD700 0%, #FDB931 30%, #FFFFFF 60%, #9E7D2D 100%);
+    /* Blue Theme matches site branding (#4FB6D8) */
+    background: linear-gradient(135deg, #4FB6D8 0%, #2563EB 50%, #60A5FA 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 900;
     margin-right: 8px;
     letter-spacing: -1px;
-    text-shadow: 0px 0px 20px rgba(253, 185, 49, 0.4);
+    text-shadow: 0px 0px 20px rgba(37, 99, 235, 0.4);
     font-size: 1.5rem;
     /* Larger than title */
 }
@@ -313,7 +315,8 @@
 
 @media (max-width: 768px) {
     .row {
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
+        /* Reduced from 2rem to 1rem for tighter mobile layout */
     }
 
     .header,
@@ -328,8 +331,8 @@
     }
 
     .top10List {
-        gap: 3.5rem;
-        /* Smaller gap on mobile */
+        gap: 1.5rem;
+        /* Reduced gap for Top 10 on mobile too */
     }
 
     .title {
