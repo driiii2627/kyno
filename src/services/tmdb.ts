@@ -118,6 +118,9 @@ export const tmdb = {
   },
   getCollectionDetails: async (collectionId: number) => {
     return fetchFromTMDB<{ parts: Movie[] }>(`/collection/${collectionId}`);
+  },
+  getImages: async (id: number, type: 'movie' | 'tv') => {
+    return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
   }
 };
 

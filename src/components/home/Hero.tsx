@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, Plus, Tv } from 'lucide-react';
+import { Play, Plus, Tv, Info } from 'lucide-react';
 import styles from './Hero.module.css';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -17,6 +17,7 @@ interface HeroProps {
 export default function Hero({ movies }: HeroProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [movieDetails, setMovieDetails] = useState<MovieDetails | null>(null);
+    const [logoPath, setLogoPath] = useState<string | null>(null);
 
     const movie = movies[currentIndex] as CatalogItem; // Cast for TS
 
@@ -37,7 +38,7 @@ export default function Hero({ movies }: HeroProps) {
         return () => clearTimeout(timeoutId);
     }, [movies.length]);
 
-    // Fetch details when movie changes
+    // Fetch details and LOGO when movie changes
     useEffect(() => {
         if (!movie) return;
 
@@ -46,8 +47,21 @@ export default function Hero({ movies }: HeroProps) {
                 // Determine type based on properties (fallback logic)
                 const isTv = !!movie.first_air_date;
                 const type = isTv ? 'tv' : 'movie';
-                const details = await tmdb.getDetails(movie.id, type);
+
+                const [details, images] = await Promise.all([
+                    tmdb.getDetails(movie.id, type),
+                    tmdb.getImages(movie.id, type)
+                ]);
+
                 setMovieDetails(details);
+
+                // Find best logo: PT > EN > First
+                const ptLogo = images.logos.find(l => l.iso_639_1 === 'pt');
+                const enLogo = images.logos.find(l => l.iso_639_1 === 'en');
+                const bestLogo = ptLogo || enLogo || images.logos[0];
+
+                setLogoPath(bestLogo ? bestLogo.file_path : null);
+
             } catch (error) {
                 console.error("Failed to fetch details", error);
             }
@@ -112,41 +126,37 @@ export default function Hero({ movies }: HeroProps) {
             </div>
 
             <div className={styles.content}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                <div className={styles.topBadges}>
                     <div className={styles.originalLabel}>Kyno+ Destaques</div>
                     {/* Progress Indicator */}
-                    <div style={{
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '9999px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                        backdropFilter: 'blur(12px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.75rem',
-                        fontWeight: 500,
-                        color: '#d4d4d8' // zinc-300
-                    }}>
+                    <div className={styles.counterBadge}>
                         {currentIndex + 1} / {movies.length}
                     </div>
                 </div>
 
-                <h1 className={`${styles.title} ${title.length > 25 ? styles.titleLong : ''}`}>
-                    {title}
-                </h1>
+                {/* LOGO or Title */}
+                {logoPath ? (
+                    <div className={styles.logoContainer}>
+                        <img
+                            src={getImageUrl(logoPath, 'w500')}
+                            alt={title}
+                            className={styles.heroLogo}
+                        />
+                    </div>
+                ) : (
+                    <h1 className={`${styles.title} ${title.length > 25 ? styles.titleLong : ''}`}>
+                        {title}
+                    </h1>
+                )}
 
                 <div className={styles.meta}>
                     <span className={styles.year}>{year}</span>
                     <div className={styles.separator}>•</div>
-                    <span className={styles.genresText}>{genres}</span>
-                    {duration && (
-                        <>
-                            <div className={styles.separator}>•</div>
-                            <span className={styles.duration}>{duration}</span>
-                        </>
-                    )}
-                    <div className={styles.separator}>•</div>
                     <span className={styles.rating}>
                         <span className={styles.star}>★</span> {rating}
                     </span>
+                    <div className={styles.separator}>•</div>
+                    <span className={styles.genresText}>{genres}</span>
                 </div>
 
                 <div className={styles.buttons}>
@@ -155,20 +165,14 @@ export default function Hero({ movies }: HeroProps) {
                         genres={movieDetails?.genres?.map(g => g.name) || []}
                     >
                         <button className={styles.watchBtn}>
-                            <Play className="fill-black" size={20} />
+                            <Play className="fill-black" size={24} color="black" />
                             Assistir
                         </button>
                     </TrackedLink>
 
-                    <button className={styles.actionBtn}>
-                        <Plus size={24} />
-                        <span>Minha Lista</span>
-                    </button>
-
-                    <button className={styles.actionBtn}>
-                        <Tv size={24} />
-                        <span>Trailer</span>
-                    </button>
+                    <Link href={linkHref} className={styles.infoBtn}>
+                        <Info size={24} />
+                    </Link>
                 </div>
 
                 <div className={styles.description}>
