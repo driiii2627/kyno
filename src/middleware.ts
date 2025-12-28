@@ -92,7 +92,7 @@ export async function middleware(req: NextRequest) {
     // 4. Enforce Profile Selection
     // If logged in, but no profile selected -> Redirect to /profiles
     if (user && !isLoginPage) {
-        const activeProfileId = req.cookies.get('kyno_active_profile')?.value;
+        const activeProfileId = req.cookies.get('X-Profile-ID')?.value;
         const isProfilesPage = pathname === '/profiles'; // or startsWith if creating? No, creating is modal on /profiles
 
         if (!activeProfileId && !isProfilesPage) {

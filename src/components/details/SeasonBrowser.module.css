@@ -256,9 +256,12 @@
 
     .overview {
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         font-size: 0.8rem;
         color: #a1a1aa;
         display: -webkit-box;
+        -webkit-box-orient: vertical;
+        /* Add this if missing or needed for completeness, though specific lint was clamp */
         height: auto;
     }
 
