@@ -47,8 +47,16 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (user) {
-        // Security Check: Only specific email
-        if (user.email !== 'kaicolivsantos@gmail.com') {
+        // Security Check: Database Driven Whitelist
+        // We use the authenticated client. The RLS policy "Admins can read their own entry" 
+        // ensures that if the user can find themselves in this table, they are authorized.
+        const { data: isWhitelisted, error: whitelistError } = await supabase
+            .from('admin_whitelist')
+            .select('email')
+            .eq('email', user.email)
+            .single()
+
+        if (whitelistError || !isWhitelisted) {
             await supabase.auth.signOut();
             return NextResponse.redirect(new URL('/login?error=unauthorized', request.url));
         }

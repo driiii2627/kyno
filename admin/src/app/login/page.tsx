@@ -30,7 +30,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                         required
                         className="bg-black/20 border border-white/5 rounded-lg p-3 text-white outline-none focus:border-white/20 transition-all"
                         placeholder="admin@kyno.com"
-                        defaultValue="kaicolivsantos@gmail.com"
                     />
                 </div>
 
