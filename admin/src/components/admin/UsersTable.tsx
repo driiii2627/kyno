@@ -29,12 +29,12 @@ export function UsersTable({ users }: UsersTableProps) {
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="text-gray-400 text-xs uppercase tracking-wider border-b border-white/10">
-                            <th className="p-4 font-semibold">Usuário</th>
+                        <tr className="text-gray-400 text-xs uppercase tracking-wider border-b border-white/10 bg-white/5">
+                            <th className="p-4 font-semibold rounded-tl-lg">Usuário</th>
                             <th className="p-4 font-semibold">Email</th>
                             <th className="p-4 font-semibold">Data de Cadastro</th>
                             <th className="p-4 font-semibold">Último Acesso</th>
-                            <th className="p-4 font-semibold w-10"></th>
+                            <th className="p-4 font-semibold w-10 rounded-tr-lg"></th>
                         </tr>
                     </thead>
                     <tbody className="text-sm">

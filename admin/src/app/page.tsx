@@ -14,35 +14,59 @@ export default async function AdminDashboard() {
   const admin = await createAdminClient()
 
   // Fetch columns: ID, Email, Last Sign In, Created At
-  // Pagination? For now, list first 50.
+  // Pagination? For now, list first 1000 to catch everyone.
   const { data: { users }, error } = await admin.auth.admin.listUsers({
     page: 1,
-    perPage: 50
+    perPage: 1000
   })
 
   // Fetch profiles for these users to show names if available
   // Assuming 'profiles' table has 'id' matching 'auth.users.id'
-  const userIds = users?.map(u => u.id) || []
+  // Fetch profiles
   let profiles: any[] = []
-
   if (userIds.length > 0) {
     const { data } = await admin
       .from('profiles')
       .select('*')
-      .in('user_id', userIds) // Matching auth.uid with profiles.user_id
-
+      .in('user_id', userIds)
     profiles = data || []
+  }
+
+  // [NEW] Fetch Security Logs for IPs
+  let securityLogs: any[] = []
+  if (userIds.length > 0) {
+    // We want the LATEST log for each user to get their last known IP.
+    // Since we can't easily doing "distinct on" via simple client syntax sometimes, 
+    // we'll just fetch all logs for these users (if dataset is small) or 
+    // better: assumes there's one entry per user if it's updated on login, 
+    // OR we just fetch the registration/last_ip from the logs table.
+    // Looking at `registerAction` it inserts. Looking at `loginAction`... it doesn't seem to update LAST_IP in the provided snippet?
+    // Wait, `loginAction` snippet didn't show updating security logs table.
+    // `registerAction` inserts: user_id, registration_ip, last_ip.
+    // Let's assume there is at least one entry per user from registration.
+
+    const { data } = await admin
+      .from('kyno_user_security_logs')
+      .select('user_id, last_ip, registration_ip')
+      .in('user_id', userIds)
+    // If there are multiple, we might get duplicates. 
+    // We will just process them client side to find the match.
+
+    securityLogs = data || []
   }
 
   // Merge data
   const mergedUsers = users?.map(u => {
-    // There might be multiple profiles per user (based on createProfileAction limit check), 
-    // or maybe just one active one. The schema check implies 1-to-many but let's assume we want to show the lists or the first one.
-    // user_id is the foreign key in profiles table.
     const userProfiles = profiles.filter(p => p.user_id === u.id)
+    // Find log for this user. If multiple, take the most recent? 
+    // The table might just have one row per user or log history. 
+    // Assuming we want any IP we can find:
+    const userLog = securityLogs.find(l => l.user_id === u.id)
+
     return {
       ...u,
-      profiles: userProfiles // Pass all profiles
+      profiles: userProfiles,
+      last_ip: userLog?.last_ip || userLog?.registration_ip || null
     }
   }) || []
 
