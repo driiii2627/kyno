@@ -81,7 +81,6 @@ export default async function AdminDashboard() {
   }) || []
 
   return (
-  return (
     <main className="min-h-screen bg-[#0a0a0a] text-gray-100">
       <AdminHeader userEmail={user.email} />
 
