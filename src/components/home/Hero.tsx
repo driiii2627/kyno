@@ -182,7 +182,13 @@ export default function Hero({ movies }: HeroProps) {
                         />
                     </div>
                 ))}
-                <div className={styles.gradientOverlay} />
+                ))}
+
+                {/* Overlay with dynamic class for video mode */}
+                <div
+                    className={`${styles.gradientOverlay} ${(trailerId && !showImageFallback) ? styles.videoMode : ''}`}
+                />
+
                 <div className={styles.leftVignette} />
                 <div className={styles.bottomVignette} />
             </div>
