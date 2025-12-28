@@ -167,11 +167,95 @@
 }
 
 @media (max-width: 768px) {
+    .grid {
+        flex-direction: column;
+        overflow-x: hidden;
+        padding-right: 0;
+        gap: 1rem;
+        padding-bottom: 0;
+        scroll-snap-type: none;
+    }
+
     .card {
-        /* Mobile: Show ~2.2 items for "peek" effect or just 2 items */
-        min-width: 175px;
-        /* Fixed readable width */
-        max-width: 175px;
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        gap: 1rem;
+    }
+
+    .card:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .thumbnailWrapper {
+        width: 130px;
+        min-width: 130px;
+        aspect-ratio: 16 / 9;
+        border-radius: 0.25rem;
+    }
+
+    .episodeBadge {
+        font-size: 0.6rem;
+        padding: 0 0.3rem;
+        bottom: 0.25rem;
+        left: 0.25rem;
+    }
+
+    .playOverlay {
+        opacity: 0.6;
+        /* Always visible on mobile */
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .playIcon {
+        transform: scale(0.6);
+        padding: 0.5rem;
+    }
+
+    .cardInfo {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+        min-width: 0;
+        /* Text truncation fix */
+    }
+
+    .cardHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .episodeTitle {
+        font-size: 0.9rem;
+        color: #fff;
+        line-height: 1.2;
+    }
+
+    .duration {
+        font-size: 0.75rem;
+        color: #71717a;
+    }
+
+    .overview {
+        -webkit-line-clamp: 2;
+        font-size: 0.8rem;
+        color: #a1a1aa;
+        display: -webkit-box;
+        height: auto;
+    }
+
+    /* Hide nav buttons on mobile */
+    .navButton {
+        display: none;
     }
 }
 
