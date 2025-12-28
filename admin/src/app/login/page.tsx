@@ -1,4 +1,3 @@
-```typescript
 import { login } from '../auth/actions'
 import { Lock } from 'lucide-react'
 
