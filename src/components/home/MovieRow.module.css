@@ -326,8 +326,15 @@
     }
 
     .card {
-        width: 110px;
-        /* Compact mobile size */
+        width: 125px;
+        /* Increased from 110px as requested */
+    }
+
+    /* Hide Desktop Navigation Arrows & Gradients on Mobile */
+    .handle,
+    .sliderMaskLeft,
+    .sliderMaskRight {
+        display: none !important;
     }
 
     .top10List {
