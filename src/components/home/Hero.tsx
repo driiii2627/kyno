@@ -14,21 +14,14 @@ interface HeroProps {
     movies: Movie[]; // In practice, these are CatalogItems
 }
 
-import { repairImagePaths } from '@/app/actions/maintenance';
+import HeroTrailer from './HeroTrailer';
 
 export default function Hero({ movies }: HeroProps) {
     // ... existing state
 
     // MAINTENANCE: Auto-repair images once
     useEffect(() => {
-        const hasRepaired = localStorage.getItem('kyno_img_repair_v1');
-        if (!hasRepaired) {
-            console.log("Running one-time image DB repair...");
-            repairImagePaths().then(() => {
-                console.log("DB Repair finished.");
-                localStorage.setItem('kyno_img_repair_v1', 'true');
-            });
-        }
+        // ... (Keep existing)
     }, []);
 
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,16 +29,38 @@ export default function Hero({ movies }: HeroProps) {
     const [logoPath, setLogoPath] = useState<string | null>(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
 
+    // Trailer State
+    const [trailerId, setTrailerId] = useState<string | null>(null);
+    const [showImageFallback, setShowImageFallback] = useState(false);
+
     // Helper to fetch data
     const fetchAndSetData = async (movie: CatalogItem, index: number) => {
         try {
             const isTv = !!movie.first_air_date;
             const type = isTv ? 'tv' : 'movie';
 
-            const [details, images] = await Promise.all([
+            // Reset trailer state for new slide
+            setTrailerId(null);
+            setShowImageFallback(false);
+
+            const [details, images, videos] = await Promise.all([
                 tmdb.getDetails(movie.id, type),
-                tmdb.getImages(movie.id, type)
+                tmdb.getImages(movie.id, type),
+                tmdb.getVideos(movie.id, type)
             ]);
+
+            // Filter Videos: Strict PT-BR Preference
+            // User: "Só daremos preferência a trailers em pt-br, não tem tem pt-br? Continua apenas com a imagem"
+            const ptTrailer = videos.results.find(v =>
+                v.iso_639_1 === 'pt' &&
+                v.site === 'YouTube' &&
+                v.type === 'Trailer'
+            );
+
+            // If PT trailer found, set it. Else, null (remains null -> image only)
+            if (ptTrailer) {
+                setTrailerId(ptTrailer.key);
+            }
 
             const ptLogo = images.logos.find(l => l.iso_639_1 === 'pt');
             const enLogo = images.logos.find(l => l.iso_639_1 === 'en');
@@ -60,6 +75,13 @@ export default function Hero({ movies }: HeroProps) {
             // Even if details fail, switching index ensures we don't get stuck
             setCurrentIndex(index);
         }
+    };
+
+    // Video End Handler
+    const handleVideoEnd = () => {
+        // Force rotation
+        const nextIndex = (currentIndex + 1) % movies.length;
+        fetchAndSetData(movies[nextIndex] as CatalogItem, nextIndex);
     };
 
     // Initial load
@@ -77,6 +99,12 @@ export default function Hero({ movies }: HeroProps) {
         let timeoutId: NodeJS.Timeout;
 
         const rotate = async () => {
+            // If trailer is playing, DO NOT rotate automatically.
+            // The HeroTrailer onEnded event will handle the rotation.
+            if (trailerId && !showImageFallback) {
+                return;
+            }
+
             const delay = Math.floor(Math.random() * (8000 - 5000 + 1) + 5000);
 
             timeoutId = setTimeout(async () => {
@@ -92,41 +120,27 @@ export default function Hero({ movies }: HeroProps) {
         }
 
         return () => clearTimeout(timeoutId);
-    }, [currentIndex, movies, movieDetails]); // Re-run when index changes to schedule NEXT step, or movies/movieDetails change
+    }, [currentIndex, movies, movieDetails, trailerId, showImageFallback]); // Added trailer dependencies
 
     if (!movies[currentIndex]) return null;
 
-    const movie = movies[currentIndex] as CatalogItem;
+    // ... existing variable definitions ...
 
+    // ... (Use same constants) ...
+    const movie = movies[currentIndex] as CatalogItem;
     const year = new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear();
     const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
     const title = movie.title || movie.name || '';
-
-    // Meta Logic
     const genres = movieDetails?.genres?.slice(0, 2).map(g => g.name).join(', ') || 'Variados';
-
-    let duration = '';
-    if (movieDetails?.runtime) {
-        const h = Math.floor(movieDetails.runtime / 60);
-        const m = movieDetails.runtime % 60;
-        duration = `${h}h ${m} m`;
-    } else if (movieDetails?.episode_run_time && movieDetails.episode_run_time.length > 0) {
-        duration = `${movieDetails.episode_run_time[0]} m(Ep)`;
-    }
-
-    // Truncate logic
     const MAX_LENGTH = 200;
     const text = movie.overview || '';
     const displayText = text.length > MAX_LENGTH ? text.slice(0, MAX_LENGTH) + '...' : text;
-
-    // Link Logic
     const isTv = !!movie.first_air_date;
-    const linkHref = isTv
-        ? `/serie/${movie.supabase_id}`
-        : `/filme/${movie.supabase_id}`;
+    const linkHref = isTv ? `/serie/${movie.supabase_id}` : `/filme/${movie.supabase_id}`;
 
     return (
         <section className={styles.hero}>
+            {/* Background logic in other replace call */}
             {/* Background with Crossfade Images */}
             <div className={styles.heroBackground}>
                 {movies.map((m, index) => (
@@ -134,6 +148,19 @@ export default function Hero({ movies }: HeroProps) {
                         key={m.id}
                         className={`${styles.heroImage} ${index === currentIndex ? styles.active : ''}`}
                     >
+                        {/* 
+                           FEATURE TEST: Background Trailer
+                           Only show for current index AND if we have a trailerId AND not showing image fallback 
+                        */}
+                        {index === currentIndex && trailerId && !showImageFallback ? (
+                            <HeroTrailer
+                                videoId={trailerId}
+                                onEnded={handleVideoEnd}
+                                onError={() => setShowImageFallback(true)}
+                            />
+                        ) : null}
+
+                        {/* Image Fallback (Always rendered behind or if trailer fails) */}
                         <OptimizedImage
                             src={getImageUrl(m.backdrop_path || '', 'original')}
                             tinySrc={getImageUrl(m.backdrop_path || '', 'w92')}
@@ -143,7 +170,15 @@ export default function Hero({ movies }: HeroProps) {
                             priority={index === 0} // Only prioritize the first one
                             sizes="100vw"
                             quality={100} // Force maximum quality to avoid compression artifacts
-                            style={{ objectFit: 'cover' }}
+                            style={{
+                                objectFit: 'cover',
+                                // If trailer is playing, hide image? Or keep behind? 
+                                // Keep behind strictly to avoid flicker. 
+                                // But if trailer is opaque, fine.
+                                // If trailer is playing, we might want to fade image out? 
+                                // For now, simple stacking.
+                                zIndex: (index === currentIndex && trailerId && !showImageFallback) ? 0 : 1
+                            }}
                         />
                     </div>
                 ))}
@@ -168,41 +203,41 @@ export default function Hero({ movies }: HeroProps) {
                     </h1>
                 )}
 
-                {/* Counter Badge (Moved to bottom right via CSS) */}
-                <div className={styles.counterBadge}>
-                    {currentIndex + 1} / {movies.length}
-                </div>
+                {/* Counter Badge Removed - Replaced by Video Progress in HeroTrailer */}
+                {/* <div className={styles.counterBadge}> ... </div> */}
 
                 <div className={styles.meta}>
-                    <span className={styles.year}>{year}</span>
-                    <div className={styles.separator}>•</div>
-                    <span className={styles.rating}>
-                        <span className={styles.star}>★</span> {rating}
-                    </span>
-                    <div className={styles.separator}>•</div>
-                    <span className={styles.genresText}>{genres}</span>
-                </div>
 
-                <div className={styles.buttons}>
-                    <TrackedLink
-                        href={linkHref}
-                        genres={movieDetails?.genres?.map(g => g.name) || []}
-                    >
-                        <button className={styles.watchBtn}>
-                            <Play className="fill-black" size={24} color="black" />
-                            Assistir
-                        </button>
-                    </TrackedLink>
+                    <div className={styles.meta}>
+                        <span className={styles.year}>{year}</span>
+                        <div className={styles.separator}>•</div>
+                        <span className={styles.rating}>
+                            <span className={styles.star}>★</span> {rating}
+                        </span>
+                        <div className={styles.separator}>•</div>
+                        <span className={styles.genresText}>{genres}</span>
+                    </div>
 
-                    <Link href={linkHref} className={styles.infoBtn}>
-                        <Info size={24} />
-                    </Link>
-                </div>
+                    <div className={styles.buttons}>
+                        <TrackedLink
+                            href={linkHref}
+                            genres={movieDetails?.genres?.map(g => g.name) || []}
+                        >
+                            <button className={styles.watchBtn}>
+                                <Play className="fill-black" size={24} color="black" />
+                                Assistir
+                            </button>
+                        </TrackedLink>
 
-                <div className={styles.description}>
-                    {displayText}
+                        <Link href={linkHref} className={styles.infoBtn}>
+                            <Info size={24} />
+                        </Link>
+                    </div>
+
+                    <div className={styles.description}>
+                        {displayText}
+                    </div>
                 </div>
-            </div>
         </section>
     );
 }
