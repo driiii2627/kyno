@@ -206,38 +206,38 @@ export default function Hero({ movies }: HeroProps) {
                 {/* Counter Badge Removed - Replaced by Video Progress in HeroTrailer */}
                 {/* <div className={styles.counterBadge}> ... </div> */}
 
+
+
                 <div className={styles.meta}>
-
-                    <div className={styles.meta}>
-                        <span className={styles.year}>{year}</span>
-                        <div className={styles.separator}>•</div>
-                        <span className={styles.rating}>
-                            <span className={styles.star}>★</span> {rating}
-                        </span>
-                        <div className={styles.separator}>•</div>
-                        <span className={styles.genresText}>{genres}</span>
-                    </div>
-
-                    <div className={styles.buttons}>
-                        <TrackedLink
-                            href={linkHref}
-                            genres={movieDetails?.genres?.map(g => g.name) || []}
-                        >
-                            <button className={styles.watchBtn}>
-                                <Play className="fill-black" size={24} color="black" />
-                                Assistir
-                            </button>
-                        </TrackedLink>
-
-                        <Link href={linkHref} className={styles.infoBtn}>
-                            <Info size={24} />
-                        </Link>
-                    </div>
-
-                    <div className={styles.description}>
-                        {displayText}
-                    </div>
+                    <span className={styles.year}>{year}</span>
+                    <div className={styles.separator}>•</div>
+                    <span className={styles.rating}>
+                        <span className={styles.star}>★</span> {rating}
+                    </span>
+                    <div className={styles.separator}>•</div>
+                    <span className={styles.genresText}>{genres}</span>
                 </div>
+
+                <div className={styles.buttons}>
+                    <TrackedLink
+                        href={linkHref}
+                        genres={movieDetails?.genres?.map(g => g.name) || []}
+                    >
+                        <button className={styles.watchBtn}>
+                            <Play className="fill-black" size={24} color="black" />
+                            Assistir
+                        </button>
+                    </TrackedLink>
+
+                    <Link href={linkHref} className={styles.infoBtn}>
+                        <Info size={24} />
+                    </Link>
+                </div>
+
+                <div className={styles.description}>
+                    {displayText}
+                </div>
+            </div>
         </section>
     );
 }
