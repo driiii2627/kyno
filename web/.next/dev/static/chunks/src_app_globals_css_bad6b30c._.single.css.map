@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/src/app/globals.css"],"sourcesContent":[":root {\n  /* Kyno+ Theme Colors */\n  --bg-start: #0F2027;\n  --bg-mid: #203A43;\n  --bg-end: #2C5364;\n\n  --text-primary: #ffffff;\n  --text-secondary: #aaaaaa;\n\n  --primary-accent: #ffffff;\n  /* White buttons */\n\n  /* Font */\n  --font-inter: 'Inter', sans-serif;\n}\n\n* {\n  box-sizing: border-box;\n  padding: 0;\n  margin: 0;\n}\n\nhtml,\nbody {\n  max-width: 100vw;\n  overflow-x: hidden;\n  color: var(--text-primary);\n  font-family: var(--font-inter);\n  background: linear-gradient(180deg,\n      #0F2027 0%,\n      #13262F 50%,\n      #162c36 100%);\n  background-attachment: fixed;\n  min-height: 100vh;\n}\n\na {\n  color: inherit;\n  text-decoration: none;\n}\n\nbutton {\n  background: none;\n  border: none;\n  cursor: pointer;\n  font-family: inherit;\n  color: inherit;\n}"],"names":[],"mappings":"AAAA;;;;;;;;;;AAgBA;;;;;;AAMA;;;;;;;;;AAcA;;;;;AAKA"}}]
+}

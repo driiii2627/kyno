@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+:root {
+  /* Kyno+ Theme Colors */
+  --bg-start: #0F2027;
+  --bg-mid: #203A43;
+  --bg-end: #2C5364;
+
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+
+  --primary-accent: #ffffff;
+
+  --foreground: #ffffff;
+}
+
+body {
+  color: var(--foreground);
+  background: #050c1a;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Aurora Effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center,
+      rgba(30, 60, 150, 0.15) 0%,
+      rgba(50, 20, 80, 0.1) 30%,
+      transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(10%, 10%) rotate(5deg);
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-button {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s;
+  }
+
+  .glass-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+  }
+}

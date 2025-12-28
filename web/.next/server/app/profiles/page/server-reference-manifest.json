@@ -1,0 +1,110 @@
+{
+  "node": {
+    "0018c6db43529b3ca9c55f1a4bb647fb8415811d1d": {
+      "workers": {
+        "app/profiles/page": {
+          "moduleId": 90968,
+          "async": false,
+          "exportedName": "getProfilesAction",
+          "filename": "src/app/profiles/actions.ts"
+        }
+      },
+      "layer": {
+        "app/profiles/page": "action-browser"
+      },
+      "exportedName": "getProfilesAction",
+      "filename": "src/app/profiles/actions.ts"
+    },
+    "407fa483aadb683ffaf8d267be44a2d4010bfbd905": {
+      "workers": {
+        "app/profiles/page": {
+          "moduleId": 90968,
+          "async": false,
+          "exportedName": "createProfileAction",
+          "filename": "src/app/profiles/actions.ts"
+        }
+      },
+      "layer": {
+        "app/profiles/page": "action-browser"
+      },
+      "exportedName": "createProfileAction",
+      "filename": "src/app/profiles/actions.ts"
+    },
+    "40c7e6cc5ffa74f4aaa5de5b158ce112ad5e6af404": {
+      "workers": {
+        "app/profiles/page": {
+          "moduleId": 90968,
+          "async": false,
+          "exportedName": "updateProfileAction",
+          "filename": "src/app/profiles/actions.ts"
+        }
+      },
+      "layer": {
+        "app/profiles/page": "action-browser"
+      },
+      "exportedName": "updateProfileAction",
+      "filename": "src/app/profiles/actions.ts"
+    },
+    "40fc0c27050575de9cc323afb67bce1d8322753d08": {
+      "workers": {
+        "app/profiles/page": {
+          "moduleId": 90968,
+          "async": false,
+          "exportedName": "deleteProfileAction",
+          "filename": "src/app/profiles/actions.ts"
+        }
+      },
+      "layer": {
+        "app/profiles/page": "action-browser"
+      },
+      "exportedName": "deleteProfileAction",
+      "filename": "src/app/profiles/actions.ts"
+    },
+    "4009cb87dbf8261408287db81f95ca338a80372201": {
+      "workers": {
+        "app/profiles/page": {
+          "moduleId": 90968,
+          "async": false,
+          "exportedName": "switchProfileAction",
+          "filename": "src/app/profiles/actions.ts"
+        }
+      },
+      "layer": {
+        "app/profiles/page": "action-browser"
+      },
+      "exportedName": "switchProfileAction",
+      "filename": "src/app/profiles/actions.ts"
+    },
+    "00044a13b912e98127fb87132cc89613aabacf9b57": {
+      "workers": {
+        "app/profiles/page": {
+          "moduleId": 90968,
+          "async": false,
+          "exportedName": "signOutAction",
+          "filename": "src/app/profiles/actions.ts"
+        }
+      },
+      "layer": {
+        "app/profiles/page": "action-browser"
+      },
+      "exportedName": "signOutAction",
+      "filename": "src/app/profiles/actions.ts"
+    },
+    "0056cb79b9ec21b37d317dc696b43a5f5c326ae982": {
+      "workers": {
+        "app/profiles/page": {
+          "moduleId": 90968,
+          "async": false,
+          "exportedName": "getActiveProfileAction",
+          "filename": "src/app/profiles/actions.ts"
+        }
+      },
+      "layer": {
+        "app/profiles/page": "action-browser"
+      },
+      "exportedName": "getActiveProfileAction",
+      "filename": "src/app/profiles/actions.ts"
+    }
+  },
+  "edge": {}
+}

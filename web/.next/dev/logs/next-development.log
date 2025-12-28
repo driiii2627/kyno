@@ -1,0 +1,117 @@
+[00:00:01.864] Server  LOG     ✓ Ready in 1332ms
+[00:00:14.599] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:00:14.606] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:00:14.609] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:00:14.611] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:00:15.333] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:39.571] Server  LOG     ✓ Compiled in 148ms
+[00:05:06.655] Server  LOG     ✓ Compiled in 7ms
+[00:06:29.953] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:06:29.955] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:06:29.957] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:06:29.958] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:06:30.290] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:08:06.260] Server  LOG     ✓ Compiled in 8ms
+[00:09:29.185] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:09:29.187] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:09:29.190] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:09:29.191] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:09:29.495] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:11:15.018] Server  LOG     ✓ Compiled in 5ms
+[00:13:52.014] Server  LOG     ✓ Compiled in 4ms
+[00:16:22.234] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:22.237] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:22.240] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:22.242] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:22.614] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:24.770] Server  LOG     ✓ Compiled in 6ms
+[00:16:38.136] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:38.137] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:38.139] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:38.140] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:16:38.427] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:18:41.780] Server  LOG     ✓ Compiled in 8ms
+[00:20:45.490] Server  LOG     ✓ Compiled in 12ms
+[00:20:46.668] Server  LOG     ✓ Compiled in 8ms
+[00:24:31.892] Server  LOG     ✓ Compiled in 17ms
+[00:24:33.188] Server  LOG     ✓ Compiled in 8ms
+[00:24:53.092] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:24:53.093] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:24:53.095] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:24:53.097] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:24:53.405] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:26:57.150] Server  LOG     ✓ Compiled in 26ms
+[00:27:10.296] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:27:10.297] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:27:10.300] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:27:10.301] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:27:10.634] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:30:03.263] Server  LOG     ✓ Compiled in 3ms
+[00:33:16.813] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:33:18.027] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:33:18.028] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:33:18.030] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:33:18.032] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:33:20.214] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:33:20.852] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:33:20.854] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:33:20.856] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:33:20.858] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:36:36.814] Server  LOG     ✓ Compiled in 5ms
+[00:38:32.802] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:38:32.804] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:38:32.806] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:38:32.810] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:38:33.181] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:40:35.276] Server  LOG     ✓ Compiled in 8ms
+[00:45:03.581] Server  LOG     ✓ Compiled in 4ms
+[00:45:05.916] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:45:05.918] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:45:05.919] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:45:05.919] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:45:07.664] Server  LOG     ✓ Compiled in 4ms
+[00:48:11.536] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:48:11.541] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:48:11.542] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:48:11.544] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:52:40.691] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:52:40.694] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:52:40.697] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:52:40.697] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:52:42.593] Server  LOG     ✓ Compiled in 4ms
+[00:56:57.952] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:56:57.957] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:56:57.959] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[00:56:57.961] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:01:52.220] Server  LOG     ✓ Compiled in 9ms
+[01:02:08.246] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:02:09.602] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:02:09.607] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:02:09.609] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:02:09.612] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:09.203] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:05:12.614] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:12.616] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:12.617] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:12.619] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:43.186] Server  LOG     ✓ Compiled in 34ms
+[01:05:54.624] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:54.629] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:54.631] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:54.632] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:05:55.057] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:06:16.296] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:06:17.421] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:06:17.426] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:06:17.427] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:06:17.429] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:11:49.101] Server  LOG     ✓ Compiled in 5ms
+[01:26:43.802] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/movie/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:26:43.803] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/popular?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:26:43.804] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/movie/top_rated?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:26:43.805] Server  LOG     [TMDB Request] https://api.themoviedb.org/3/trending/tv/week?api_key=e407e3f55ac924320df3192273006442&language=pt-BR
+[01:44:55.794] Server  LOG     ✓ Compiled in 4ms
+[01:44:58.099] Server  LOG     ✓ Compiled in 4ms
+[01:50:56.004] Server  LOG     ✓ Compiled in 6ms
+[01:57:32.794] Server  LOG     ✓ Compiled in 5ms
+[01:59:34.265] Server  LOG     ✓ Compiled in 12ms

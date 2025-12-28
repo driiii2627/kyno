@@ -1,0 +1,12 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/category/[slug]/page": "/category/[slug]",
+  "/details/[id]/page": "/details/[id]",
+  "/favicon.ico/route": "/favicon.ico",
+  "/filme/[id]/page": "/filme/[id]",
+  "/login/[code]/page": "/login/[code]",
+  "/page": "/",
+  "/profiles/page": "/profiles",
+  "/serie/[id]/page": "/serie/[id]"
+}
