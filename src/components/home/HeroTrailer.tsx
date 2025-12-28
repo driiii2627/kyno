@@ -1,33 +1,31 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import YouTube, { YouTubeProps } from 'react-youtube';
 import styles from './Hero.module.css'; // Creating new module might be better, but reusing for simple overlay styles
 import { Volume2, VolumeX, Image as ImageIcon } from 'lucide-react';
 
 interface HeroTrailerProps {
     videoId: string;
+    isMuted: boolean;
+    onProgress: (progress: number) => void;
     onEnded: () => void;
     onError: () => void;
 }
 
-export default function HeroTrailer({ videoId, onEnded, onError }: HeroTrailerProps) {
-    const [isMuted, setIsMuted] = useState(true);
-    const [progress, setProgress] = useState(0);
-    const [duration, setDuration] = useState(0);
-    // const [player, setPlayer] = useState<any>(null); // Type 'any' for YT player instance
+export default function HeroTrailer({ videoId, isMuted, onProgress, onEnded, onError }: HeroTrailerProps) {
     const playerRef = useRef<any>(null);
 
-    const toggleMute = () => {
+    // Sync Mute State
+    useEffect(() => {
         if (playerRef.current) {
             if (isMuted) {
-                playerRef.current.unMute();
-            } else {
                 playerRef.current.mute();
+            } else {
+                playerRef.current.unMute();
             }
-            setIsMuted(!isMuted);
         }
-    };
+    }, [isMuted]);
 
     const opts: YouTubeProps['opts'] = {
         height: '100%',
@@ -37,12 +35,14 @@ export default function HeroTrailer({ videoId, onEnded, onError }: HeroTrailerPr
             controls: 0,
             rel: 0,
             showinfo: 0,
-            mute: 1, // Start muted
+            mute: 1, // Always start muted, controlled by effect
             loop: 0,
             modestbranding: 1,
-            cc_load_policy: 0,
+            cc_load_policy: 0, // Try to hide captions
             iv_load_policy: 3,
             fs: 0,
+            disablekb: 1, // Disable keyboard to prevent focus stealing scroll?
+            playsinline: 1,
         },
     };
 
@@ -53,18 +53,22 @@ export default function HeroTrailer({ videoId, onEnded, onError }: HeroTrailerPr
                 const current = playerRef.current.getCurrentTime();
                 const total = playerRef.current.getDuration();
                 if (total > 0) {
-                    setProgress((current / total) * 100);
-                    setDuration(total);
+                    onProgress((current / total) * 100);
                 }
             }
-        }, 100);
+        }, 500); // Throttled to 500ms to reduce renders
 
         return () => clearInterval(interval);
-    }, []);
+    }, [onProgress]);
 
     const onReady = (event: any) => {
         playerRef.current = event.target;
         event.target.playVideo();
+        if (isMuted) {
+            event.target.mute();
+        } else {
+            event.target.unMute();
+        }
     };
 
     return (
@@ -73,38 +77,16 @@ export default function HeroTrailer({ videoId, onEnded, onError }: HeroTrailerPr
                 <YouTube
                     videoId={videoId}
                     opts={opts}
-                    className={styles.youtubePlayer} // Wrapper div
-                    iframeClassName={styles.iframe} // Actual iframe
+                    className={styles.youtubePlayer}
+                    iframeClassName={styles.iframe}
                     onEnd={onEnded}
                     onError={onError}
                     onReady={onReady}
                 />
             </div>
-
-            <div className={styles.trailerControls}>
-                {/* Progress Bar (Mini) */}
-                <div className={styles.progressBar}>
-                    <div
-                        className={styles.progressFill}
-                        style={{ width: `${progress}%` }}
-                    />
-                </div>
-
-                <button
-                    onClick={toggleMute}
-                    className={styles.controlBtn}
-                >
-                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                </button>
-
-                <button
-                    onClick={onError}
-                    className={styles.controlBtn}
-                    title="Voltar para Imagem"
-                >
-                    <ImageIcon size={20} />
-                </button>
-            </div>
+            {/* Controls moved to Parent */}
         </div>
     );
 }
+
+export default React.memo(HeroTrailer);

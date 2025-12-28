@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, Plus, Tv, Info } from 'lucide-react';
+import { Play, Plus, Tv, Info, Volume2, VolumeX, Image as ImageIcon } from 'lucide-react';
 import styles from './Hero.module.css';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -32,6 +32,8 @@ export default function Hero({ movies }: HeroProps) {
     // Trailer State
     const [trailerId, setTrailerId] = useState<string | null>(null);
     const [showImageFallback, setShowImageFallback] = useState(false);
+    const [isMuted, setIsMuted] = useState(true);
+    const [trailerProgress, setTrailerProgress] = useState(0);
 
     // Helper to fetch data
     const fetchAndSetData = async (movie: CatalogItem, index: number) => {
@@ -39,9 +41,10 @@ export default function Hero({ movies }: HeroProps) {
             const isTv = !!movie.first_air_date;
             const type = isTv ? 'tv' : 'movie';
 
-            // Reset trailer state for new slide
+            // Reset state
             setTrailerId(null);
             setShowImageFallback(false);
+            setTrailerProgress(0);
 
             const [details, images, videos] = await Promise.all([
                 tmdb.getDetails(movie.id, type),
@@ -155,6 +158,8 @@ export default function Hero({ movies }: HeroProps) {
                         {index === currentIndex && trailerId && !showImageFallback ? (
                             <HeroTrailer
                                 videoId={trailerId}
+                                isMuted={isMuted}
+                                onProgress={setTrailerProgress}
                                 onEnded={handleVideoEnd}
                                 onError={() => setShowImageFallback(true)}
                             />
@@ -192,6 +197,34 @@ export default function Hero({ movies }: HeroProps) {
                 <div className={styles.leftVignette} />
                 <div className={styles.bottomVignette} />
             </div>
+
+            {/* TRAILER CONTROLS (Lifted to Parent for Z-Index Fix) */}
+            {trailerId && !showImageFallback && (
+                <div className={styles.trailerControls}>
+                    {/* Progress Bar (Mini) */}
+                    <div className={styles.progressBar}>
+                        <div
+                            className={styles.progressFill}
+                            style={{ width: `${trailerProgress}%` }}
+                        />
+                    </div>
+
+                    <button
+                        onClick={() => setIsMuted(!isMuted)}
+                        className={styles.controlBtn}
+                    >
+                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    </button>
+
+                    <button
+                        onClick={() => setShowImageFallback(true)}
+                        className={styles.controlBtn}
+                        title="Voltar para Imagem"
+                    >
+                        <ImageIcon size={20} />
+                    </button>
+                </div>
+            )}
 
             <div className={styles.content}>
                 {/* LOGO or Title */}
