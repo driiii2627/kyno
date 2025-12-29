@@ -73,16 +73,12 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
             const { error } = await admin.from('movies').upsert({
                 tmdb_id: details.id,
                 title: details.title,
-                overview: details.overview,
+                description: details.overview,
                 poster_url: details.poster_path,
                 backdrop_url: details.backdrop_path,
-                // logo_url: logoPath, // Column missing in DB, disabling for now
-                release_date: details.release_date || null,
-                popularity: details.vote_average * 10, // heuristic
-                // Use first genre as primary for simplified genre mapping or logic
-                // For now, let's just insert main fields. 
-                // Note: The schemas might need 'genre_ids' or specific cols.
-                // Assuming basic schema for now.
+                logo_url: logoPath,
+                release_year: details.release_date ? parseInt(details.release_date.split('-')[0]) : null,
+                rating: details.vote_average,
                 created_at: new Date().toISOString()
             }, { onConflict: 'tmdb_id' });
 
@@ -94,12 +90,12 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
             const { data: seriesData, error: seriesError } = await admin.from('series').upsert({
                 tmdb_id: details.id,
                 title: details.name,
-                overview: details.overview,
+                description: details.overview,
                 poster_url: details.poster_path,
                 backdrop_url: details.backdrop_path,
-                // logo_url: logoPath,
-                release_date: details.first_air_date || null,
-                popularity: details.vote_average * 10,
+                logo_url: logoPath,
+                release_year: details.first_air_date ? parseInt(details.first_air_date.split('-')[0]) : null,
+                rating: details.vote_average,
                 created_at: new Date().toISOString()
             }, { onConflict: 'tmdb_id' }).select().single();
 
