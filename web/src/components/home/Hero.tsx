@@ -70,7 +70,7 @@ export default function Hero({ movies }: HeroProps) {
 
     // Parse YouTube ID directly from URL
     const trailerId = currentMovie?.trailer_url
-        ? (currentMovie.trailer_url.match(/(?:youtube\\.com\\/(?: [^\\/]+\\/.+\\/|(?:v|e(?:mbed)?)\\/ |.* [?&]v =) | youtu\\.be\\/)([^\"&?\\/\\s]{11})/) || [])[1]
+        ? (currentMovie.trailer_url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/) || [])[1]
         : null;
 
     // Reset state on slide change
