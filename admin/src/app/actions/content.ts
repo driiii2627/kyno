@@ -183,3 +183,39 @@ export async function importCollectionAction(collectionId: number) {
         return { error: err.message };
     }
 }
+
+/**
+ * Fetches all movies and series from the library.
+ */
+export async function getLibraryContent() {
+    try {
+        const admin = await createAdminClient();
+
+        // Fetch movies
+        const { data: movies, error: moviesError } = await admin
+            .from('movies')
+            .select('id, tmdb_id, title, poster_url, release_date, created_at')
+            .order('created_at', { ascending: false });
+
+        // Fetch series
+        const { data: series, error: seriesError } = await admin
+            .from('series')
+            .select('id, tmdb_id, title, poster_url, release_date, created_at')
+            .order('created_at', { ascending: false });
+
+        if (moviesError) throw moviesError;
+        if (seriesError) throw seriesError;
+
+        // Combine and normalize
+        const library = [
+            ...(movies || []).map(m => ({ ...m, media_type: 'movie' })),
+            ...(series || []).map(s => ({ ...s, media_type: 'tv' }))
+        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+        return { data: library };
+
+    } catch (err: any) {
+        console.error('Error fetching library:', err);
+        return { error: err.message };
+    }
+}
