@@ -9,29 +9,35 @@ export function DashboardTabs({ users }: { users: any[] }) {
     const [tab, setTab] = useState<'users' | 'content'>('users');
 
     return (
+import { Clapperboard } from 'lucide-react';
+
+    // ... (inside component)
+
+    return (
         <div>
-            {/* Main Tabs */}
-            <div className="flex gap-6 mb-8 border-b border-white/10 pb-1">
-                <button
-                    onClick={() => setTab('users')}
-                    className={`pb-4 px-2 text-sm font-bold flex items-center gap-2 transition-colors relative
-                        ${tab === 'users' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}
-                    `}
-                >
-                    <Users size={18} />
-                    Usuários
-                    {tab === 'users' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_-2px_10px_rgba(59,130,246,0.5)]"></div>}
-                </button>
-                <button
-                    onClick={() => setTab('content')}
-                    className={`pb-4 px-2 text-sm font-bold flex items-center gap-2 transition-colors relative
-                        ${tab === 'content' ? 'text-white' : 'text-gray-500 hover:text-gray-300'}
-                    `}
-                >
-                    <Film size={18} />
-                    Conteúdo
-                    {tab === 'content' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500 shadow-[0_-2px_10px_rgba(168,85,247,0.5)]"></div>}
-                </button>
+            {/* Main Tabs (Pill Style) */}
+            <div className="flex justify-center mb-10">
+                <div className="flex p-1.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full max-w-md w-full relative">
+                    {/* Safe way using conditional classes instead of complex sliding div for now to ensure robustness */}
+                    <button
+                        onClick={() => setTab('users')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold transition-all duration-300
+                            ${tab === 'users' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}
+                        `}
+                    >
+                        <Users size={16} />
+                        Usuários
+                    </button>
+                    <button
+                        onClick={() => setTab('content')}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold transition-all duration-300
+                            ${tab === 'content' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}
+                        `}
+                    >
+                        <Clapperboard size={16} />
+                        Conteúdo
+                    </button>
+                </div>
             </div>
 
             {/* Content Area */}

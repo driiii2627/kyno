@@ -9,17 +9,7 @@ export function AdminHeader({ userEmail }: { userEmail?: string }) {
                     <span className="font-bold text-white text-lg tracking-wide">Kyno<span className="text-blue-500">Admin</span></span>
                 </div>
 
-                <nav className="hidden md:flex items-center gap-1">
-                    <a href="#" className="px-4 py-2 text-sm text-white font-medium bg-white/10 rounded-lg transition-colors">
-                        Usuários
-                    </a>
-                    <a href="#" className="px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                        Conteúdo
-                    </a>
-                    <a href="#" className="px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-                        Analytics
-                    </a>
-                </nav>
+
             </div>
 
             <div className="flex items-center gap-4">
