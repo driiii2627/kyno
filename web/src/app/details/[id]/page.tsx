@@ -163,11 +163,8 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     return (
         <div className={styles.container}>
             {/* Background Hero */}
-            {/* Background Hero with Trailer Support */}
-            <DetailsBackground
-                backdropUrl={backdropUrl}
-                trailerId={item.show_trailer && item.trailer_url ? (item.trailer_url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) || [])[1] : null}
-            />
+            {/* Background Hero (Image Only) */}
+            <DetailsBackground backdropUrl={backdropUrl} />
 
             {/* Back Button */}
             <Link href="/" className={styles.backButton}>

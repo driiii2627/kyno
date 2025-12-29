@@ -1,28 +1,34 @@
 'use client';
 
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import styles from './DetailsBackground.module.css';
 
 interface DetailsBackgroundProps {
     backdropUrl: string | null;
-    trailerId: string | null;
-    isMobile?: boolean;
 }
 
-export default function DetailsBackground({ backdropUrl, trailerId, isMobile = false }: DetailsBackgroundProps) {
+export default function DetailsBackground({ backdropUrl }: DetailsBackgroundProps) {
+    if (!backdropUrl) return null;
+
     return (
-        <div className="absolute inset-0 z-0 overflow-hidden">
-            {/* Base Image (Always there to prevent flashing) */}
-            {backdropUrl && (
-                <img
+        <div className={styles.heroBackground}>
+            {/* Image Layer */}
+            <div className={styles.heroImage}>
+                <OptimizedImage
                     src={backdropUrl}
                     alt="Background"
-                    className="absolute inset-0 w-full h-full object-cover opacity-75"
+                    fill
+                    priority
+                    quality={100}
+                    unoptimized // Essential for DB url support
+                    style={{ objectFit: 'cover', zIndex: 0 }}
                 />
-            )}
+            </div>
 
-            {/* Gradients (Preserved from original) */}
-            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-[#111] via-[#111]/80 to-transparent pointer-events-none" />
-            <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#111] via-[#111]/40 to-transparent pointer-events-none" />
+            {/* Overlays mimicking the Home Hero exactly */}
+            <div className={styles.gradientOverlay} />
+            <div className={styles.leftVignette} />
+            <div className={styles.bottomVignette} />
         </div>
     );
 }
