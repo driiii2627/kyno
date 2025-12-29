@@ -76,7 +76,7 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 overview: details.overview,
                 poster_url: details.poster_path,
                 backdrop_url: details.backdrop_path,
-                logo_url: logoPath,
+                // logo_url: logoPath, // Column missing in DB, disabling for now
                 release_date: details.release_date || null,
                 popularity: details.vote_average * 10, // heuristic
                 // Use first genre as primary for simplified genre mapping or logic
@@ -97,7 +97,7 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 overview: details.overview,
                 poster_url: details.poster_path,
                 backdrop_url: details.backdrop_path,
-                logo_url: logoPath,
+                // logo_url: logoPath,
                 release_date: details.first_air_date || null,
                 popularity: details.vote_average * 10,
                 created_at: new Date().toISOString()

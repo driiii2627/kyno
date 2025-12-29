@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Search, Plus, Check, X, Loader2, Film, Tv, Library, Layers } from 'lucide-react';
 import { searchContentAction, importContentAction, importCollectionAction } from '@/app/actions/content';
+import { useToast } from '@/components/ui/Toast';
 
 export function ContentManager() {
     const [activeTab, setActiveTab] = useState<'add' | 'manage'>('add');
