@@ -6,13 +6,39 @@
 // Simple in-memory cache to avoid spamming the external API
 const validIdsCache: {
     movie: { timestamp: number; ids: Set<string> } | null;
-    tv: { timestamp: number; ids: Set<string> } | null;
+    serie: { timestamp: number; ids: Set<string> } | null;
+    anime: { timestamp: number; ids: Set<string> } | null;
 } = {
     movie: null,
-    tv: null
+    serie: null,
+    anime: null
 };
 
 const CACHE_DURATION = 1000 * 60 * 30; // 30 minutes
+
+async function getCachedIds(category: 'movie' | 'serie' | 'anime'): Promise<Set<string>> {
+    const cached = validIdsCache[category];
+    if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+        return cached.ids;
+    }
+
+    // Fetch fresh
+    const url = `https://superflixapi.buzz/lista?category=${category}&type=tmdb&format=json`;
+    // console.log(`[Superflix] Fetching list for ${category}...`);
+
+    const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+    if (!res.ok) throw new Error(`API Error: ${res.status}`);
+
+    const idsArray: string[] = await res.json();
+    const idsSet = new Set(idsArray.map(id => id.toString())); // Ensure strings
+
+    validIdsCache[category] = {
+        timestamp: Date.now(),
+        ids: idsSet
+    };
+
+    return idsSet;
+}
 
 export const superflix = {
     /**
@@ -20,45 +46,26 @@ export const superflix = {
      */
     checkAvailability: async (tmdbId: number, type: 'movie' | 'tv'): Promise<{ available: boolean, reason?: string }> => {
         try {
-            const category = type === 'movie' ? 'movie' : 'serie';
+            const idStr = tmdbId.toString();
 
-            // 1. Check Cache
-            const cached = validIdsCache[type];
-            if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
-                if (cached.ids.has(tmdbId.toString())) {
-                    return { available: true };
-                }
+            if (type === 'movie') {
+                const movies = await getCachedIds('movie');
+                if (movies.has(idStr)) return { available: true };
+                return { available: false, reason: 'Filme não encontrado no catálogo externo.' };
             }
 
-            // If not in cache (or cache expired), fetch fresh list
-            // Optimization: If cache is valid but ID not found, it's likely actually unavailable. 
-            // EXCEPT if it was added *very* recently.
-            // For Safety in Admin: We can force refresh or just trust cache for 30mins.
-            if (!cached || (Date.now() - cached.timestamp >= CACHE_DURATION)) {
-                const url = `https://superflixapi.buzz/lista?category=${category}&type=tmdb&format=json`;
-                // console.log(`[Superflix] Fetching list for ${category}...`);
+            if (type === 'tv') {
+                // Check Series AND Anime (animations like Rick and Morty are often here)
+                const series = await getCachedIds('serie');
+                if (series.has(idStr)) return { available: true };
 
-                const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+                const animes = await getCachedIds('anime');
+                if (animes.has(idStr)) return { available: true };
 
-                if (!res.ok) {
-                    return { available: false, reason: `API Error: ${res.status}` };
-                }
-
-                const idsArray: string[] = await res.json();
-                const idsSet = new Set(idsArray);
-
-                // Update Cache
-                validIdsCache[type] = {
-                    timestamp: Date.now(),
-                    ids: idsSet
-                };
+                return { available: false, reason: 'Série/Anime não encontrado no catálogo externo.' };
             }
 
-            // Re-check after cache update
-            const isAvailable = validIdsCache[type]?.ids.has(tmdbId.toString());
-
-            if (isAvailable) return { available: true };
-            return { available: false, reason: 'Not found in external catalog' };
+            return { available: false, reason: 'Tipo de mídia inválido.' };
 
         } catch (e: any) {
             console.error(`[Superflix Error] ${type} ${tmdbId}:`, e);
