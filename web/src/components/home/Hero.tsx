@@ -116,11 +116,20 @@ export default function Hero({ movies }: HeroProps) {
             setShowImageFallback(false);
             setTrailerProgress(0);
 
+            // NEW: Prioritize Supabase Logo (Instant Load)
+            let initialLogoPath = movie.logo_url || null;
+            if (initialLogoPath) {
+                setLogoPath(initialLogoPath);
+            }
+
             const [details, images, videos] = await Promise.all([
                 tmdb.getDetails(movie.id, type),
-                tmdb.getImages(movie.id, type),
+                // Only fetch images if we don't have a logo yet
+                !initialLogoPath ? tmdb.getImages(movie.id, type) : Promise.resolve({ logos: [] }),
                 tmdb.getVideos(movie.id, type)
             ]);
+
+            // ... Trailer Logic (Keep as is) ...
 
             // Filter Videos: Strict "Dublado" Preference
             // User complained that generic 'pt' videos are often just subtitled.
@@ -157,13 +166,17 @@ export default function Hero({ movies }: HeroProps) {
                 setIsDubbed(false);
             }
 
-            const ptLogo = images.logos.find(l => l.iso_639_1 === 'pt');
-            const enLogo = images.logos.find(l => l.iso_639_1 === 'en');
-            const bestLogo = ptLogo || enLogo || images.logos[0];
+            // Fallback Logo Logic (If Supabase didn't have it)
+            if (!initialLogoPath) {
+                const ptLogo = images.logos?.find((l: any) => l.iso_639_1 === 'pt');
+                const enLogo = images.logos?.find((l: any) => l.iso_639_1 === 'en');
+                const bestLogo = ptLogo || enLogo || images.logos?.[0];
+                setLogoPath(bestLogo ? bestLogo.file_path : null);
+            }
 
             // Batch updates (React 18 does this auto, but careful order helps mental model)
             setMovieDetails(details);
-            setLogoPath(bestLogo ? bestLogo.file_path : null);
+            // Logo already set if initialLogoPath existed, otherwise set by fallback above
             setCurrentIndex(index);
         } catch (error) {
             console.error("Failed to fetch data", error);
