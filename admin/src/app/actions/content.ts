@@ -445,27 +445,31 @@ export async function syncContentAction(id: number, type: 'movie' | 'tv', tmdbId
         // 1. Fetch fresh details
         const details = await tmdb.getDetails(tmdbId, type);
         const images = await tmdb.getImages(tmdbId, type);
+        const videos = await tmdb.getVideos(tmdbId, type); // Fetch Videos
 
         // 2. Resolve Logo (PT > EN > Any)
         const logoPath = images.logos.find(l => l.iso_639_1 === 'pt')?.file_path ||
             images.logos.find(l => l.iso_639_1 === 'en')?.file_path ||
             images.logos[0]?.file_path || null;
 
+        // 3. Resolve Trailer (PT > EN > Any)
+        const trailer = videos.results.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === 'pt') ||
+            videos.results.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === 'en') ||
+            videos.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
+
+        const trailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+
         const admin = await createAdminClient();
         const table = type === 'movie' ? 'movies' : 'series';
 
-        // 3. Update fields (smart update, keeping custom video_url?)
-        // User requested: "caso atualize uma capa, banner etc.." -> usually implies visual refresh.
-        // We will update visual fields but keep critical ones like video_url if users customized them?
-        // Actually, user said "sync with tmdb... in case cover updates".
-        // Use standard upsert logic but targeting ID.
-
+        // 4. Update fields
         const { error } = await admin.from(table).update({
             title: details.name || details.title, // Handle TV vs Movie naming
             description: details.overview,
             poster_url: details.poster_path,
             backdrop_url: details.backdrop_path,
             logo_url: logoPath,
+            trailer_url: trailerUrl, // Update Trailer
             release_year: (details.first_air_date || details.release_date || '').split('-')[0] || null,
             rating: details.vote_average,
             // NOT updating video_url to avoid breaking custom links
