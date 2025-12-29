@@ -134,7 +134,7 @@ export function ContentManager() {
                                         {item.title || item.name}
                                     </h3>
                                     <p className="text-xs text-gray-500 mb-4">
-                                        {(item.release_date || item.first_air_date || '').split('-')[0]}
+                                        {item.release_year || (item.release_date || item.first_air_date || '').split('-')[0]}
                                     </p>
 
                                     {/* Actions */}

@@ -194,13 +194,13 @@ export async function getLibraryContent() {
         // Fetch movies
         const { data: movies, error: moviesError } = await admin
             .from('movies')
-            .select('id, tmdb_id, title, poster_url, release_date, created_at')
+            .select('id, tmdb_id, title, poster_url, release_year, created_at')
             .order('created_at', { ascending: false });
 
         // Fetch series
         const { data: series, error: seriesError } = await admin
             .from('series')
-            .select('id, tmdb_id, title, poster_url, release_date, created_at')
+            .select('id, tmdb_id, title, poster_url, release_year, created_at')
             .order('created_at', { ascending: false });
 
         if (moviesError) throw moviesError;
