@@ -1,6 +1,6 @@
 'use server';
 
-import { tmdb, TmdbDetails } from '@/services/tmdb';
+import { tmdb, TmdbDetails, TmdbMovie } from '@/services/tmdb';
 import { superflix } from '@/services/superflix';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { revalidatePath } from 'next/cache';
