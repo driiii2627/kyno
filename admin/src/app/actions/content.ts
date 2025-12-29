@@ -50,6 +50,88 @@ export async function searchContentAction(query: string) {
 }
 
 /**
+ * Fetches popular and trending content for Discovery Mode.
+ */
+export async function getPopularContentAction() {
+    try {
+        const [
+            trendingDay,
+            trendingWeek,
+            popularMovies,
+            popularSeries,
+            topRatedMovies
+        ] = await Promise.all([
+            tmdb.getTrending('all', 'day'),
+            tmdb.getTrending('all', 'week'),
+            tmdb.getList('movie', 'popular'),
+            tmdb.getList('tv', 'popular'),
+            tmdb.getList('movie', 'top_rated')
+        ]);
+
+        // Helper to process availability in parallel for a list
+        const processList = async (list: TmdbMovie[]) => {
+            // Limit to top 15 to avoid massive API spam
+            const top15 = list.slice(0, 15);
+            return Promise.all(top15.map(async (item) => {
+                const type = item.media_type || (item.title ? 'movie' : 'tv');
+                // Availability check (optional for discovery speed, maybe check only on interaction? 
+                // User asked for "Check Superflix". We should check availability but it might be slow for 5 lists * 15 items = 75 requests.
+                // Creating a simplified check or parallelizing heavily.
+
+                // Let's do a fast check or just skip availability for the list view until click?
+                // The prompt implies we use the same system. I will check availability but maybe LIMIT concurrency if needed.
+                // ContentManager already handles lists well. Let's try full check. `superflix.ts` has cache!
+
+                const { available } = await superflix.checkAvailability(item.id, type as 'movie' | 'tv');
+
+                // Check Library
+                const admin = await createAdminClient();
+                const { data: existing } = await admin
+                    .from(type === 'movie' ? 'movies' : 'series')
+                    .select('id')
+                    .eq('tmdb_id', item.id)
+                    .single();
+
+                return {
+                    ...item,
+                    media_type: type, // Ensure media_type is set
+                    is_available: available,
+                    is_in_library: !!existing
+                };
+            }));
+        };
+
+        const [
+            trendingDayProcessed,
+            trendingWeekProcessed,
+            popularMoviesProcessed,
+            popularSeriesProcessed,
+            topRatedMoviesProcessed
+        ] = await Promise.all([
+            processList(trendingDay.results),
+            processList(trendingWeek.results),
+            processList(popularMovies.results),
+            processList(popularSeries.results),
+            processList(topRatedMovies.results)
+        ]);
+
+        return {
+            data: {
+                trendingDay: trendingDayProcessed,
+                trendingWeek: trendingWeekProcessed,
+                popularMovies: popularMoviesProcessed,
+                popularSeries: popularSeriesProcessed,
+                topRatedMovies: topRatedMoviesProcessed
+            }
+        };
+
+    } catch (err: any) {
+        console.error('Popular Content Error:', err);
+        return { error: 'Failed to fetch popular content.' };
+    }
+}
+
+/**
  * Imports a single Movie or TV Show into Supabase.
  */
 export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') {

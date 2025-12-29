@@ -76,6 +76,12 @@ export const tmdb = {
     getSeasonDetails: async (tvId: number, seasonNumber: number) => {
         return fetchFromTMDB<any>(`/tv/${tvId}/season/${seasonNumber}`);
     },
+    getTrending: async (type: 'all' | 'movie' | 'tv', timeWindow: 'day' | 'week' = 'day') => {
+        return fetchFromTMDB<{ results: TmdbMovie[] }>(`/trending/${type}/${timeWindow}`);
+    },
+    getList: async (type: 'movie' | 'tv', category: 'popular' | 'top_rated' | 'upcoming' | 'on_the_air') => {
+        return fetchFromTMDB<{ results: TmdbMovie[] }>(`/${type}/${category}`);
+    },
     getImages: async (id: number, type: 'movie' | 'tv') => {
         return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
     }
