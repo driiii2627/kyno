@@ -128,7 +128,7 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                     // Fetch Episodes for this season
                     const seasonDetails = await tmdb.getSeasonDetails(details.id, season.season_number);
                     if (seasonDetails.episodes) {
-                        const episodesToInsert = seasonDetails.episodes.map(ep => ({
+                        const episodesToInsert = seasonDetails.episodes.map((ep: any) => ({
                             season_id: seasonRect.id,
                             tmdb_id: ep.id,
                             number: ep.episode_number,
