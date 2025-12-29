@@ -11,8 +11,22 @@ export function ContentManager() {
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
+    // Library State
+    const [filterType, setFilterType] = useState<'all' | 'movie' | 'tv'>('all');
+    const [searchLibraryQuery, setSearchLibraryQuery] = useState('');
+
     // Import state
     const [importingId, setImportingId] = useState<number | null>(null);
+
+    // Filtered Library Results
+    const filteredLibrary = results.filter(item => {
+        if (activeTab === 'manage') {
+            const matchesType = filterType === 'all' || item.media_type === filterType;
+            const matchesSearch = item.title?.toLowerCase().includes(searchLibraryQuery.toLowerCase());
+            return matchesType && matchesSearch;
+        }
+        return true;
+    });
 
     // Fetch library when tab changes
     useEffect(() => {

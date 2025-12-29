@@ -71,9 +71,6 @@ export function UsersTable({ users }: UsersTableProps) {
                     <button className="text-white font-bold border-b-2 border-blue-500 pb-4 -mb-4.5 px-2">
                         Usuários <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full ml-2">{filteredUsers.length}</span>
                     </button>
-                    <button className="text-gray-500 font-medium hover:text-gray-300 pb-4 -mb-4.5 px-2 transition-colors">
-                        Conteúdo (Em breve)
-                    </button>
                 </div>
 
                 <div className="relative w-full md:w-64">
