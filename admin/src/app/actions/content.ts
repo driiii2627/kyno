@@ -143,11 +143,19 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
         // 2. Fetch Full Details
         const details = await tmdb.getDetails(tmdbId, type);
         const images = await tmdb.getImages(tmdbId, type);
+        const videos = await tmdb.getVideos(tmdbId, type); // Fetch Videos
 
         // Determine Logo (find first PNG in PT, then EN, then any)
         const logoPath = images.logos.find(l => l.iso_639_1 === 'pt')?.file_path ||
             images.logos.find(l => l.iso_639_1 === 'en')?.file_path ||
             images.logos[0]?.file_path || null;
+
+        // Determine Trailer (YouTube, Trailer, PT > EN)
+        const trailer = videos.results.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === 'pt') ||
+            videos.results.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.iso_639_1 === 'en') ||
+            videos.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
+
+        const trailerUrl = trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
 
         const admin = await createAdminClient();
 
@@ -169,7 +177,9 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 poster_url: details.poster_path,
                 backdrop_url: details.backdrop_path,
                 logo_url: logoPath,
-                video_url: videoUrl, // Added video_url
+                video_url: videoUrl,
+                trailer_url: trailerUrl, // New Column
+                show_trailer: true,      // Default True
                 release_year: details.release_date ? parseInt(details.release_date.split('-')[0]) : null,
                 rating: details.vote_average,
                 created_at: new Date().toISOString()
@@ -187,7 +197,9 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 poster_url: details.poster_path,
                 backdrop_url: details.backdrop_path,
                 logo_url: logoPath,
-                video_url: videoUrl, // Added video_url
+                video_url: videoUrl,
+                trailer_url: trailerUrl, // New Column
+                show_trailer: true,      // Default True
                 release_year: details.first_air_date ? parseInt(details.first_air_date.split('-')[0]) : null,
                 rating: details.vote_average,
                 created_at: new Date().toISOString()
@@ -410,7 +422,9 @@ export async function updateContentAction(id: number, type: 'movie' | 'tv', data
             poster_url: data.poster_url,
             backdrop_url: data.backdrop_url,
             logo_url: data.logo_url,
-            video_url: data.video_url
+            video_url: data.video_url,
+            trailer_url: data.trailer_url, // Allow manual update
+            show_trailer: data.show_trailer // Allow toggle
         }).eq('id', id);
 
         if (error) throw error;
