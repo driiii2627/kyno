@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Plus, Check, X, Loader2, Film, Tv, Library, Layers } from 'lucide-react';
-import { searchContentAction, importContentAction, importCollectionAction, getLibraryContent } from '@/app/actions/content';
-import { useToast } from '@/components/ui/Toast';
+import { Search, Plus, Check, X, Loader2, Library, Layers } from 'lucide-react';
+import { searchContentAction, importContentAction, getLibraryContent, getItemDetailsAction } from '@/app/actions/content';
 import { ManageContentModal } from './ManageContentModal';
+import { ImportConfirmationModal } from './ImportConfirmationModal';
+import { CollectionImportModal } from './CollectionImportModal';
 
 export function ContentManager() {
     const [activeTab, setActiveTab] = useState<'add' | 'manage'>('add');
@@ -16,10 +17,13 @@ export function ContentManager() {
     const [filterType, setFilterType] = useState<'all' | 'movie' | 'tv'>('all');
     const [searchLibraryQuery, setSearchLibraryQuery] = useState('');
 
-    // Import state
-    const [importingId, setImportingId] = useState<number | null>(null);
+    // Import Flow State
+    const [inspectingId, setInspectingId] = useState<number | null>(null); // Loading state for "Adicionar" button
+    const [confirmItem, setConfirmItem] = useState<any>(null); // Single Import Modal
+    const [collectionImport, setCollectionImport] = useState<{ id: number, item: any } | null>(null); // Collection Modal
+    const [importLoading, setImportLoading] = useState(false); // Processing state inside confirmation modal
 
-    // Manage Modal State
+    // Manage Modal State (Edit/Delete)
     const [manageItem, setManageItem] = useState<any>(null);
 
     // Filtered Library Results
@@ -37,8 +41,6 @@ export function ContentManager() {
         if (activeTab === 'manage') {
             loadLibrary();
         } else {
-            // Keep previous results or clear?
-            // Clearing avoids confusion between search results and library
             setResults([]);
         }
     }, [activeTab]);
@@ -63,44 +65,86 @@ export function ContentManager() {
         else alert(error);
     };
 
-    const handleImport = async (item: any) => {
-        if (!confirm(`Importar "${item.title || item.name}" para o site?`)) return;
+    // Step 1: User clicks "Add" -> Inspect details to check for collection
+    const handleImportClick = async (item: any) => {
+        setInspectingId(item.id);
 
-        setImportingId(item.id);
-        const res = await importContentAction(item.id, item.media_type);
-        setImportingId(null);
+        // Fetch full details to check for collection
+        const { data: details, error } = await getItemDetailsAction(item.id, item.media_type);
+        setInspectingId(null);
 
-        if (res.success) {
-            alert('Sucesso! Conteúdo adicionado.');
-            // Update local state to show it's in library
-            setResults(prev => prev.map(r => r.id === item.id ? { ...r, is_in_library: true } : r));
+        if (error || !details) {
+            alert('Erro ao obter detalhes: ' + error);
+            return;
+        }
+
+        // Check if belongs to collection (and user hasn't forced single import logic yet)
+        if (item.media_type === 'movie' && details.belongs_to_collection) {
+            setCollectionImport({
+                id: details.belongs_to_collection.id,
+                item: { ...item, ...details } // Merge info
+            });
         } else {
-            alert('Erro: ' + res.error);
+            // Standard Single Import (Series or Movie without collection)
+            setConfirmItem(item); // Open confirmation modal
         }
     };
 
-    const handleImportCollection = async (collectionId: number) => {
-        if (!confirm(`Tentar importar toda a franquia/coleção? Isso pode demorar um pouco.`)) return;
+    // Step 2A: Confirm Single Import
+    const executeSingleImport = async () => {
+        if (!confirmItem) return;
 
-        const res = await importCollectionAction(collectionId);
+        setImportLoading(true);
+        const res = await importContentAction(confirmItem.id, confirmItem.media_type);
+        setImportLoading(false);
+
         if (res.success) {
-            alert(`Franquia processada! Importados: ${res.count}, Pulados: ${res.skipped}`);
+            setConfirmItem(null);
+            // Update UI to show "In Library"
+            setResults(prev => prev.map(r => r.id === confirmItem.id ? { ...r, is_in_library: true } : r));
+
+            // If we are in 'manage' mode or just want to refresh library cache
+            if (activeTab === 'manage') loadLibrary();
         } else {
-            alert(res.error);
+            alert('Erro ao importar: ' + res.error);
         }
+    };
+
+    // Step 2B: Collection Import Finished
+    const handleCollectionSuccess = () => {
+        // Refresh whatever view we are in. If in search, we might want to mark the original item as added?
+        if (collectionImport) {
+            setResults(prev => prev.map(r => r.id === collectionImport.item.id ? { ...r, is_in_library: true } : r));
+        }
+        setCollectionImport(null);
+        if (activeTab === 'manage') loadLibrary();
     };
 
     return (
         <div className="space-y-6">
 
-            {/* Modal Injection */}
+            {/* Modals */}
             <ManageContentModal
                 isOpen={!!manageItem}
                 onClose={() => setManageItem(null)}
                 item={manageItem}
-                onSuccess={() => {
-                    loadLibrary(); // Reload list
-                }}
+                onSuccess={() => loadLibrary()}
+            />
+
+            <ImportConfirmationModal
+                isOpen={!!confirmItem}
+                onClose={() => setConfirmItem(null)}
+                item={confirmItem}
+                onConfirm={executeSingleImport}
+                loading={importLoading}
+            />
+
+            <CollectionImportModal
+                isOpen={!!collectionImport}
+                onClose={() => setCollectionImport(null)}
+                collectionId={collectionImport?.id || 0}
+                initialItem={collectionImport?.item}
+                onSuccess={handleCollectionSuccess}
             />
 
             {/* Sub-Tabs */}
@@ -155,15 +199,15 @@ export function ContentManager() {
                                         {/* Status Bubble */}
                                         {item.is_in_library ? (
                                             <div className="bg-blue-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md">
-                                                <Library size={10} /> Na Biblioteca
+                                                <Check size={10} />
                                             </div>
                                         ) : item.is_available ? (
                                             <div className="bg-green-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md animate-pulse">
-                                                <Check size={10} /> Disponível
+                                                <Check size={10} />
                                             </div>
                                         ) : (
-                                            <div className="bg-red-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md" title={item.availability_reason}>
-                                                <X size={10} /> Indisponível
+                                            <div className="bg-red-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md">
+                                                <X size={10} />
                                             </div>
                                         )}
                                     </div>
@@ -186,19 +230,19 @@ export function ContentManager() {
                                     {/* Actions */}
                                     <div className="space-y-2">
                                         <button
-                                            disabled={!item.is_available || item.is_in_library || importingId === item.id}
-                                            onClick={() => handleImport(item)}
-                                            className={`w-full py-2 rounded text-xs font-bold flex items-center justify-center gap-2 transition-colors
+                                            disabled={!item.is_available || item.is_in_library || inspectingId === item.id}
+                                            onClick={() => handleImportClick(item)}
+                                            className={`w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors
                                                 ${item.is_in_library
                                                     ? 'bg-white/5 text-gray-500 cursor-not-allowed'
                                                     : item.is_available
-                                                        ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                                                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg'
                                                         : 'bg-white/5 text-gray-600 cursor-not-allowed'
                                                 }
                                             `}
                                         >
-                                            {importingId === item.id ? <Loader2 className="animate-spin" size={14} /> : <Plus size={14} />}
-                                            {item.is_in_library ? 'Adicionado' : 'Adicionar'}
+                                            {inspectingId === item.id ? <Loader2 className="animate-spin" size={14} /> : <Plus size={14} />}
+                                            {item.is_in_library ? 'Na Biblioteca' : 'Adicionar'}
                                         </button>
                                     </div>
                                 </div>
@@ -292,10 +336,10 @@ export function ContentManager() {
                                         <div className="space-y-2">
                                             <button
                                                 onClick={() => setManageItem(item)}
-                                                className="w-full py-2 rounded text-xs font-bold flex items-center justify-center gap-2 transition-colors bg-white/10 hover:bg-white/20 text-white"
+                                                className="w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors bg-white/10 hover:bg-white/20 text-white"
                                                 title="Gerenciar Conteúdo"
                                             >
-                                                <Check size={14} /> Gerenciar
+                                                <Layers size={14} /> Gerenciar
                                             </button>
                                         </div>
                                     </div>

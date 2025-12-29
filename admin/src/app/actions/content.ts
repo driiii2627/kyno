@@ -174,28 +174,85 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
 /**
  * Imports an entire collection (Franchise).
  */
-export async function importCollectionAction(collectionId: number) {
+/**
+ * Fetches collection details with status for each part.
+ */
+export async function getCollectionDetailsAction(collectionId: number) {
     try {
         const collection = await tmdb.getCollection(collectionId);
 
+        // Enhance parts with status (Parallel)
+        const partsWithStatus = await Promise.all(collection.parts.map(async (part: any) => {
+            // 1. Check Availability
+            const { available } = await superflix.checkAvailability(part.id, 'movie');
+
+            // 2. Check Library
+            const admin = await createAdminClient();
+            const { data: existing } = await admin
+                .from('movies')
+                .select('id')
+                .eq('tmdb_id', part.id)
+                .single();
+
+            // 3. Get proper poster (sometimes parts have missing posters in collection view?)
+            // Usually they are fine, but good to ensure.
+
+            return {
+                ...part,
+                media_type: 'movie',
+                is_available: available,
+                is_in_library: !!existing
+            };
+        }));
+
+        // Sort by release date
+        partsWithStatus.sort((a, b) =>
+            new Date(a.release_date || '9999-01-01').getTime() - new Date(b.release_date || '9999-01-01').getTime()
+        );
+
+        return {
+            data: {
+                ...collection,
+                parts: partsWithStatus
+            }
+        };
+
+    } catch (err: any) {
+        console.error('Get Collection error:', err);
+        return { error: err.message };
+    }
+}
+
+/**
+ * Imports specific items from a collection (or all).
+ * Now accepts a list of IDs to import for better control.
+ */
+export async function importCollectionAction(itemsToImport: { id: number, type: 'movie' | 'tv' }[]) {
+    try {
         let successCount = 0;
         let failCount = 0;
 
-        for (const part of collection.parts) {
-            // 1. Check availability
-            const { available } = await superflix.checkAvailability(part.id, 'movie'); // Collections are usually movies
-
-            if (available) {
-                const res = await importContentAction(part.id, 'movie');
-                if (res.success) successCount++;
-                else failCount++;
-            } else {
-                failCount++; // Skipped
-            }
+        for (const item of itemsToImport) {
+            const res = await importContentAction(item.id, item.type);
+            if (res.success) successCount++;
+            else failCount++;
         }
 
-        return { success: true, count: successCount, skipped: failCount };
+        revalidatePath('/');
+        return { success: true, count: successCount, failed: failCount };
 
+    } catch (err: any) {
+        return { error: err.message };
+    }
+}
+
+/**
+ * Fetches details for a single item to check for collections etc.
+ */
+export async function getItemDetailsAction(tmdbId: number, type: 'movie' | 'tv') {
+    try {
+        const details = await tmdb.getDetails(tmdbId, type);
+        return { data: details };
     } catch (err: any) {
         return { error: err.message };
     }
