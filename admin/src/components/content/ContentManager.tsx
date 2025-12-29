@@ -84,10 +84,6 @@ export function ContentManager() {
     const toggleSelection = (id: number) => {
         if (!isSelectionMode) return;
 
-        // Find item in any list (Search or Popular)
-        // Helper to check availability/library status before selecting
-        // For simplicity, we assume ID is unique enough
-
         setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         );
@@ -154,7 +150,6 @@ export function ContentManager() {
             // Find item object (Search or Popular)
             let item = searchResults.find(r => r.id === id);
             if (!item && popularData) {
-                // Search in all popular lists
                 const allPopular = [
                     ...popularData.trendingDay,
                     ...popularData.trendingWeek,
@@ -211,7 +206,26 @@ export function ContentManager() {
         }
     };
 
-    // --- Components ---
+    // --- Styled Components ---
+
+    const CustomScrollbar = () => (
+        <style jsx global>{`
+            .custom-scrollbar::-webkit-scrollbar {
+                height: 6px; /* Slimmer */
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                transition: background 0.3s;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+        `}</style>
+    );
 
     const ContentCard = ({ item }: { item: any }) => {
         const isSelected = selectedIds.includes(item.id);
@@ -220,18 +234,24 @@ export function ContentManager() {
         return (
             <div
                 onClick={() => isSelectable && toggleSelection(item.id)}
-                className={`group relative bg-[#111] border rounded-xl overflow-hidden transition-all shadow-xl min-w-[160px] md:min-w-[180px]
-                    ${isSelected ? 'border-blue-500 ring-2 ring-blue-500/20 scale-[0.98]' : 'border-white/5 hover:border-white/20 hover:-translate-y-1'}
+                className={`group relative bg-[#111] border rounded-xl overflow-hidden transition-all duration-300 shadow-xl w-[150px] md:w-[170px] flex flex-col
+                    ${isSelected
+                        ? 'border-blue-500 ring-2 ring-blue-500/20 scale-[0.98]'
+                        : 'border-white/5 hover:border-white/20 hover:-translate-y-1 hover:shadow-blue-900/10'
+                    }
                     ${isSelectable ? 'cursor-pointer' : ''}
                 `}
             >
-                {/* Poster */}
-                <div className="aspect-[2/3] relative">
+                {/* Poster - Fixed Aspect Ratio */}
+                <div className="aspect-[2/3] relative overflow-hidden bg-gray-900">
                     <img
                         src={item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750?text=No+Image'}
                         alt={item.title || item.name}
-                        className={`w-full h-full object-cover transition-opacity ${isSelected || item.is_in_library ? 'opacity-40' : 'opacity-80 group-hover:opacity-100'}`}
+                        className={`w-full h-full object-cover transition-transform duration-500 ${isSelected || item.is_in_library ? 'opacity-40' : 'opacity-80 group-hover:opacity-100 group-hover:scale-105'}`}
                     />
+
+                    {/* Subtle Gradient Overlay */}
+                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#111] to-transparent opacity-60" />
 
                     {/* Selection Overlay */}
                     {isSelectable && (
@@ -242,45 +262,51 @@ export function ContentManager() {
                         </div>
                     )}
 
-                    {/* Success/In Library Checkmark */}
-                    {item.is_in_library && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
-                            <Check size={24} className="text-blue-500 drop-shadow-lg" />
-                        </div>
-                    )}
-
-                    <div className="absolute top-2 right-2 flex flex-col gap-2">
+                    {/* Status Badge (Available/Unavailable) */}
+                    <div className="absolute top-2 right-2 z-10">
                         {item.is_available ? (
-                            !item.is_in_library && <div className="bg-green-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md animate-pulse">
-                                <Check size={10} />
+                            !item.is_in_library && <div className="bg-green-500/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md">
+                                <Check size={8} />
                             </div>
                         ) : (
-                            <div className="bg-red-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md">
-                                <X size={10} />
+                            <div className="bg-red-500/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md">
+                                <X size={8} />
                             </div>
                         )}
                     </div>
+
+                    {/* In Library Badge - Centered */}
+                    {item.is_in_library && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
+                            <Check size={28} className="text-blue-500 drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
+                        </div>
+                    )}
                 </div>
 
-                {/* Info */}
-                <div className="p-3">
-                    <h3 className="text-white font-bold text-xs truncate mb-1" title={item.title || item.name}>
-                        {item.title || item.name}
-                    </h3>
-                    <div className="flex justify-between items-center text-[10px] text-gray-500 mb-2">
-                        <span>{item.release_year || (item.release_date || item.first_air_date || '').split('-')[0]}</span>
-                        <span className="flex items-center gap-1"><Star size={8} className="text-yellow-500" /> {item.vote_average?.toFixed(1)}</span>
+                {/* Footer Info - Fixed Height */}
+                <div className="p-3 bg-[#111] border-t border-white/5 flex-1 flex flex-col justify-between">
+                    <div>
+                        <h3 className="text-white font-bold text-xs mb-1 line-clamp-1" title={item.title || item.name}>
+                            {item.title || item.name}
+                        </h3>
+                        <div className="flex justify-between items-center text-[10px] text-gray-500 mb-2">
+                            <span>{item.release_year || (item.release_date || item.first_air_date || '').split('-')[0]}</span>
+                            <div className="flex items-center gap-1">
+                                <Star size={8} className="text-yellow-500 fill-yellow-500" />
+                                <span>{item.vote_average?.toFixed(1)}</span>
+                            </div>
+                        </div>
                     </div>
 
                     {!isSelectionMode && (
                         <button
                             disabled={!item.is_available || item.is_in_library || inspectingId === item.id}
                             onClick={(e) => { e.stopPropagation(); handleImportClick(item); }}
-                            className={`w-full py-1.5 rounded text-[10px] font-bold flex items-center justify-center gap-1 transition-colors
+                            className={`w-full py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1.5 transition-all
                                 ${item.is_in_library
-                                    ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+                                    ? 'bg-transparent border border-white/10 text-gray-600 cursor-not-allowed hidden' // Hide button if in library for cleaner look? Or keep disabled. User likes clean.
                                     : item.is_available
-                                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg'
+                                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
                                         : 'bg-white/5 text-gray-600 cursor-not-allowed'
                                 }
                             `}
@@ -295,14 +321,17 @@ export function ContentManager() {
     };
 
     const HorizontalList = ({ title, icon: Icon, items }: { title: string, icon: any, items: any[] }) => (
-        <div className="space-y-4">
+        <div className="space-y-3"> {/* Reduced spacing */}
             <div className="flex items-center gap-2 px-1">
-                <Icon className="text-blue-500" size={20} />
-                <h2 className="text-xl font-bold text-white">{title}</h2>
+                <div className="p-1.5 rounded-lg bg-white/5 text-blue-400">
+                    <Icon size={16} />
+                </div>
+                <h2 className="text-sm font-bold text-white uppercase tracking-wider">{title}</h2>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4 px-1 scrollbar-hide snap-x">
+            {/* Custom scrollbar applied here */}
+            <div className="custom-scrollbar flex gap-4 overflow-x-auto pb-4 px-1 snap-x">
                 {items.map(item => (
-                    <div key={item.id} className="snap-start">
+                    <div key={item.id} className="snap-start flex-shrink-0">
                         <ContentCard item={item} />
                     </div>
                 ))}
@@ -312,6 +341,7 @@ export function ContentManager() {
 
     return (
         <div className="space-y-8 relative min-h-[500px]">
+            <CustomScrollbar />
             {/* Modals */}
             <ManageContentModal isOpen={!!manageItem} onClose={() => setManageItem(null)} item={manageItem} onSuccess={() => loadLibrary()} />
             <ImportConfirmationModal isOpen={!!confirmItem} onClose={() => setConfirmItem(null)} item={confirmItem} onConfirm={executeSingleImport} loading={importLoading} />
@@ -382,7 +412,7 @@ export function ContentManager() {
 
                     {/* View: Discovery */}
                     {viewMode === 'discovery' && !query && (
-                        <div className="space-y-10">
+                        <div className="space-y-8"> {/* Reduced global spacing */}
                             {isLoadingPopular ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                                     <Loader2 className="animate-spin text-purple-500" size={48} />
@@ -392,14 +422,14 @@ export function ContentManager() {
                                 <>
                                     <div className="flex justify-end px-2">
                                         <button onClick={loadPopularContent} className="text-xs font-bold text-gray-500 hover:text-white flex items-center gap-1 transition-colors">
-                                            <RefreshCw size={12} /> Atualizar Listas
+                                            <RefreshCw size={12} /> Atualizar
                                         </button>
                                     </div>
                                     <HorizontalList title="🔥 Bombando Hoje" icon={Flame} items={popularData.trendingDay} />
                                     <HorizontalList title="⚡ Destaques da Semana" icon={TrendingUp} items={popularData.trendingWeek} />
                                     <HorizontalList title="🎬 Filmes Populares" icon={Film} items={popularData.popularMovies} />
                                     <HorizontalList title="📺 Séries em Alta" icon={Tv} items={popularData.popularSeries} />
-                                    <HorizontalList title="⭐ Critica Aclamada" icon={Star} items={popularData.topRatedMovies} />
+                                    <HorizontalList title="⭐ Aclamação da Crítica" icon={Star} items={popularData.topRatedMovies} />
                                 </>
                             ) : null}
                         </div>
