@@ -81,8 +81,7 @@ export function ManageContentModal({ isOpen, onClose, item, onSuccess }: ManageC
         setSyncing(false);
 
         if (res.success) {
-            onSuccess(); // Refresh list to show new images/titles
-            // Optionally manually update local form state too if we stayed open
+            onSuccess();
             onClose();
         } else {
             alert('Erro ao sincronizar: ' + res.error);
@@ -90,178 +89,196 @@ export function ManageContentModal({ isOpen, onClose, item, onSuccess }: ManageC
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
             {/* Backdrop Blur */}
             <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
 
-            <div className="relative w-full max-w-7xl bg-[#0a0a0a] rounded-3xl shadow-2xl overflow-hidden border border-white/10 flex flex-col max-h-[90vh]">
+            {/* Main Card Container - No Overflow Hidden here to allow pop-out elements if we wanted,
+                but better strategy is scrolling content. */}
+            <div className="relative w-full max-w-7xl bg-[#0a0a0a] rounded-3xl shadow-2xl border border-white/10 flex flex-col max-h-[95vh] overflow-hidden">
 
-                {/* Visual Header (Backdrop Blended) */}
-                <div className="relative h-72 w-full overflow-hidden shrink-0">
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent z-10" />
+                {/* Scrollable Container for EVERYTHING */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
 
-                    {formData.backdrop_url ? (
-                        <img
-                            src={`https://image.tmdb.org/t/p/original${formData.backdrop_url}`}
-                            alt="Backdrop"
-                            className="w-full h-full object-cover opacity-50"
-                        />
-                    ) : (
-                        <div className="w-full h-full bg-neutral-900" />
-                    )}
-
-                    {/* Top Controls: Just Close */}
-                    <div className="absolute top-6 right-6 z-20">
-                        <button
-                            onClick={onClose}
-                            className="bg-black/40 hover:bg-white/10 text-white p-2.5 rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-110"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-
-                    {/* Title & Type Badge */}
-                    <div className="absolute bottom-6 left-8 right-8 z-20 flex items-end gap-8">
-                        {/* Poster Overlap - Increased size and z-index ensures it sits on top of body padding if needed */}
-                        <div className="hidden md:block w-40 h-60 rounded-xl shadow-2xl border-2 border-white/10 overflow-hidden bg-gray-800 -mb-20 shrink-0 relative z-30 transform hover:scale-105 transition-transform duration-500">
-                            {formData.poster_url ? (
+                    {/* Visual Header */}
+                    <div className="relative h-80 w-full shrink-0">
+                        {/* Background Image */}
+                        <div className="absolute inset-0 z-0">
+                            {formData.backdrop_url ? (
                                 <img
-                                    src={`https://image.tmdb.org/t/p/w500${formData.poster_url}`}
-                                    className="w-full h-full object-cover"
-                                    alt="Poster"
+                                    src={`https://image.tmdb.org/t/p/original${formData.backdrop_url}`}
+                                    alt="Backdrop"
+                                    className="w-full h-full object-cover opacity-50 mask-gradient-to-b"
                                 />
                             ) : (
-                                <div className="flex items-center justify-center w-full h-full text-gray-500"><ImageIcon /></div>
+                                <div className="w-full h-full bg-neutral-900" />
                             )}
+                            {/* Gradient Overlay for seamless blend */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/30 to-transparent" />
                         </div>
 
-                        <div className="flex-1 mb-2">
-                            <div className="flex items-center gap-3 mb-3">
-                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded border uppercase tracking-wider ${item.media_type === 'movie' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'bg-purple-500/20 text-purple-300 border-purple-500/30'}`}>
-                                    {item.media_type === 'movie' ? 'Filme' : 'Série'}
-                                </span>
-                                <span className="text-gray-400 text-xs font-mono opacity-60">ID: {item.id} • TMDB: {item.tmdb_id}</span>
-                            </div>
-                            <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight drop-shadow-xl tracking-tight">
-                                {formData.title || 'Sem Título'}
-                            </h1>
+                        {/* Top Right Close */}
+                        <div className="absolute top-6 right-6 z-50">
+                            <button
+                                onClick={onClose}
+                                className="bg-black/40 hover:bg-white/10 text-white p-3 rounded-full backdrop-blur-md border border-white/10 transition-all hover:scale-110 shadow-lg"
+                            >
+                                <X size={24} />
+                            </button>
                         </div>
-                    </div>
-                </div>
 
-                {/* Content Body */}
-                <div className="flex-1 overflow-y-auto bg-[#0a0a0a] custom-scrollbar">
-                    <div className="p-8 pt-24 md:pl-56 md:pt-10 space-y-8">
-
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                            {/* Left Column: Metadata */}
-                            <div className="space-y-6">
-                                {/* Title Input */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                                        <FileText size={12} /> Título
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="title"
-                                        value={formData.title}
-                                        onChange={handleChange}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:border-blue-500/50 focus:bg-white/10 outline-none transition-all font-medium text-base"
+                        {/* Hero Info Layer */}
+                        <div className="absolute bottom-0 left-0 right-0 p-8 pb-0 flex items-end gap-8 z-20">
+                            {/* Poster - We put it here, overlapping the container below visually via structure */}
+                            <div className="hidden lg:block w-48 h-72 rounded-xl shadow-2xl border-2 border-white/10 overflow-hidden bg-gray-800 shrink-0 transform translate-y-12 transition-transform duration-500 hover:scale-105">
+                                {formData.poster_url ? (
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w500${formData.poster_url}`}
+                                        className="w-full h-full object-cover"
+                                        alt="Poster"
                                     />
-                                </div>
-
-                                {/* Description */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                                        <FileText size={12} /> Sinopse
-                                    </label>
-                                    <textarea
-                                        name="description"
-                                        value={formData.description}
-                                        onChange={handleChange}
-                                        rows={6}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-gray-300 focus:border-blue-500/50 focus:bg-white/10 outline-none transition-all resize-none leading-relaxed text-sm"
-                                    />
-                                </div>
+                                ) : (
+                                    <div className="flex items-center justify-center w-full h-full text-gray-500"><ImageIcon size={48} /></div>
+                                )}
                             </div>
 
-                            {/* Right Column: Media & Actions */}
-                            <div className="space-y-6">
-                                {/* Video URL */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                                        <Video size={12} /> URL do Vídeo (M3U8 / MP4)
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            name="video_url"
-                                            value={formData.video_url}
-                                            onChange={handleChange}
-                                            placeholder="https://..."
-                                            className="w-full bg-blue-500/5 border border-blue-500/20 rounded-lg pl-10 pr-4 py-3 text-blue-200 focus:border-blue-500/50 focus:bg-blue-500/10 outline-none transition-all font-mono text-xs shadow-inner"
-                                        />
-                                        <PlayCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500/50" size={16} />
-                                    </div>
+                            <div className="flex-1 pb-8">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className={`text-xs font-bold px-3 py-1 rounded-full border uppercase tracking-wider shadow-lg ${item.media_type === 'movie' ? 'bg-blue-600/80 text-white border-blue-400/50' : 'bg-purple-600/80 text-white border-purple-400/50'}`}>
+                                        {item.media_type === 'movie' ? 'Filme' : 'Série'}
+                                    </span>
+                                    <span className="text-gray-400 text-xs font-mono opacity-80 bg-black/50 px-2 py-1 rounded">ID: {item.id}</span>
                                 </div>
-
-                                {/* Image URLs */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-gray-600 uppercase">Poster URL</label>
-                                        <input
-                                            type="text"
-                                            name="poster_url"
-                                            value={formData.poster_url}
-                                            onChange={handleChange}
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-gray-400 focus:border-white/20 outline-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-gray-600 uppercase">Backdrop URL</label>
-                                        <input
-                                            type="text"
-                                            name="backdrop_url"
-                                            value={formData.backdrop_url}
-                                            onChange={handleChange}
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-gray-400 focus:border-white/20 outline-none"
-                                        />
-                                    </div>
-                                </div>
+                                <h1 className="text-4xl md:text-6xl font-black text-white leading-none drop-shadow-2xl tracking-tight max-w-4xl">
+                                    {formData.title || 'Sem Título'}
+                                </h1>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Footer Actions */}
-                <div className="p-6 border-t border-white/10 bg-[#0a0a0a] flex items-center justify-between gap-4">
-                    <button
-                        onClick={handleDelete}
-                        disabled={loading || syncing}
-                        className="px-6 py-2.5 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors uppercase tracking-wide"
-                    >
-                        {loading ? <Loader2 className="animate-spin" size={14} /> : <Trash2 size={16} />}
-                        Excluir Conteúdo
-                    </button>
+                    {/* Content Body */}
+                    <div className="p-8 lg:p-12 pt-16 bg-[#0a0a0a] min-h-[400px]">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-                    <div className="flex gap-3">
-                        <button
-                            onClick={handleSync}
-                            disabled={syncing || loading}
-                            className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 rounded-xl font-bold text-xs flex items-center gap-2 transition-all uppercase tracking-wide"
-                        >
-                            <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-                            {syncing ? 'Sync...' : 'Sincronizar'}
-                        </button>
+                            {/* Spacer for Poster Column */}
+                            <div className="hidden lg:block lg:col-span-3">
+                                {/* The poster sits above this empty space visually because of the negative margin/transform in the header */}
+                            </div>
 
-                        <button
-                            onClick={handleSave}
-                            disabled={loading || syncing}
-                            className="px-8 py-2.5 bg-white hover:bg-gray-200 text-black rounded-xl font-bold text-xs flex items-center gap-2 transition-all shadow-lg hover:scale-[1.02] uppercase tracking-wide"
-                        >
-                            {loading ? <Loader2 className="animate-spin" size={14} /> : <Save size={16} />}
-                            Salvar Alterações
-                        </button>
+                            {/* Main Form Area */}
+                            <div className="lg:col-span-9 space-y-10">
+
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                                    {/* Left: Text Data */}
+                                    <div className="space-y-8">
+                                        <div className="space-y-3">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                                <FileText size={14} className="text-blue-500" /> Título Oficial
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="title"
+                                                value={formData.title}
+                                                onChange={handleChange}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all font-bold text-lg placeholder-white/20"
+                                                placeholder="Nome do filme ou série"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                                <FileText size={14} className="text-blue-500" /> Sinopse
+                                            </label>
+                                            <textarea
+                                                name="description"
+                                                value={formData.description}
+                                                onChange={handleChange}
+                                                rows={8}
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all resize-none leading-relaxed text-sm placeholder-white/20"
+                                                placeholder="Descrição detalhada..."
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Right: Technical Data */}
+                                    <div className="space-y-8">
+                                        <div className="space-y-3">
+                                            <label className="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                                <Video size={14} /> URL do Vídeo (Stream)
+                                            </label>
+                                            <div className="relative group">
+                                                <input
+                                                    type="text"
+                                                    name="video_url"
+                                                    value={formData.video_url}
+                                                    onChange={handleChange}
+                                                    placeholder="https://server.com/video.m3u8"
+                                                    className="w-full bg-blue-500/5 border border-blue-500/20 rounded-xl pl-12 pr-4 py-4 text-blue-100 focus:border-blue-500 focus:bg-blue-500/10 outline-none transition-all font-mono text-sm shadow-inner group-hover:border-blue-500/40"
+                                                />
+                                                <PlayCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500" size={20} />
+                                            </div>
+                                            <p className="text-[10px] text-gray-600 pl-1">Link direto para o arquivo .mp4 ou .m3u8</p>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Poster URL</label>
+                                                <input
+                                                    type="text"
+                                                    name="poster_url"
+                                                    value={formData.poster_url}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-xs text-gray-300 focus:border-blue-500/50 outline-none font-mono"
+                                                />
+                                            </div>
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Backdrop URL</label>
+                                                <input
+                                                    type="text"
+                                                    name="backdrop_url"
+                                                    value={formData.backdrop_url}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-xs text-gray-300 focus:border-blue-500/50 outline-none font-mono"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Buttons Group */}
+                                        <div className="pt-8 flex flex-col gap-4">
+                                            <button
+                                                onClick={handleSave}
+                                                disabled={loading || syncing}
+                                                className="w-full bg-white hover:bg-gray-200 text-black py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-3 transition-all shadow-xl hover:scale-[1.01] uppercase tracking-wide"
+                                            >
+                                                {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                                                Salvar Alterações
+                                            </button>
+
+                                            <div className="flex gap-4">
+                                                <button
+                                                    onClick={handleSync}
+                                                    disabled={syncing || loading}
+                                                    className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all uppercase tracking-wide hover:border-white/20"
+                                                >
+                                                    <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} />
+                                                    {syncing ? 'Sync...' : 'Sincronizar TMDB'}
+                                                </button>
+                                                <button
+                                                    onClick={handleDelete}
+                                                    disabled={loading || syncing}
+                                                    className="flex-1 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 text-red-500 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all uppercase tracking-wide hover:border-red-500/40"
+                                                >
+                                                    <Trash2 size={16} />
+                                                    Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
