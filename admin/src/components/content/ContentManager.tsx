@@ -24,7 +24,7 @@ export function ContentManager() {
     // Library State
     const [libraryResults, setLibraryResults] = useState<any[]>([]);
     const [isLibraryLoading, setIsLibraryLoading] = useState(false);
-    const [filterType, setFilterType] = useState<'all' | 'movie' | 'tv'>('all');
+    const [filterType, setFilterType] = useState<'all' | 'movie' | 'tv' | 'trailers'>('all');
     const [searchLibraryQuery, setSearchLibraryQuery] = useState('');
 
     // Import Flow State
