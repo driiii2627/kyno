@@ -1,6 +1,5 @@
 'use client';
 
-import OptimizedImage from '@/components/ui/OptimizedImage';
 import styles from './DetailsBackground.module.css';
 
 interface DetailsBackgroundProps {
@@ -14,14 +13,10 @@ export default function DetailsBackground({ backdropUrl }: DetailsBackgroundProp
         <div className={styles.heroBackground}>
             {/* Image Layer */}
             <div className={styles.heroImage}>
-                <OptimizedImage
+                <img
                     src={backdropUrl}
                     alt="Background"
-                    fill
-                    priority
-                    quality={100}
-                    unoptimized // Essential for DB url support
-                    style={{ objectFit: 'cover', zIndex: 0 }}
+                    className={styles.image}
                 />
             </div>
 

@@ -14,9 +14,20 @@
     left: 0;
     width: 100%;
     height: 100%;
-    /* No scale transform by default to avoid "giant" complaint, or standard scale(1) */
     transform: scale(1);
-    transition: opacity 1s ease-in-out;
+}
+
+/* Strict image styling to prevent "Giant" overflow */
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* This cuts the image to fit without distortion */
+    object-position: center top;
+    /* Focus on faces/top like the original Hero */
+    display: block;
+    opacity: 1;
+    /* Force visible */
 }
 
 /* Replicating Hero.module.css Gradient Overlay */
