@@ -518,84 +518,84 @@ return (
                             </button>
                         ))}
                     </div>
+
+                    <div className="relative w-full md:w-64 flex gap-2">
+                        <input
+                            type="text"
+                            value={searchLibraryQuery}
+                            onChange={(e) => setSearchLibraryQuery(e.target.value)}
+                            placeholder="Filtrar biblioteca..."
+                            className="w-full bg-black/40 border border-white/10 rounded-full pl-4 pr-4 py-2 text-xs text-white focus:outline-none focus:border-white/20 transition-all"
+                        />
+                        {/* Sync Trailers Button (Only visible in 'trailers' or 'all' filter) */}
+                        {['trailers', 'all'].includes(filterType) && (
+                            <button
+                                onClick={handleSyncMissingTrailers}
+                                title="Sincronizar Trailers Ausentes"
+                                className="p-2 bg-white/5 border border-white/10 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                            >
+                                <RefreshCw size={16} />
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div className="relative w-full md:w-64 flex gap-2">
-                    <input
-                        type="text"
-                        value={searchLibraryQuery}
-                        onChange={(e) => setSearchLibraryQuery(e.target.value)}
-                        placeholder="Filtrar biblioteca..."
-                        className="w-full bg-black/40 border border-white/10 rounded-full pl-4 pr-4 py-2 text-xs text-white focus:outline-none focus:border-white/20 transition-all"
-                    />
-                    {/* Sync Trailers Button (Only visible in 'trailers' or 'all' filter) */}
-                    {['trailers', 'all'].includes(filterType) && (
-                        <button
-                            onClick={handleSyncMissingTrailers}
-                            title="Sincronizar Trailers Ausentes"
-                            className="p-2 bg-white/5 border border-white/10 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                        >
-                            <RefreshCw size={16} />
-                        </button>
+
+                {isLibraryLoading ? (
+                    <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" size={48} /></div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        {libraryResults
+                            .filter(item => {
+                                const matchesSearch = item.title?.toLowerCase().includes(searchLibraryQuery.toLowerCase());
+                                if (!matchesSearch) return false;
+
+                                if (filterType === 'all') return true;
+                                if (filterType === 'trailers') return item.trailer_url && item.show_trailer;
+                                return item.media_type === filterType;
+                            })
+                            .map((item) => (
+                                <div key={item.id} className="group relative bg-[#111] border border-white/5 rounded-xl overflow-hidden hover:border-white/20 transition-all hover:-translate-y-1 shadow-2xl">
+                                    <div className="aspect-[2/3] relative">
+                                        <img src={item.poster_url ? `https://image.tmdb.org/t/p/w500${item.poster_url}` : 'https://placehold.co/500x750?text=No+Image'} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="text-white font-bold text-sm truncate mb-1">{item.title}</h3>
+                                        <button onClick={() => setManageItem(item)} className="w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white"><Layers size={14} /> Gerenciar</button>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                )}
+            </div>
+        )
+        }
+
+        {/* Batch Selection Floating Bar (Common) */}
+        {
+            isSelectionMode && (
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl p-4 flex items-center gap-6 z-50 animate-in slide-in-from-bottom-6 duration-300 w-[90%] max-w-lg">
+                    <div className="flex flex-col">
+                        <span className="text-white font-bold text-sm">{selectedIds.length} Itens Selecionados</span>
+                        <span className="text-xs text-gray-500">Prontos para importação segura</span>
+                    </div>
+                    <div className="flex-1" />
+                    {processingQueue ? (
+                        <div className="flex items-center gap-4">
+                            <div className="flex flex-col items-end">
+                                <span className="text-blue-400 font-bold text-xs animate-pulse">Processando fila...</span>
+                                <span className="text-white text-xs">{queueProgress?.current} / {queueProgress?.total}</span>
+                            </div>
+                            <Loader2 className="animate-spin text-blue-500" size={24} />
+                        </div>
+                    ) : (
+                        <div className="flex gap-2">
+                            <button onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }} className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-gray-400 hover:text-white transition-colors"><X size={20} /></button>
+                            <button onClick={handleBatchImport} disabled={selectedIds.length === 0} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20 transition-all hover:scale-105 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"><PlayCircle size={18} /> Importar Itens</button>
+                        </div>
                     )}
                 </div>
-            </div>
-
-                    {isLibraryLoading ? (
-            <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-500" size={48} /></div>
-        ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {libraryResults
-                    .filter(item => {
-                        const matchesSearch = item.title?.toLowerCase().includes(searchLibraryQuery.toLowerCase());
-                        if (!matchesSearch) return false;
-
-                        if (filterType === 'all') return true;
-                        if (filterType === 'trailers') return item.trailer_url && item.show_trailer;
-                        return item.media_type === filterType;
-                    })
-                    .map((item) => (
-                        <div key={item.id} className="group relative bg-[#111] border border-white/5 rounded-xl overflow-hidden hover:border-white/20 transition-all hover:-translate-y-1 shadow-2xl">
-                            <div className="aspect-[2/3] relative">
-                                <img src={item.poster_url ? `https://image.tmdb.org/t/p/w500${item.poster_url}` : 'https://placehold.co/500x750?text=No+Image'} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                            <div className="p-4">
-                                <h3 className="text-white font-bold text-sm truncate mb-1">{item.title}</h3>
-                                <button onClick={() => setManageItem(item)} className="w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white"><Layers size={14} /> Gerenciar</button>
-                            </div>
-                        </div>
-                    ))}
-            </div>
-        )}
-    </div>
-)
-}
-
-{/* Batch Selection Floating Bar (Common) */ }
-{
-    isSelectionMode && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl p-4 flex items-center gap-6 z-50 animate-in slide-in-from-bottom-6 duration-300 w-[90%] max-w-lg">
-            <div className="flex flex-col">
-                <span className="text-white font-bold text-sm">{selectedIds.length} Itens Selecionados</span>
-                <span className="text-xs text-gray-500">Prontos para importação segura</span>
-            </div>
-            <div className="flex-1" />
-            {processingQueue ? (
-                <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end">
-                        <span className="text-blue-400 font-bold text-xs animate-pulse">Processando fila...</span>
-                        <span className="text-white text-xs">{queueProgress?.current} / {queueProgress?.total}</span>
-                    </div>
-                    <Loader2 className="animate-spin text-blue-500" size={24} />
-                </div>
-            ) : (
-                <div className="flex gap-2">
-                    <button onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }} className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-gray-400 hover:text-white transition-colors"><X size={20} /></button>
-                    <button onClick={handleBatchImport} disabled={selectedIds.length === 0} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20 transition-all hover:scale-105 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"><PlayCircle size={18} /> Importar Itens</button>
-                </div>
-            )}
-        </div>
-    )
-}
-        </div >
-    );
+            )
+        }
+    </div >
+);
 }
