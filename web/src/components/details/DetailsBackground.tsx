@@ -18,7 +18,7 @@ export default function DetailsBackground({ backdropUrl, trailerId, isMobile = f
                     tinySrc={backdropUrl.replace('original', 'w780')}
                     alt="Background"
                     fill
-                    className="object-cover opacity-60" // Fixed opacity for background
+                    className="w-full h-full object-cover opacity-60" // Fixed opacity for background
                     priority
                     quality={100}
                 />
