@@ -22,7 +22,9 @@ export function ManageContentModal({ isOpen, onClose, item, onSuccess }: ManageC
         poster_url: '',
         backdrop_url: '',
         logo_url: '',
-        video_url: ''
+        video_url: '',
+        trailer_url: '',
+        show_trailer: true
     });
 
     useEffect(() => {
@@ -33,7 +35,9 @@ export function ManageContentModal({ isOpen, onClose, item, onSuccess }: ManageC
                 poster_url: item.poster_url || '',
                 backdrop_url: item.backdrop_url || '',
                 logo_url: item.logo_url || '',
-                video_url: item.video_url || ''
+                video_url: item.video_url || '',
+                trailer_url: item.trailer_url || '',
+                show_trailer: item.show_trailer !== undefined ? item.show_trailer : true
             });
         }
     }, [item]);
@@ -227,22 +231,64 @@ export function ManageContentModal({ isOpen, onClose, item, onSuccess }: ManageC
                                     </div>
 
                                     {/* Video Section */}
-                                    <div className="p-6 bg-[#0f0f0f] rounded-2xl border border-white/5 space-y-4">
-                                        <div className="flex items-center gap-2 text-blue-500/80 mb-1">
-                                            <Video size={16} />
-                                            <h3 className="font-bold uppercase tracking-widest text-[10px]">Streaming Source</h3>
+                                    <div className="p-6 bg-[#0f0f0f] rounded-2xl border border-white/5 space-y-6">
+                                        {/* Main Video URL */}
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2 text-blue-500/80 mb-1">
+                                                <Video size={16} />
+                                                <h3 className="font-bold uppercase tracking-widest text-[10px]">Streaming Source</h3>
+                                            </div>
+
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    name="video_url"
+                                                    value={formData.video_url}
+                                                    onChange={handleChange}
+                                                    placeholder="https://..."
+                                                    className="w-full bg-[#0a0a0a] border border-blue-900/20 rounded-lg pl-12 pr-4 py-4 text-blue-100 font-mono text-xs focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 outline-none transition-all shadow-inner"
+                                                />
+                                                <PlayCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500/50" size={20} />
+                                            </div>
                                         </div>
 
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                name="video_url"
-                                                value={formData.video_url}
-                                                onChange={handleChange}
-                                                placeholder="https://..."
-                                                className="w-full bg-[#0a0a0a] border border-blue-900/20 rounded-lg pl-12 pr-4 py-4 text-blue-100 font-mono text-xs focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/10 outline-none transition-all shadow-inner"
-                                            />
-                                            <PlayCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500/50" size={20} />
+                                        {/* Trailer Section */}
+                                        <div className="space-y-4 pt-4 border-t border-white/5">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <div className="flex items-center gap-2 text-red-500/80">
+                                                    <PlayCircle size={16} />
+                                                    <h3 className="font-bold uppercase tracking-widest text-[10px]">Trailer Youtube</h3>
+                                                </div>
+
+                                                {/* Toggle Switch */}
+                                                <label className="flex items-center gap-2 cursor-pointer group">
+                                                    <span className={`text-[10px] font-bold uppercase transition-colors ${formData.show_trailer ? 'text-green-500' : 'text-gray-600'}`}>
+                                                        {formData.show_trailer ? 'Ativado' : 'Desativado'}
+                                                    </span>
+                                                    <div className="relative">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.show_trailer}
+                                                            onChange={(e) => setFormData(prev => ({ ...prev, show_trailer: e.target.checked }))}
+                                                            className="sr-only"
+                                                        />
+                                                        <div className={`w-10 h-5 rounded-full shadow-inner transition-colors ${formData.show_trailer ? 'bg-green-500/20' : 'bg-white/5'}`}></div>
+                                                        <div className={`absolute top-1 left-1 w-3 h-3 rounded-full transition-transform duration-300 ${formData.show_trailer ? 'translate-x-5 bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-gray-500'}`}></div>
+                                                    </div>
+                                                </label>
+                                            </div>
+
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    name="trailer_url"
+                                                    value={formData.trailer_url}
+                                                    onChange={handleChange}
+                                                    placeholder="https://youtube.com/watch?v=..."
+                                                    className="w-full bg-[#0a0a0a] border border-red-900/20 rounded-lg pl-12 pr-4 py-4 text-red-100 font-mono text-xs focus:border-red-500/50 focus:ring-1 focus:ring-red-500/10 outline-none transition-all shadow-inner"
+                                                />
+                                                <PlayCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-red-500/50" size={20} />
+                                            </div>
                                         </div>
                                     </div>
 

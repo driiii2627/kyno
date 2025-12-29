@@ -7,6 +7,7 @@ import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
 import styles from './Details.module.css';
 import SeasonBrowser from '@/components/details/SeasonBrowser';
+import DetailsBackground from '@/components/details/DetailsBackground';
 
 import DetailsTabs from '@/components/details/DetailsTabs';
 import TrackedLink from '@/components/ui/TrackedLink';
@@ -154,22 +155,11 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     return (
         <div className={styles.container}>
             {/* Background Hero */}
-            <div className={styles.heroBackground}>
-                {backdropUrl && (
-                    <OptimizedImage
-                        src={backdropUrl}
-                        tinySrc={backdropUrl.replace('original', 'w780')} // Upgrade placeholder to w780 for better mobile quality
-                        alt="Background"
-                        fill
-                        className={styles.heroImage}
-                        priority
-                        quality={100} // Max quality for details background
-                    />
-                )}
-                {/* CSS Gradients */}
-                <div className={styles.gradientOverlayBottom} />
-                <div className={styles.gradientOverlaySide} />
-            </div>
+            {/* Background Hero with Trailer Support */}
+            <DetailsBackground
+                backdropUrl={backdropUrl}
+                trailerId={item.show_trailer && item.trailer_url ? (item.trailer_url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/) || [])[1] : null}
+            />
 
             {/* Back Button */}
             <Link href="/" className={styles.backButton}>

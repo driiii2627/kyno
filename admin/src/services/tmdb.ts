@@ -84,5 +84,8 @@ export const tmdb = {
     },
     getImages: async (id: number, type: 'movie' | 'tv') => {
         return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
+    },
+    getVideos: async (id: number, type: 'movie' | 'tv') => {
+        return fetchFromTMDB<{ results: { key: string, name: string, site: string, type: string, iso_639_1: string }[] }>(`/${type}/${id}/videos`);
     }
 };

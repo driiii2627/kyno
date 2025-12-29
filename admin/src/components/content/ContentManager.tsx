@@ -448,13 +448,13 @@ export function ContentManager() {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
                         {/* Filter Bubbles */}
                         <div className="flex p-1 bg-white/5 rounded-full border border-white/10">
-                            {['all', 'movie', 'tv'].map(t => (
+                            {['all', 'movie', 'tv', 'trailers'].map(t => (
                                 <button
                                     key={t}
                                     onClick={() => setFilterType(t as any)}
                                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all capitalize ${filterType === t ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
                                 >
-                                    {t === 'all' ? 'Todos' : t === 'movie' ? 'Filmes' : 'Séries'}
+                                    {t === 'all' ? 'Todos' : t === 'movie' ? 'Filmes' : t === 'tv' ? 'Séries' : 'Com Trailer'}
                                 </button>
                             ))}
                         </div>
@@ -475,7 +475,14 @@ export function ContentManager() {
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                             {libraryResults
-                                .filter(item => (filterType === 'all' || item.media_type === filterType) && item.title?.toLowerCase().includes(searchLibraryQuery.toLowerCase()))
+                                .filter(item => {
+                                    const matchesSearch = item.title?.toLowerCase().includes(searchLibraryQuery.toLowerCase());
+                                    if (!matchesSearch) return false;
+
+                                    if (filterType === 'all') return true;
+                                    if (filterType === 'trailers') return item.trailer_url && item.show_trailer;
+                                    return item.media_type === filterType;
+                                })
                                 .map((item) => (
                                     <div key={item.id} className="group relative bg-[#111] border border-white/5 rounded-xl overflow-hidden hover:border-white/20 transition-all hover:-translate-y-1 shadow-2xl">
                                         <div className="aspect-[2/3] relative">
