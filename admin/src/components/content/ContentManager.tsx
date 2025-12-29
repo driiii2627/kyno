@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Search, Plus, Check, X, Loader2, Film, Tv, Library, Layers } from 'lucide-react';
 import { searchContentAction, importContentAction, importCollectionAction, getLibraryContent } from '@/app/actions/content';
 import { useToast } from '@/components/ui/Toast';
+import { ManageContentModal } from './ManageContentModal';
 
 export function ContentManager() {
     const [activeTab, setActiveTab] = useState<'add' | 'manage'>('add');
@@ -16,81 +17,29 @@ export function ContentManager() {
     const [searchLibraryQuery, setSearchLibraryQuery] = useState('');
 
     // Import state
-    const [importingId, setImportingId] = useState<number | null>(null);
 
-    // Filtered Library Results
-    const filteredLibrary = results.filter(item => {
-        if (activeTab === 'manage') {
-            const matchesType = filterType === 'all' || item.media_type === filterType;
-            const matchesSearch = item.title?.toLowerCase().includes(searchLibraryQuery.toLowerCase());
-            return matchesType && matchesSearch;
-        }
-        return true;
-    });
+    // Manage Modal State
+    const [manageItem, setManageItem] = useState<any>(null);
 
-    // Fetch library when tab changes
-    useEffect(() => {
-        if (activeTab === 'manage') {
-            loadLibrary();
-        } else {
-            setResults([]); // Clear results when switching back start fresh or keep previous?
-            // Actually keeps search results if we don't clear. Let's clear for now to avoid confusion.
-            setResults([]);
-        }
-    }, [activeTab]);
-
-    const loadLibrary = async () => {
-        setLoading(true);
-        const { data, error } = await getLibraryContent();
-        setLoading(false);
-        if (data) setResults(data);
-        else console.error(error);
-    };
-
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!query.trim()) return;
-
-        setLoading(true);
-        const { results: data, error } = await searchContentAction(query);
-        setLoading(false);
-
-        if (data) setResults(data);
-        else alert(error);
-    };
-
-    const handleImport = async (item: any) => {
-        if (!confirm(`Importar "${item.title || item.name}" para o site?`)) return;
-
-        setImportingId(item.id);
-        const res = await importContentAction(item.id, item.media_type);
-        setImportingId(null);
-
-        if (res.success) {
-            alert('Sucesso! Conteúdo adicionado.');
-            // Update local state to show it's in library
-            setResults(prev => prev.map(r => r.id === item.id ? { ...r, is_in_library: true } : r));
-        } else {
-            alert('Erro: ' + res.error);
-        }
-    };
-
-    const handleImportCollection = async (collectionId: number) => {
-        if (!confirm(`Tentar importar toda a franquia/coleção? Isso pode demorar um pouco.`)) return;
-
-        // Use a toast or loading state here in real app
-        const res = await importCollectionAction(collectionId);
-        if (res.success) {
-            alert(`Franquia processada! Importados: ${res.count}, Pulados: ${res.skipped}`);
-        } else {
-            alert(res.error);
-        }
-    };
+    // ... (rest of render)
 
     return (
         <div className="space-y-6">
+
+            {/* Modal Injection */}
+            <ManageContentModal
+                isOpen={!!manageItem}
+                onClose={() => setManageItem(null)}
+                item={manageItem}
+                onSuccess={() => {
+                    loadLibrary(); // Reload list
+                    // maybe keep modal open? no, usually close on big success
+                }}
+            />
+
             {/* Sub-Tabs */}
             <div className="flex gap-4 border-b border-white/10 pb-4">
+                {/* ... existing tabs ... */}
                 <button
                     onClick={() => setActiveTab('add')}
                     className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
@@ -153,7 +102,6 @@ export function ContentManager() {
                                             </div>
                                         )}
                                     </div>
-
                                     <div className="absolute top-2 left-2">
                                         <div className="bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10 uppercase">
                                             {item.media_type === 'movie' ? 'Filme' : 'Série'}
@@ -278,8 +226,9 @@ export function ContentManager() {
                                         {/* Actions */}
                                         <div className="space-y-2">
                                             <button
-                                                className="w-full py-2 rounded text-xs font-bold flex items-center justify-center gap-2 transition-colors bg-white/5 text-gray-400 cursor-not-allowed"
-                                                title="Edição em breve"
+                                                onClick={() => setManageItem(item)}
+                                                className="w-full py-2 rounded text-xs font-bold flex items-center justify-center gap-2 transition-colors bg-white/10 hover:bg-white/20 text-white"
+                                                title="Gerenciar Conteúdo"
                                             >
                                                 <Check size={14} /> Gerenciar
                                             </button>
