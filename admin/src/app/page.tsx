@@ -121,14 +121,7 @@ export default async function AdminDashboard() {
           </div>
         )}
 
-        {/* Create Tabs UI in Client Component */}
-        <section>
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Gerenciamento de Usuários</h2>
-            <p className="text-gray-400 text-sm">Visualize, edite e monitore os usuários da plataforma.</p>
-          </div>
-          <UsersTable users={mergedUsers} />
-        </section>
+        <DashboardTabs users={mergedUsers} />
       </div>
     </main>
   )
