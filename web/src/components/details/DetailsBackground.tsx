@@ -16,7 +16,7 @@ export default function DetailsBackground({ backdropUrl, trailerId, isMobile = f
                 <img
                     src={backdropUrl}
                     alt="Background"
-                    className="absolute inset-0 w-full h-full object-cover object-top opacity-60"
+                    className="absolute inset-0 w-full h-full object-cover opacity-75"
                 />
             )}
 
