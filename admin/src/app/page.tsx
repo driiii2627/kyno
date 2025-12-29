@@ -1,8 +1,9 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { UsersTable } from '@/components/admin/UsersTable'
+
 import { AdminHeader } from '@/components/admin/AdminHeader'
+import { DashboardTabs } from '@/components/admin/DashboardTabs'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
