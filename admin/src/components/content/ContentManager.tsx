@@ -197,6 +197,43 @@ export function ContentManager() {
 
             {activeTab === 'manage' && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Filters & Search */}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+                        {/* Bubble Tabs */}
+                        <div className="flex p-1 bg-white/5 rounded-full border border-white/10">
+                            <button
+                                onClick={() => setFilterType('all')}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${filterType === 'all' ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                            >
+                                Todos
+                            </button>
+                            <button
+                                onClick={() => setFilterType('movie')}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${filterType === 'movie' ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                            >
+                                Filmes
+                            </button>
+                            <button
+                                onClick={() => setFilterType('tv')}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${filterType === 'tv' ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                            >
+                                Séries
+                            </button>
+                        </div>
+
+                        {/* Library Search */}
+                        <div className="relative w-full md:w-64">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+                            <input
+                                type="text"
+                                value={searchLibraryQuery}
+                                onChange={(e) => setSearchLibraryQuery(e.target.value)}
+                                placeholder="Filtrar biblioteca..."
+                                className="w-full bg-black/40 border border-white/10 rounded-full pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-white/20 transition-all"
+                            />
+                        </div>
+                    </div>
+
                     {/* Library Grid */}
                     {loading ? (
                         <div className="flex justify-center py-20">
@@ -207,9 +244,13 @@ export function ContentManager() {
                             <Library size={48} className="mx-auto mb-4 opacity-20" />
                             <p>Sua biblioteca está vazia. Adicione filmes e séries na aba "Adicionar Novo".</p>
                         </div>
+                    ) : filteredLibrary.length === 0 ? (
+                        <div className="text-center p-12 text-gray-500">
+                            <p>Nenhum resultado encontrado para o filtro.</p>
+                        </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                            {results.map((item) => (
+                            {filteredLibrary.map((item) => (
                                 <div key={item.id} className="group relative bg-[#111] border border-white/5 rounded-xl overflow-hidden hover:border-white/20 transition-all hover:-translate-y-1 shadow-2xl">
                                     {/* Poster */}
                                     <div className="aspect-[2/3] relative">
