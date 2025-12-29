@@ -13,15 +13,10 @@ export default function DetailsBackground({ backdropUrl, trailerId, isMobile = f
         <div className="absolute inset-0 z-0 overflow-hidden">
             {/* Base Image (Always there to prevent flashing) */}
             {backdropUrl && (
-                <OptimizedImage
+                <img
                     src={backdropUrl}
-                    tinySrc={backdropUrl.includes('original') ? backdropUrl.replace('original', 'w780') : undefined}
                     alt="Background"
-                    fill
-                    className="w-full h-full object-cover object-top opacity-60"
-                    priority
-                    quality={100}
-                    unoptimized
+                    className="absolute inset-0 w-full h-full object-cover object-top opacity-60"
                 />
             )}
 
