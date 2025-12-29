@@ -16,6 +16,7 @@ export interface SupabaseContent {
     duration?: number;
     created_at: string;
     logo_url?: string; // DB column is logo_url
+    trailer_url?: string; // DB column is trailer_url
 }
 
 // Interface for the combined data (Supabase ID + TMDB Metadata)
@@ -23,6 +24,7 @@ export interface CatalogItem extends Movie {
     video_url: string;
     supabase_id: string;
     logo_url?: string; // Passed from DB
+    trailer_url?: string; // Passed from DB
     genre?: string;
     genres?: { id: number; name: string }[];
     duration?: number;
@@ -163,7 +165,9 @@ export const contentService = {
             // Construct a fake genre object if needed by UI, or just rely on 'genre' string
             genres: dbMovie.genre ? [{ id: 0, name: dbMovie.genre }] : [],
             duration: dbMovie.duration,
-            logo_url: dbMovie.logo_url
+            logo_url: dbMovie.logo_url,
+            // Prioritize Supabase managed trailer
+            trailer_url: dbMovie.trailer_url
         })) as CatalogItem[];
     },
 
@@ -196,7 +200,8 @@ export const contentService = {
             supabase_id: dbSeriesItem.id,
             genre: dbSeriesItem.genre,
             genres: dbSeriesItem.genre ? [{ id: 0, name: dbSeriesItem.genre }] : [],
-            logo_url: dbSeriesItem.logo_url
+            logo_url: dbSeriesItem.logo_url,
+            trailer_url: dbSeriesItem.trailer_url
         })) as CatalogItem[];
     }
 };
