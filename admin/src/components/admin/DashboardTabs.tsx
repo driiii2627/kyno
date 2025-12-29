@@ -3,23 +3,16 @@
 import { useState } from 'react';
 import { UsersTable } from './UsersTable';
 import { ContentManager } from '@/components/content/ContentManager';
-import { Users, Film } from 'lucide-react';
-
-import { Clapperboard } from 'lucide-react';
+import { Users, Clapperboard } from 'lucide-react';
 
 export function DashboardTabs({ users }: { users: any[] }) {
     const [tab, setTab] = useState<'users' | 'content'>('users');
-
-    return (
-
-    // ... (inside component)
 
     return (
         <div>
             {/* Main Tabs (Pill Style) */}
             <div className="flex justify-center mb-10">
                 <div className="flex p-1.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full max-w-md w-full relative">
-                    {/* Safe way using conditional classes instead of complex sliding div for now to ensure robustness */}
                     <button
                         onClick={() => setTab('users')}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold transition-all duration-300
