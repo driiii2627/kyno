@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Plus, Check, X, Loader2, Film, Tv, Library, Layers } from 'lucide-react';
-import { searchContentAction, importContentAction, importCollectionAction } from '@/app/actions/content';
+import { searchContentAction, importContentAction, importCollectionAction, getLibraryContent } from '@/app/actions/content';
 import { useToast } from '@/components/ui/Toast';
 
 export function ContentManager() {
@@ -13,6 +13,25 @@ export function ContentManager() {
 
     // Import state
     const [importingId, setImportingId] = useState<number | null>(null);
+
+    // Fetch library when tab changes
+    useEffect(() => {
+        if (activeTab === 'manage') {
+            loadLibrary();
+        } else {
+            setResults([]); // Clear results when switching back start fresh or keep previous?
+            // Actually keeps search results if we don't clear. Let's clear for now to avoid confusion.
+            setResults([]);
+        }
+    }, [activeTab]);
+
+    const loadLibrary = async () => {
+        setLoading(true);
+        const { data, error } = await getLibraryContent();
+        setLoading(false);
+        if (data) setResults(data);
+        else console.error(error);
+    };
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -163,9 +182,58 @@ export function ContentManager() {
             )}
 
             {activeTab === 'manage' && (
-                <div className="text-center p-12 text-gray-500 bg-white/5 rounded-xl border border-white/10 border-dashed">
-                    <Library size={48} className="mx-auto mb-4 opacity-20" />
-                    <p>Em breve: Lista de filmes e séries cadastrados para edição/remoção rápida.</p>
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Library Grid */}
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <Loader2 className="animate-spin text-blue-500" size={48} />
+                        </div>
+                    ) : results.length === 0 ? (
+                        <div className="text-center p-12 text-gray-500 bg-white/5 rounded-xl border border-white/10 border-dashed">
+                            <Library size={48} className="mx-auto mb-4 opacity-20" />
+                            <p>Sua biblioteca está vazia. Adicione filmes e séries na aba "Adicionar Novo".</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            {results.map((item) => (
+                                <div key={item.id} className="group relative bg-[#111] border border-white/5 rounded-xl overflow-hidden hover:border-white/20 transition-all hover:-translate-y-1 shadow-2xl">
+                                    {/* Poster */}
+                                    <div className="aspect-[2/3] relative">
+                                        <img
+                                            src={item.poster_url ? `https://image.tmdb.org/t/p/w500${item.poster_url}` : 'https://placehold.co/500x750?text=No+Image'}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                        />
+                                        <div className="absolute top-2 left-2">
+                                            <div className="bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10 uppercase">
+                                                {item.media_type === 'movie' ? 'Filme' : 'Série'}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Info */}
+                                    <div className="p-4">
+                                        <h3 className="text-white font-bold text-sm truncate mb-1" title={item.title}>
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-xs text-gray-500 mb-4">
+                                            {item.release_year || 'Ano desconhecido'}
+                                        </p>
+
+                                        {/* Actions */}
+                                        <div className="space-y-2">
+                                            <button
+                                                className="w-full py-2 rounded text-xs font-bold flex items-center justify-center gap-2 transition-colors bg-white/5 text-gray-400 cursor-not-allowed"
+                                                title="Edição em breve"
+                                            >
+                                                <Check size={14} /> Gerenciar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>
