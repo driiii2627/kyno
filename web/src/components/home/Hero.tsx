@@ -11,7 +11,7 @@ import { CatalogItem } from '@/services/content'; // Import CatalogItem to know 
 import TrackedLink from '@/components/ui/TrackedLink';
 
 interface HeroProps {
-    movies: Movie[]; // In practice, these are CatalogItems
+    movies: CatalogItem[]; // In practice, these are CatalogItems
 }
 
 import HeroTrailer from './HeroTrailer';
