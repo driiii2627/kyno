@@ -236,3 +236,95 @@ export async function getLibraryContent() {
         return { error: err.message };
     }
 }
+
+/**
+ * Deletes content from the database.
+ */
+export async function deleteContentAction(id: number, type: 'movie' | 'tv') {
+    try {
+        const admin = await createAdminClient();
+        const table = type === 'movie' ? 'movies' : 'series';
+
+        const { error } = await admin.from(table).delete().eq('id', id);
+
+        if (error) throw error;
+
+        revalidatePath('/');
+        return { success: true };
+    } catch (err: any) {
+        console.error('Delete error:', err);
+        return { error: err.message };
+    }
+}
+
+/**
+ * Updates content fields manually.
+ */
+export async function updateContentAction(id: number, type: 'movie' | 'tv', data: any) {
+    try {
+        const admin = await createAdminClient();
+        const table = type === 'movie' ? 'movies' : 'series';
+
+        const { error } = await admin.from(table).update({
+            title: data.title,
+            description: data.description,
+            poster_url: data.poster_url,
+            backdrop_url: data.backdrop_url,
+            logo_url: data.logo_url,
+            video_url: data.video_url
+        }).eq('id', id);
+
+        if (error) throw error;
+
+        revalidatePath('/');
+        return { success: true };
+    } catch (err: any) {
+        console.error('Update error:', err);
+        return { error: err.message };
+    }
+}
+
+/**
+ * Syncs content with latest TMDB data.
+ */
+export async function syncContentAction(id: number, type: 'movie' | 'tv', tmdbId: number) {
+    try {
+        // 1. Fetch fresh details
+        const details = await tmdb.getDetails(tmdbId, type);
+        const images = await tmdb.getImages(tmdbId, type);
+
+        // 2. Resolve Logo (PT > EN > Any)
+        const logoPath = images.logos.find(l => l.iso_639_1 === 'pt')?.file_path ||
+            images.logos.find(l => l.iso_639_1 === 'en')?.file_path ||
+            images.logos[0]?.file_path || null;
+
+        const admin = await createAdminClient();
+        const table = type === 'movie' ? 'movies' : 'series';
+
+        // 3. Update fields (smart update, keeping custom video_url?)
+        // User requested: "caso atualize uma capa, banner etc.." -> usually implies visual refresh.
+        // We will update visual fields but keep critical ones like video_url if users customized them?
+        // Actually, user said "sync with tmdb... in case cover updates".
+        // Use standard upsert logic but targeting ID.
+
+        const { error } = await admin.from(table).update({
+            title: details.name || details.title, // Handle TV vs Movie naming
+            description: details.overview,
+            poster_url: details.poster_path,
+            backdrop_url: details.backdrop_path,
+            logo_url: logoPath,
+            release_year: (details.first_air_date || details.release_date || '').split('-')[0] || null,
+            rating: details.vote_average,
+            // NOT updating video_url to avoid breaking custom links
+        }).eq('id', id);
+
+        if (error) throw error;
+
+        revalidatePath('/');
+        return { success: true };
+
+    } catch (err: any) {
+        console.error('Sync error:', err);
+        return { error: err.message };
+    }
+}
