@@ -17,11 +17,78 @@ export function ContentManager() {
     const [searchLibraryQuery, setSearchLibraryQuery] = useState('');
 
     // Import state
+    const [importingId, setImportingId] = useState<number | null>(null);
 
     // Manage Modal State
     const [manageItem, setManageItem] = useState<any>(null);
 
-    // ... (rest of render)
+    // Filtered Library Results
+    const filteredLibrary = results.filter(item => {
+        if (activeTab === 'manage') {
+            const matchesType = filterType === 'all' || item.media_type === filterType;
+            const matchesSearch = item.title?.toLowerCase().includes(searchLibraryQuery.toLowerCase());
+            return matchesType && matchesSearch;
+        }
+        return true;
+    });
+
+    // Fetch library when tab changes
+    useEffect(() => {
+        if (activeTab === 'manage') {
+            loadLibrary();
+        } else {
+            // Keep previous results or clear?
+            // Clearing avoids confusion between search results and library
+            setResults([]);
+        }
+    }, [activeTab]);
+
+    const loadLibrary = async () => {
+        setLoading(true);
+        const { data, error } = await getLibraryContent();
+        setLoading(false);
+        if (data) setResults(data);
+        else console.error(error);
+    };
+
+    const handleSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!query.trim()) return;
+
+        setLoading(true);
+        const { results: data, error } = await searchContentAction(query);
+        setLoading(false);
+
+        if (data) setResults(data);
+        else alert(error);
+    };
+
+    const handleImport = async (item: any) => {
+        if (!confirm(`Importar "${item.title || item.name}" para o site?`)) return;
+
+        setImportingId(item.id);
+        const res = await importContentAction(item.id, item.media_type);
+        setImportingId(null);
+
+        if (res.success) {
+            alert('Sucesso! Conteúdo adicionado.');
+            // Update local state to show it's in library
+            setResults(prev => prev.map(r => r.id === item.id ? { ...r, is_in_library: true } : r));
+        } else {
+            alert('Erro: ' + res.error);
+        }
+    };
+
+    const handleImportCollection = async (collectionId: number) => {
+        if (!confirm(`Tentar importar toda a franquia/coleção? Isso pode demorar um pouco.`)) return;
+
+        const res = await importCollectionAction(collectionId);
+        if (res.success) {
+            alert(`Franquia processada! Importados: ${res.count}, Pulados: ${res.skipped}`);
+        } else {
+            alert(res.error);
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -33,13 +100,11 @@ export function ContentManager() {
                 item={manageItem}
                 onSuccess={() => {
                     loadLibrary(); // Reload list
-                    // maybe keep modal open? no, usually close on big success
                 }}
             />
 
             {/* Sub-Tabs */}
             <div className="flex gap-4 border-b border-white/10 pb-4">
-                {/* ... existing tabs ... */}
                 <button
                     onClick={() => setActiveTab('add')}
                     className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${activeTab === 'add' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
@@ -82,7 +147,7 @@ export function ContentManager() {
                                 {/* Poster */}
                                 <div className="aspect-[2/3] relative">
                                     <img
-                                        src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                                        src={item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://placehold.co/500x750?text=No+Image'}
                                         alt={item.title || item.name}
                                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                                     />
