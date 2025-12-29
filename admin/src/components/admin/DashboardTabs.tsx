@@ -5,11 +5,12 @@ import { UsersTable } from './UsersTable';
 import { ContentManager } from '@/components/content/ContentManager';
 import { Users, Film } from 'lucide-react';
 
+import { Clapperboard } from 'lucide-react';
+
 export function DashboardTabs({ users }: { users: any[] }) {
     const [tab, setTab] = useState<'users' | 'content'>('users');
 
     return (
-import { Clapperboard } from 'lucide-react';
 
     // ... (inside component)
 
