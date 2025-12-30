@@ -367,11 +367,7 @@
     }
 }
 
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-width: 100%;
-}
+
 
 .characterName {
     font-size: 0.75rem;
