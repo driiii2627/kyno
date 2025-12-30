@@ -47,10 +47,10 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(15, 23, 42, 0.6);
-    /* Slate 900 glass */
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.08);
+    /* Weak White Glass */
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
     padding: 0.4rem 0.5rem;
     border-radius: 9999px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -93,8 +93,8 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
     color: #cbd5e1;
     transition: all 0.2s;
     border: 1px solid rgba(255, 255, 255, 0.05);
