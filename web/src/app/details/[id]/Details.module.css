@@ -47,7 +47,8 @@
 }
 
 .title {
-    font-size: 3.5rem;
+    font-size: 4rem;
+    /* Increased from 3.5rem */
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 1.5rem;
@@ -57,6 +58,15 @@
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
+font-weight: 800;
+line-height: 1.1;
+margin-bottom: 1.5rem;
+background: linear-gradient(180deg, #fff 0%, #cbd5e1 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
 /* Metadata Row */
 .metadata {
     display: flex;
@@ -64,7 +74,8 @@
     flex-wrap: wrap;
     gap: 1rem;
     color: #cbd5e1;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    /* Increased from 1rem */
     font-weight: 500;
     margin-bottom: 2rem;
 }
@@ -96,17 +107,19 @@
     margin-bottom: 2rem;
 }
 
-.playButton {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #fff;
-    color: #000;
-    padding: 12px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.2s;
+display: flex;
+align-items: center;
+gap: 0.5rem;
+background: #fff;
+color: #000;
+padding: 16px 40px;
+/* Increased from 12px 32px */
+border-radius: 8px;
+font-weight: 600;
+font-size: 1.1rem;
+/* Added slightly larger text */
+text-decoration: none;
+transition: transform 0.2s;
 }
 
 .playButton:hover {
@@ -114,8 +127,10 @@
 }
 
 .actionIconBtn {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    /* Increased from 48px */
+    height: 56px;
+    /* Increased from 48px */
     border-radius: 50%;
     border: 2px solid rgba(255, 255, 255, 0.2);
     display: flex;
@@ -208,7 +223,8 @@
 
 /* Overview */
 .overview {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    /* Increased from 1.1rem */
     line-height: 1.6;
     color: #cbd5e1;
     margin-bottom: 3rem;

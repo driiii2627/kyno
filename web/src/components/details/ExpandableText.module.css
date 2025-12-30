@@ -6,31 +6,30 @@
     gap: 0.5rem;
 }
 
-.truncatedText {
-    font-size: clamp(1rem, 1.3vw, 1.6rem);
-    line-height: 1.6;
-    color: #e2e8f0;
+/* Base Text Style */
+.text {
     margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    /* Inherit or set default */
 }
 
 .readMoreBtn {
-    background: transparent;
+    background: none;
     border: none;
-    color: #cbd5e1;
-    font-size: 0.9rem;
-    font-weight: 600;
+    color: #fff;
+    font-weight: 700;
     cursor: pointer;
+    font-size: inherit;
     padding: 0;
-    text-decoration: underline;
-    transition: color 0.2s;
+    margin-left: 6px;
+    text-transform: none;
+    display: inline;
 }
 
 .readMoreBtn:hover {
+    text-decoration: underline;
     color: #fff;
 }
 

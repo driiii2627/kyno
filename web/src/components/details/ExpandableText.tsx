@@ -14,19 +14,22 @@ export default function ExpandableText({ text, className }: ExpandableTextProps)
 
     // If text is short, just show it normally
     if (!text || text.length < 250) {
-        return <p className={`${styles.truncatedText} ${className || ''}`} style={{ display: 'block' }}>{text}</p>;
+        return <p className={`${styles.text} ${className || ''}`}>{text}</p>;
     }
+
+    const truncated = text.slice(0, 250).trim();
 
     return (
         <div className={styles.container}>
-            {/* Truncated View */}
-            <p className={`${styles.truncatedText} ${className || ''}`}>
-                {text}
+            {/* Truncated View (Inline Button) */}
+            <p className={`${styles.text} ${className || ''}`}>
+                {truncated}...
+                <button className={styles.readMoreBtn} onClick={() => setShowPopup(true)}>
+                    Ler mais
+                </button>
             </p>
 
-            <button className={styles.readMoreBtn} onClick={() => setShowPopup(true)}>
-                Ler mais
-            </button>
+            {/* Popup View */}
 
             {/* Popup View */}
             {showPopup && (
