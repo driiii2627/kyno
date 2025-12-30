@@ -41,63 +41,64 @@ export default async function SearchPage({ searchParams }: PageProps) {
     }
 
     return (
-        <div className="min-h-screen bg-[#141414] pt-24 px-4 md:px-12 pb-12">
+        <div className={styles.container}>
 
             {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
-                <Link href="/" className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition">
-                    <ArrowLeft size={24} />
-                </Link>
-                <h1 className="text-3xl font-bold">
-                    {query ? `Busca: "${query}"` : 'Buscar'}
-                </h1>
+            <div className={styles.header}>
+                <div className={styles.titleGroup}>
+                    <Link href="/" className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition">
+                        <ArrowLeft size={24} />
+                    </Link>
+                    <h1 className={styles.title}>
+                        {query ? `Busca: "${query}"` : 'Buscar'}
+                    </h1>
+                </div>
             </div>
 
             {/* Grid Results */}
             {query && (
                 <>
                     {results.length > 0 ? (
-                        <div className={styles.searchGrid}>
+                        <div className={styles.grid}>
                             {results.map((item) => (
                                 <Link
                                     key={item.id}
-                                    href={item.type === 'movie' ? `/details/${item.supabase_id || item.id}` : `/details/${item.supabase_id || item.id}`}
+                                    href={`/details/${item.supabase_id || item.id}`}
                                     className={styles.card}
                                 >
-                                    <div className="relative w-full h-full">
+                                    <div className={styles.imageWrapper}>
                                         <OptimizedImage
                                             src={getImageUrl(item.poster_path, 'w500')}
                                             tinySrc={getImageUrl(item.poster_path, 'w92')}
                                             alt={item.title || item.name}
                                             fill
                                             className={styles.image}
+                                            sizes="(max-width: 768px) 50vw, 25vw"
                                         />
                                     </div>
                                     <div className={styles.overlay}>
-                                        <div className={styles.title}>{item.title || item.name}</div>
-                                        <div className={styles.meta}>
+                                        <div className={styles.cardTitle}>{item.title || item.name}</div>
+                                        <div className={styles.cardMeta}>
                                             <span>{new Date(item.release_date || item.first_air_date || Date.now()).getFullYear()}</span>
-                                            <span className="mx-2">•</span>
-                                            <span className="bg-white/20 px-1 rounded text-xs flex items-center gap-1">
-                                                ★ {item.vote_average?.toFixed(1)}
-                                            </span>
+                                            <span>•</span>
+                                            <span>★ {item.vote_average?.toFixed(1)}</span>
                                         </div>
                                     </div>
                                 </Link>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center text-zinc-500 py-20">
-                            <p className="text-xl">Nada encontrado para "{query}".</p>
+                        <div className={styles.emptyState}>
+                            <p>Nenhum resultado encontrado para "{query}".</p>
                         </div>
                     )}
                 </>
             )}
 
             {!query && (
-                <div className="text-center text-zinc-500 py-20 flex flex-col items-center">
-                    <div className="text-6xl mb-4 opacity-50">🔍</div>
-                    <p className="text-xl">O que você quer assistir hoje?</p>
+                <div className={styles.emptyState}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
+                    <p>Digite o nome de um filme ou série.</p>
                 </div>
             )}
         </div>

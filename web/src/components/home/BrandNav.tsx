@@ -2,43 +2,41 @@
 
 import styles from './BrandNav.module.css';
 import Link from 'next/link';
-import Image from 'next/image';
 
 const BRANDS = [
     {
         id: 'disney',
-        // Disney+ White Logo
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg',
+        label: 'Disney',
         href: '/search?q=disney',
+        logoClass: styles.textDisney,
         gradientClass: styles.disney
     },
     {
-        id: 'national-geographic',
-        // National Geographic Yellow Box Logo
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/65/National_Geographic_Logo.svg',
-        href: '/search?q=national geographic',
-        gradientClass: styles.national
+        id: 'pixar',
+        label: 'Pixar',
+        href: '/search?q=pixar',
+        logoClass: styles.textPixar,
+        gradientClass: styles.pixar
     },
     {
         id: 'marvel',
-        // Marvel Studios White/Red Logo
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/w/w4/Marvel_Studios_2016_logo.svg',
+        label: 'MARVEL',
         href: '/search?q=marvel',
+        logoClass: styles.textMarvel,
         gradientClass: styles.marvel
     },
     {
         id: 'starwars',
-        // Star Wars White Logo
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Star_wars2.svg',
+        label: 'STAR WARS',
         href: '/search?q=star wars',
+        logoClass: styles.textStarWars,
         gradientClass: styles.starwars
     },
     {
         id: 'dc',
-        // DC Comics White Logo (Blue standard, but white fits dark mode better - using a white variant or standard blue which is visible)
-        // Using standard blue/white sticker
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/DC_Comics_2016.svg',
+        label: 'DC',
         href: '/search?q=dc comics',
+        logoClass: styles.textDC,
         gradientClass: styles.dc
     }
 ];
@@ -52,16 +50,11 @@ export default function BrandNav() {
                         {/* Animated Background Layer */}
                         <div className={`${styles.brandBackground} ${brand.gradientClass}`} />
 
-                        {/* Logo Layer */}
+                        {/* Styled Text Layer */}
                         <div className={styles.logoWrapper}>
-                            <Image
-                                src={brand.logoUrl}
-                                alt={brand.id}
-                                width={300}
-                                height={150}
-                                className={styles.logoImage}
-                                unoptimized={true} // Needed for external SVG/Wikimedia
-                            />
+                            <span className={`${styles.brandText} ${brand.logoClass}`}>
+                                {brand.label}
+                            </span>
                         </div>
                     </Link>
                 ))}
