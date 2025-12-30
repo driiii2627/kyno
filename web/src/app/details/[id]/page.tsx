@@ -160,6 +160,11 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
     const playerRoute = item.type === 'movie' ? `/filme/${uuid}` : `/serie/${uuid}`;
 
+    // Fix logo URL (handle relative TMDB paths vs absolute DB urls)
+    const logoUrl = item.logo_url
+        ? (item.logo_url.startsWith('http') ? item.logo_url : `https://image.tmdb.org/t/p/w500${item.logo_url}`)
+        : null;
+
     return (
         <div className={styles.container}>
             {/* Background Hero */}
