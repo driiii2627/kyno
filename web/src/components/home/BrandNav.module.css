@@ -55,7 +55,6 @@
 
 .brandCard:hover::before {
     transform: translateX(100%);
-    /* Shine passes through on hover */
     transition: transform 0.8s;
 }
 
@@ -69,7 +68,6 @@
     opacity: 0;
     transition: opacity 0.4s ease-in-out;
     z-index: 0;
-    /* Create a moving gradient to simulate "video" */
     background-size: 200% 200%;
     animation: gradientMove 3s ease infinite;
 }
@@ -78,6 +76,7 @@
     opacity: 1;
 }
 
+/* Logo Wrapper - Centers the image */
 .logoWrapper {
     position: relative;
     z-index: 2;
@@ -86,40 +85,45 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 10px;
+    /* Padding to ensure logo doesn't touch edges */
 }
 
-.logoSvg {
-    height: 50%;
-    /* Adjust size of logo within card */
-    max-width: 80%;
+/* Next.js Image often needs strict control when not using 'fill' */
+.logoImage {
     width: auto;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    height: auto;
+    max-width: 85%;
+    max-height: 70%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    /* Pop logo */
     transition: transform 0.3s;
 }
 
-.brandCard:hover .logoSvg {
+.brandCard:hover .logoImage {
     transform: scale(1.1);
 }
 
 /* Brand Specific Colors for Hover Gradient */
 .disney {
-    background-image: linear-gradient(135deg, #113CCF 0%, #000 100%);
+    background-image: linear-gradient(135deg, #001f5c 0%, #1a4da1 100%);
 }
 
 .pixar {
-    background-image: linear-gradient(135deg, #D6D6D6 0%, #000 100%);
+    background-image: linear-gradient(135deg, #e6e6e6 0%, #878787 100%);
 }
 
 .marvel {
-    background-image: linear-gradient(135deg, #ED1D24 0%, #000 100%);
+    background-image: linear-gradient(135deg, #850000 0%, #ed1d24 100%);
 }
 
 .starwars {
-    background-image: linear-gradient(135deg, #FFE81F 0%, #000 100%);
+    background-image: linear-gradient(135deg, #1a1a1a 0%, #444 100%);
 }
 
 .national {
-    background-image: linear-gradient(135deg, #FFCC00 0%, #000 100%);
+    background-image: linear-gradient(135deg, #001a33 0%, #004d99 100%);
 }
 
 @keyframes gradientMove {
@@ -139,7 +143,6 @@
 @media (max-width: 768px) {
     .brandGrid {
         grid-template-columns: repeat(3, 1fr);
-        /* 3 cols on tablet */
         gap: 1rem;
     }
 }
@@ -149,29 +152,23 @@
         padding: 0 1rem;
         margin-top: 1rem;
         overflow-x: auto;
-        /* Scrollable on mobile */
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        /* Firefox */
     }
 
     .container::-webkit-scrollbar {
         display: none;
-        /* Chrome/Safari */
     }
 
     .brandGrid {
         display: flex;
-        /* Flex row for scrolling */
         width: max-content;
         gap: 0.75rem;
         padding-bottom: 0.5rem;
-        /* Space for shadow */
     }
 
     .brandCard {
         width: 140px;
-        /* Fixed width for horizontal scroll */
         flex-shrink: 0;
     }
 }

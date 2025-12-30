@@ -2,38 +2,38 @@
 
 import styles from './BrandNav.module.css';
 import Link from 'next/link';
+import Image from 'next/image';
 
-// Map brands to search queries or category pages
 const BRANDS = [
     {
         id: 'disney',
-        label: 'Disney',
+        logoUrl: 'https://image.tmdb.org/t/p/original/wdrCwmRnLFJhEoH8GSf1Sebols3.png',
         href: '/search?q=disney',
         gradientClass: styles.disney
     },
     {
         id: 'pixar',
-        label: 'Pixar',
+        logoUrl: 'https://image.tmdb.org/t/p/original/1TjvGVDMYpwCS0xIEHZAdmfb5Hz.png',
         href: '/search?q=pixar',
         gradientClass: styles.pixar
     },
     {
         id: 'marvel',
-        label: 'Marvel',
+        logoUrl: 'https://image.tmdb.org/t/p/original/hUzeosd33nzE5MCNsZxCGEKTXaQ.png',
         href: '/search?q=marvel',
         gradientClass: styles.marvel
     },
     {
         id: 'starwars',
-        label: 'Star Wars',
+        logoUrl: 'https://image.tmdb.org/t/p/original/o86DbpburjxrqAzEDhXZcyE8pDb.png',
         href: '/search?q=star wars',
         gradientClass: styles.starwars
     },
     {
-        id: 'dc', // Swapped National Geographic for DC as it's more common in general streaming aggregation
-        label: 'DC Comics',
+        id: 'dc',
+        logoUrl: 'https://image.tmdb.org/t/p/original/2Tc1P3Ac8M479naPp1kYT3izLS5.png',
         href: '/search?q=dc comics',
-        gradientClass: styles.national // Reusing yellow style for DC/National
+        gradientClass: styles.national
     }
 ];
 
@@ -46,9 +46,16 @@ export default function BrandNav() {
                         {/* Animated Background Layer */}
                         <div className={`${styles.brandBackground} ${brand.gradientClass}`} />
 
-                        {/* Logo / Text Layer */}
-                        <div className={styles.logoText}>
-                            {brand.label}
+                        {/* Logo Layer */}
+                        <div className={styles.logoWrapper}>
+                            <Image
+                                src={brand.logoUrl}
+                                alt={brand.id}
+                                // Clean sizing: Contain within the box, center it.
+                                width={300}
+                                height={150}
+                                className={styles.logoImage}
+                            />
                         </div>
                     </Link>
                 ))}
