@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { tmdb, getImageUrl } from '@/services/tmdb';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
-import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
+import { Play, Plus, Info, Users, ArrowLeft, ThumbsUp, ThumbsDown } from 'lucide-react';
 import styles from './Details.module.css';
 import SeasonBrowser from '@/components/details/SeasonBrowser';
 import DetailsBackground from '@/components/details/DetailsBackground';
@@ -209,22 +209,33 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         ))}
                     </div>
 
-                    <div className={styles.actions}>
+                    {/* Glass Control Box */}
+                    <div className={styles.controlBox}>
                         <TrackedLink
                             href={playerRoute}
-                            className={styles.playButton}
+                            className={styles.mainPlayBtn}
                             genres={details.genres?.map(g => g.name) || []}
                         >
-                            <Play fill="currentColor" size={24} />
-                            Assistir
+                            <Play fill="currentColor" size={26} />
+                            <span>
+                                {item.type === 'tv' ? 'Assistir T1 E1' : 'Assistir'}
+                            </span>
                         </TrackedLink>
 
-                        <button className={styles.actionIconBtn}>
-                            <Plus size={22} />
-                        </button>
-                        <button className={styles.actionIconBtn}>
-                            <Info size={22} />
-                        </button>
+                        <div className={styles.actionGrid}>
+                            <button className={styles.actionBtn}>
+                                <Plus size={20} />
+                                <span>Minha Lista</span>
+                            </button>
+                            <button className={styles.actionBtn}>
+                                <ThumbsUp size={20} />
+                                <span>Gostei</span>
+                            </button>
+                            <button className={styles.actionBtn}>
+                                <ThumbsDown size={20} />
+                                <span>Não Gostei</span>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Optimized Description with Read More */}

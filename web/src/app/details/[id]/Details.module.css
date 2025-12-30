@@ -1,305 +1,229 @@
 .container {
-    position: relative;
+    padding-top: 0;
+    /* Hero handles positioning */
     min-height: 100vh;
-    background-color: #000;
-    color: #fff;
+    padding-bottom: 2rem;
+    position: relative;
     overflow-x: hidden;
-    font-family: var(--font-inter, sans-serif);
 }
 
-/* Background Hero Section */
-.heroBackground {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    /* Full screen height as requested */
-    z-index: 0;
-    pointer-events: none;
-}
-
-@media (max-width: 768px) {
-    .heroBackground {
-        height: 65vh;
-        /* Reduce height on mobile to prevent extreme zoom/cropping */
-    }
-}
-
-.heroImage {
-    object-fit: cover;
-    opacity: 0.8;
-    /* Very visible */
-    width: 100%;
-    height: 100%;
-    /* Gradient mask that lets image show almost until the end */
-    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-
-    /* Improve downscaling quality */
-    image-rendering: auto;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-}
-
-/* Gradients for Blending - Minimal black */
-.gradientOverlayBottom {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Only darkens at the very bottom for text readability */
-    background: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.5) 10%, transparent 60%);
-}
-
-.gradientOverlaySide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* subtle side gradient */
-    background: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.3) 20%, transparent 80%);
-}
-
-/* Back Button - Minimalist (No bubble) & Moved Down */
 .backButton {
-    position: absolute;
-    top: 2.5rem;
-    /* Moved back up as requested */
+    position: fixed;
+    top: 2rem;
     left: 2rem;
-    z-index: 50;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem;
-    /* Removed background/border bubbles */
-    background: transparent;
-    border: none;
-    font-size: 1rem;
-    font-weight: 500;
     color: #fff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-    /* Shadow for readability */
-    transition: opacity 0.2s, transform 0.2s;
-    opacity: 0.8;
+    text-decoration: none;
+    font-weight: 500;
+    z-index: 50;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: 30px;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s;
 }
 
 .backButton:hover {
-    opacity: 1;
-    transform: translateX(-5px);
-    background: transparent;
+    background: rgba(0, 0, 0, 0.5);
 }
 
-/* Content Layout - Fluid for adaptability */
 .content {
     position: relative;
     z-index: 10;
-    padding: 0 4vw;
-    /* Responsive padding */
-    padding-top: 25vh;
-    width: 100%;
-    max-width: 2400px;
-    /* Allow it to span wider on 4k/Zoomed out */
-    margin: 0 auto;
+    padding: 0 4%;
+    margin-top: 40vh;
+    /* Push content down to reveal hero */
     display: flex;
     flex-direction: column;
+    gap: 3rem;
 }
 
-@media (min-width: 768px) {
-    .content {
-        padding-top: 22vh;
-        padding-left: 5vw;
-        /* Matches visual flow */
-    }
-}
-
-/* Info Column */
 .infoColumn {
+    max-width: 800px;
     width: 100%;
-    max-width: 50vw;
-    /* Scale with viewport */
-    min-width: 600px;
-    /* Don't get too small */
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-}
-
-@media (max-width: 768px) {
-    .infoColumn {
-        max-width: 100%;
-        min-width: 0;
-    }
 }
 
 .title {
-    /* Fluid Typography: Scales between 2.5rem and 5vw (approx 96px on 1920p) */
-    font-size: clamp(2.5rem, 5vw, 6rem);
+    font-size: 3.5rem;
     font-weight: 800;
     line-height: 1.1;
-    color: #fff;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(180deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    margin-bottom: 0.5rem;
 }
 
+/* Metadata Row */
 .metadata {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
+    flex-wrap: wrap;
     gap: 1rem;
-    font-size: clamp(1rem, 1.2vw, 1.5rem);
-    /* Fluid text */
     color: #cbd5e1;
+    font-size: 1rem;
     font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    margin-bottom: 2rem;
 }
 
 .rating {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    padding-bottom: 2px;
+    gap: 0.25rem;
     color: #fbbf24;
     font-weight: 700;
+    background: rgba(251, 191, 36, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
 .tag {
-    padding: 0.1rem 0.6rem;
-    border: 1px solid #64748b;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 0.8em;
-    /* Relative to metadata font size */
-    color: #fff;
-    border-color: #fff;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Actions Row */
-.actions {
+/* PREVIOUS ACTION BUTTONS (REMOVED/REPLACED by Control Box) */
+
+/* NEW: Glass Control Box */
+.controlBox {
+    background: rgba(30, 30, 30, 0.6);
+    /* Slightly dark glass */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.playButton {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.8em 2em;
-    /* Relative padding */
-    background-color: #fff;
+.mainPlayBtn {
+    background: #fff;
     color: #000;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: clamp(1.1rem, 1.3vw, 1.8rem);
-    /* Fluid button text */
-    transition: transform 0.2s, background 0.2s;
-}
-
-.playButton:hover {
-    background-color: #e2e2e2;
-    transform: scale(1.02);
-}
-
-.actionIconBtn {
+    border: none;
+    border-radius: 12px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3em;
-    /* Relative size */
-    height: 3em;
-    /* Relative size */
-    font-size: clamp(1rem, 1.2vw, 1.5rem);
-    /* Base for em units above */
-    border-radius: 50%;
-    border: 2px solid #64748b;
-    color: #94a3b8;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
-    transition: all 0.2s;
-}
-
-.actionIconBtn:hover {
-    border-color: #fff;
-    color: #fff;
-    transform: scale(1.05);
-}
-
-.overview {
-    font-size: clamp(1rem, 1.3vw, 1.6rem);
-    /* Fluid reading text */
-    line-height: 1.6;
-    color: #e2e8f0;
-    max-width: 60vw;
-    /* Wider overview on huge screens */
-    margin-top: 0.5rem;
-}
-
-/* Tabs section */
-.tabs {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 0.5rem;
-}
-
-.tabButton {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.tabButton:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.activeTab {
-    color: #000;
-    background: #fff;
+    gap: 12px;
+    font-size: 1.1rem;
     font-weight: 700;
-}
-
-.activeTab:hover {
-    background: #e2e2e2;
-    color: #000;
-}
-
-/* Cast Section */
-.castSection {
-    margin-top: 2rem;
-    border-top: 1px solid #333;
-    padding-top: 1.5rem;
-}
-
-.castTitle {
-    color: #94a3b8;
-    font-size: 0.9rem;
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    text-decoration: none;
+    width: 100%;
+}
+
+.mainPlayBtn:active {
+    transform: scale(0.98);
+    background: #e2e8f0;
+}
+
+.actionGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.actionBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.actionBtn:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.actionBtn span {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Overview */
+.overview {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    margin-bottom: 3rem;
+    max-width: 100%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-bottom: 0;
+        /* Removing extra padding since header is gone */
+    }
+
+    .backButton {
+        top: 1rem;
+        left: 1rem;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    .content {
+        margin-top: 50vh;
+        /* More space for Image on mobile */
+        padding: 0 1.5rem;
+        gap: 1.5rem;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    /* Adjust Logo on mobile */
+    .logoImage {
+        max-width: 280px;
+        max-height: 120px;
+        margin: 0 auto 1.5rem auto;
+        margin-left: 0;
+    }
+
+    /* Move metadata below title/logo */
+    .metadata {
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Make Control Box look grounded */
+    .controlBox {
+        margin: 0 -0.5rem 1.5rem -0.5rem;
+        /* Slightly wider */
+        border-radius: 20px;
+        padding: 16px;
+    }
 }
 
 .castList {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
     overflow-x: auto;
     padding-bottom: 1rem;
-
-
-
     scrollbar-width: none;
 }
 
@@ -310,7 +234,6 @@
 .castItem {
     flex-shrink: 0;
     width: 100px;
-    /* Fixed width prevents giant faces */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -341,12 +264,21 @@
     line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* Limit lines */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 
+.characterName {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+/* Logo Image Styling (Root level) */
 .logoImage {
     max-width: 400px;
     max-height: 180px;
@@ -356,24 +288,4 @@
     margin-bottom: 2rem;
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
     display: block;
-}
-
-@media (max-width: 768px) {
-    .logoImage {
-        max-width: 280px;
-        max-height: 120px;
-        margin: 0 auto 1.5rem auto;
-        margin-left: 0;
-    }
-}
-
-
-
-.characterName {
-    font-size: 0.75rem;
-    color: #94a3b8;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
 }

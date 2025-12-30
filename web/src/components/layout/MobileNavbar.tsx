@@ -9,7 +9,7 @@ export default function MobileNavbar() {
     const pathname = usePathname();
 
     // Hide on specific routes like player or auth
-    if (pathname?.startsWith('/filme/') || pathname?.startsWith('/serie/') || pathname?.startsWith('/login') || pathname?.startsWith('/auth') || pathname === '/profiles') {
+    if (pathname?.startsWith('/filme/') || pathname?.startsWith('/serie/') || pathname?.startsWith('/details/') || pathname?.startsWith('/login') || pathname?.startsWith('/auth') || pathname === '/profiles') {
         return null;
     }
 
