@@ -11,30 +11,36 @@
 
 .blob {
     position: absolute;
-    top: 50%;
+    /* Adjusted to be top-center biased so it's behind the content */
+    top: 40%;
     left: 50%;
-    width: 150vw;
-    height: 150vw;
+    width: 180vw;
+    /* Massive width */
+    height: 180vw;
     transform: translate(-50%, -50%);
     background: radial-gradient(circle,
-            rgba(32, 58, 67, 0.4) 0%,
-            /* The "Kyno Blue" but faint */
-            rgba(15, 32, 39, 0.2) 40%,
-            transparent 70%);
-    filter: blur(80px);
-    /* Soften the edges significantly */
-    animation: moveBlob 20s ease-in-out infinite alternate;
-    opacity: 0.6;
+            rgba(32, 58, 67, 0.6) 0%,
+            /* Boosted Opacity (was 0.4) */
+            rgba(15, 32, 39, 0.4) 30%,
+            /* Boosted limit (was 0.2) */
+            transparent 65%);
+    filter: blur(100px);
+    animation: moveBlob 25s ease-in-out infinite alternate;
+    opacity: 1;
+    /* Fully opaque container, gradient handles transparency */
+    will-change: transform;
 }
 
 .glassOverlay {
     position: absolute;
     inset: 0;
-    /* Noise texture overlay for "opaque glass" feel */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-    opacity: 0.4;
+    /* Much stronger noise overlay */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+    opacity: 0.6;
+    /* Boosted from 0.4 */
     mix-blend-mode: overlay;
     pointer-events: none;
+    z-index: 1;
 }
 
 @keyframes moveBlob {
@@ -43,10 +49,10 @@
     }
 
     50% {
-        transform: translate(-45%, -55%) scale(1.1) rotate(10deg);
+        transform: translate(-40%, -60%) scale(1.15) rotate(15deg);
     }
 
     100% {
-        transform: translate(-55%, -45%) scale(1) rotate(-10deg);
+        transform: translate(-60%, -40%) scale(0.95) rotate(-15deg);
     }
 }
