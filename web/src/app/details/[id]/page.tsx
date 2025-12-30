@@ -183,11 +183,12 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             <div className={styles.content}>
                 {/* Info */}
                 <div className={styles.infoColumn}>
-                    {item.logo_url ? (
+                    {logoUrl ? (
                         <img
-                            src={item.logo_url}
+                            src={logoUrl}
                             alt={title}
                             className={styles.logoImage}
+                            referrerPolicy="no-referrer"
                         />
                     ) : (
                         <h1 className={styles.title}>{title}</h1>
