@@ -6,28 +6,21 @@
     height: 100%;
     z-index: -1;
     overflow: hidden;
-    background-color: #000000;
-    /* Pure Black Base */
+    background-color: #020202;
+    /* Rich Black */
 }
 
 /* 
-    Updated Gradient: 
-    - Full height linear gradient to ensure visibility
-    - Transitions from Black (top) to Deep Blue (bottom)
-    - Stronger blue component (#0b1c36) to be visible on screens
+    Cinematic Grain (Noise)
+    - Adds "Texture/Life" to the black void without adding color.
+    - Prevents the "Dead Screen" feeling.
+    - Very subtle opacity (5%).
 */
 .gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom,
-            #000000 0%,
-            #000000 40%,
-            #050e1e 70%,
-            /* Dark Blue transition */
-            #0b1c36 100%
-            /* Visible Deep Blue at bottom */
-        );
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E");
     opacity: 1;
-    /* Full opacity */
     pointer-events: none;
+    mix-blend-mode: overlay;
 }
