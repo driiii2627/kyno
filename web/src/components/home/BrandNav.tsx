@@ -16,8 +16,6 @@ const STREAMING_SERVICES = [
         id: 'prime',
         label: 'Prime Video',
         providerId: 119,
-        logoUrl: 'https://image.tmdb.org/t/p/original/d5Jbf3Jg87x4zW7I6h9e5X7f5.jpg', // Prime Logo (Placeholder - usually just text but TMDB has providers)
-        // Better Logo URL for Prime:
         // https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg (External)
         // Let's use specific TMDB file paths if possible or generic styles.
         // Found path for Prime from TMDB common usage: /emthp39XA2YScoYL1p0sdbAH2WA.jpg
@@ -42,8 +40,6 @@ const STREAMING_SERVICES = [
         id: 'apple',
         label: 'Apple TV+',
         providerId: 350,
-        logoUrl: 'https://image.tmdb.org/t/p/original/2E03IAfX1Xb5zE63Z5N5769.jpg', // Apple TV+ (Maybe incorrect path, using generic fallback if fails? No, standard path usually 2E...)
-        // Using a reliable external or just Styled Text as backup? 
         // Let's stick to TMDB paths users commonly use or Wikimedia.
         // Actually for Apple TV, the TMDB logo is often just the Apple logo.
         logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg',
@@ -53,7 +49,6 @@ const STREAMING_SERVICES = [
         id: 'hulu',
         label: 'Hulu',
         providerId: 15,
-        logoUrl: 'https://image.tmdb.org/t/p/original/zxbW8Jco5n8rQCC29H8T6UaZ3.jpg', // Hulu (Check path)
         // Fallback to wikimedia for safety
         logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg',
         gradientClass: styles.hulu
