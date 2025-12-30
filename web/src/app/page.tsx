@@ -1,4 +1,5 @@
 import Hero from '@/components/home/Hero';
+import BrandNav from '@/components/home/BrandNav';
 import MovieRow from '@/components/home/MovieRow';
 import { tmdb } from '@/services/tmdb';
 import { contentService } from '@/services/content';
@@ -128,6 +129,8 @@ export default async function Home() {
     <div style={{ paddingBottom: '3rem' }}>
       {/* Hero */}
       {heroMovies.length > 0 && <Hero movies={heroMovies} />}
+
+      <BrandNav />
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>
 
