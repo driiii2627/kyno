@@ -4,7 +4,6 @@ import MovieRow from '@/components/home/MovieRow';
 import { tmdb } from '@/services/tmdb';
 import { contentService } from '@/services/content';
 import { hashedSort, randomShuffle, getTimeSeed } from '@/lib/utils';
-import { detectFranchises } from '@/lib/franchiseUtils';
 // import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'; // Removed to fix build
 // import { cookies } from 'next/headers';
 
@@ -131,7 +130,6 @@ export default async function Home() {
       {/* Hero */}
       {heroMovies.length > 0 && <Hero movies={heroMovies} />}
 
-      {/* Streaming Services Carousel */}
       <BrandNav />
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>

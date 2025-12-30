@@ -103,13 +103,6 @@ export const tmdb = {
   getByGenre: async (genreId: number, type: 'movie' | 'tv' = 'movie') => {
     return fetchFromTMDB<{ results: Movie[] }>(`/discover/${type}`, { with_genres: genreId.toString() });
   },
-  discoverByProvider: async (providerId: number, type: 'movie' | 'tv' = 'movie') => {
-    return fetchFromTMDB<{ results: Movie[] }>(`/discover/${type}`, {
-      with_watch_providers: providerId.toString(),
-      watch_region: 'BR', // Important for correct providers
-      sort_by: 'popularity.desc'
-    });
-  },
   getDetails: async (id: number, type: 'movie' | 'tv') => {
     return fetchFromTMDB<MovieDetails>(`/${type}/${id}`);
   },
