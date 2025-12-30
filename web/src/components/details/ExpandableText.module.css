@@ -51,17 +51,20 @@
 }
 
 .popup {
-    background: rgba(30, 41, 59, 0.7);
-    /* Slate 800 glass */
-    backdrop-filter: blur(16px);
+    background: rgba(10, 10, 10, 0.85);
+    /* Deep dark neutral */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    /* Highlight top */
+    border-radius: 24px;
+    padding: 2.5rem;
     width: 100%;
     max-width: 600px;
     max-height: 80vh;
     overflow-y: auto;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     position: relative;
     animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
@@ -70,10 +73,14 @@
 }
 
 .popupTitle {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
     color: #fff;
-    margin: 0;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .fullText {
@@ -98,11 +105,12 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .closeButton:hover {
     background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg) scale(1.1);
 }
 
 @keyframes fadeIn {
