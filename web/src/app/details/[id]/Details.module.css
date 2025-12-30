@@ -143,17 +143,18 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: #262626 !important;
+    /* Force dark gray to prevent system theme override */
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 12px;
-    color: #fff;
+    color: #fff !important;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .actionBtn:active {
-    background: rgba(255, 255, 255, 0.1);
+    background: #404040 !important;
 }
 
 .actionBtn span {
@@ -186,10 +187,11 @@
     }
 
     .content {
-        margin-top: 50vh;
-        /* More space for Image on mobile */
+        margin-top: 40vh;
+        /* Moved up (was 50vh) */
         padding: 0 1.5rem;
-        gap: 1.5rem;
+        gap: 1rem;
+        /* Tighter gap */
     }
 
     .title {
@@ -198,9 +200,10 @@
 
     /* Adjust Logo on mobile */
     .logoImage {
-        max-width: 280px;
-        max-height: 120px;
-        margin: 0 auto 1.5rem auto;
+        max-width: 180px;
+        /* Smaller (was 280px) */
+        max-height: 100px;
+        margin: 0 auto 1rem auto;
         margin-left: 0;
     }
 

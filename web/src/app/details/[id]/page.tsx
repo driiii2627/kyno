@@ -209,6 +209,9 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         ))}
                     </div>
 
+                    {/* Optimized Description with Read More (NOW ABOVE CONTROL BOX) */}
+                    <ExpandableText text={details.overview} className={styles.overview} />
+
                     {/* Glass Control Box */}
                     <div className={styles.controlBox}>
                         <TrackedLink
@@ -225,15 +228,15 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         <div className={styles.actionGrid}>
                             <button className={styles.actionBtn}>
                                 <Plus size={20} />
-                                <span>Minha Lista</span>
+                                <span>Lista</span>
                             </button>
                             <button className={styles.actionBtn}>
                                 <ThumbsUp size={20} />
-                                <span>Gostei</span>
+                                <span>Adorei</span>
                             </button>
                             <button className={styles.actionBtn}>
                                 <ThumbsDown size={20} />
-                                <span>Não Gostei</span>
+                                <span>Odiei</span>
                             </button>
                         </div>
                     </div>
