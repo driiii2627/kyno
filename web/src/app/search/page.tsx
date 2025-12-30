@@ -7,6 +7,15 @@ import styles from './Search.module.css';
 
 export const dynamic = 'force-dynamic';
 
+// Mapping for Brand "Fuzzy" Search
+const BRAND_KEYWORDS: Record<string, string[]> = {
+    'marvel': ['marvel', 'iron man', 'homem de ferro', 'captain america', 'capitão américa', 'thor', 'hulk', 'avengers', 'vingadores', 'spider-man', 'homem-aranha', 'black panther', 'pantera negra', 'doctor strange', 'doutor estranho', 'guardians of the galaxy', 'guardiões da galáxia', 'loki', 'wandavision', 'eternals', 'eternos'],
+    'dc comics': ['dc', 'batman', 'superman', 'wonder woman', 'mulher maravilha', 'flash', 'aquaman', 'joker', 'coringa', 'justice league', 'liga da justiça', 'suicide squad', 'esquadrão suicida', 'shazam', 'black adam', 'adão negro', 'blue beetle', 'besouro azul', 'peacemaker', 'pacificador'],
+    'star wars': ['star wars', 'jedi', 'sith', 'mandalorian', 'skywalker', 'vader', 'obi-wan', 'ahsoka', 'andor', 'boba fett', 'clone wars', 'bad batch'],
+    'pixar': ['pixar', 'toy story', 'cars', 'carros', 'finding nemo', 'procurando nemo', 'incredibles', 'incríveis', 'soul', 'inside out', 'divertida mente', 'luca', 'coco', 'viva', 'wall-e', 'up', 'monsters', 'monstros'],
+    'disney': ['disney', 'mickey', 'frozen', 'lion king', 'rei leão', 'aladdin', 'beauty and the beast', 'bela e a fera', 'cinderella', 'cinderela', 'moana', 'zootopia', 'encanto', 'tangled', 'enrolados', 'little mermaid', 'pequena sereia']
+};
+
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
@@ -23,18 +32,24 @@ export default async function SearchPage({ searchParams }: PageProps) {
             contentService.getCatalogSeries()
         ]);
 
-        const lowerQ = query.toLowerCase();
+        const lowerQ = query.toLowerCase().trim();
+
+        // Check if query matches a known brand key (e.g. "dc comics" or just "marvel")
+        const brandKey = Object.keys(BRAND_KEYWORDS).find(k => k.includes(lowerQ) || lowerQ.includes(k));
+        const searchTerms = brandKey ? BRAND_KEYWORDS[brandKey] : [lowerQ];
+
+        const matches = (text: string | undefined) => {
+            if (!text) return false;
+            const t = text.toLowerCase();
+            return searchTerms.some(term => t.includes(term));
+        };
 
         const filteredMovies = allMovies.filter(m =>
-            m.title?.toLowerCase().includes(lowerQ) ||
-            m.overview?.toLowerCase().includes(lowerQ) ||
-            m.genre?.toLowerCase().includes(lowerQ)
+            matches(m.title) || matches(m.overview) || matches(m.genre)
         ).map(m => ({ ...m, type: 'movie' }));
 
         const filteredSeries = allSeries.filter(s =>
-            s.name?.toLowerCase().includes(lowerQ) ||
-            s.overview?.toLowerCase().includes(lowerQ) ||
-            s.genre?.toLowerCase().includes(lowerQ)
+            matches(s.name) || matches(s.overview) || matches(s.genre)
         ).map(s => ({ ...s, type: 'series' }));
 
         results = [...filteredMovies, ...filteredSeries];
