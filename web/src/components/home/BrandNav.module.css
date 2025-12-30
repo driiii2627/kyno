@@ -99,6 +99,18 @@
     transform: scale(1.1);
 }
 
+.logoImage {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+.brandCard:hover .logoImage {
+    transform: scale(1.1);
+}
+
 /* -- Themed Text Styles -- */
 
 /* Disney: Classic simple font, white glow */
