@@ -5,13 +5,36 @@ import styles from './Search.module.css';
 
 export const dynamic = 'force-dynamic';
 
-// Mapping for Brand "Fuzzy" Search
+// Expanded Keyword Map with Cross-Pollination
 const BRAND_KEYWORDS: Record<string, string[]> = {
-    'marvel': ['marvel', 'iron man', 'homem de ferro', 'captain america', 'capitão américa', 'thor', 'hulk', 'avengers', 'vingadores', 'spider-man', 'homem-aranha', 'black panther', 'pantera negra', 'doctor strange', 'doutor estranho', 'guardians of the galaxy', 'guardiões da galáxia', 'loki', 'wandavision', 'eternals', 'eternos'],
-    'dc comics': ['dc', 'batman', 'superman', 'wonder woman', 'mulher maravilha', 'flash', 'aquaman', 'joker', 'coringa', 'justice league', 'liga da justiça', 'suicide squad', 'esquadrão suicida', 'shazam', 'black adam', 'adão negro', 'blue beetle', 'besouro azul', 'peacemaker', 'pacificador'],
-    'star wars': ['star wars', 'jedi', 'sith', 'mandalorian', 'skywalker', 'vader', 'obi-wan', 'ahsoka', 'andor', 'boba fett', 'clone wars', 'bad batch'],
-    'pixar': ['pixar', 'toy story', 'cars', 'carros', 'finding nemo', 'procurando nemo', 'incredibles', 'incríveis', 'soul', 'inside out', 'divertida mente', 'luca', 'coco', 'viva', 'wall-e', 'up', 'monsters', 'monstros'],
-    'disney': ['disney', 'mickey', 'frozen', 'lion king', 'rei leão', 'aladdin', 'beauty and the beast', 'bela e a fera', 'cinderella', 'cinderela', 'moana', 'zootopia', 'encanto', 'tangled', 'enrolados', 'little mermaid', 'pequena sereia']
+    'marvel': [
+        'marvel', 'iron man', 'homem de ferro', 'captain america', 'capitão américa', 'thor', 'hulk', 'avengers', 'vingadores',
+        'spider-man', 'homem-aranha', 'black panther', 'pantera negra', 'doctor strange', 'doutor estranho',
+        'guardians of the galaxy', 'guardiões da galáxia', 'loki', 'wandavision', 'eternals', 'eternos', 'deadpool',
+        'wolverine', 'x-men', 'daredevil', 'demolidor', 'punisher', 'justiceiro'
+    ],
+    'dc comics': [
+        'dc', 'batman', 'superman', 'wonder woman', 'mulher maravilha', 'flash', 'aquaman', 'joker', 'coringa',
+        'justice league', 'liga da justiça', 'suicide squad', 'esquadrão suicida', 'shazam', 'black adam', 'adão negro',
+        'blue beetle', 'besouro azul', 'peacemaker', 'pacificador', 'harley quinn', 'alerquina', 'penguin', 'pinguim'
+    ],
+    'star wars': [
+        'star wars', 'jedi', 'sith', 'mandalorian', 'skywalker', 'vader', 'obi-wan', 'ahsoka', 'andor', 'boba fett',
+        'clone wars', 'bad batch', 'rogue one', 'han solo', 'empire strikes back', 'império contra-ataca',
+        'return of the jedi', 'retorno de jedi', 'new hope', 'uma nova esperança', 'phantom menace', 'ameaça fantasma'
+    ],
+    'pixar': [
+        'pixar', 'toy story', 'cars', 'carros', 'finding nemo', 'procurando nemo', 'incredibles', 'incríveis',
+        'soul', 'inside out', 'divertida mente', 'luca', 'coco', 'viva', 'wall-e', 'up', 'monsters', 'monstros',
+        'ratatouille', 'brave', 'valente'
+    ],
+    'disney': [
+        'disney', 'mickey', 'frozen', 'lion king', 'rei leão', 'aladdin', 'beauty and the beast', 'bela e a fera',
+        'cinderella', 'cinderela', 'moana', 'zootopia', 'encanto', 'tangled', 'enrolados', 'little mermaid', 'pequena sereia',
+        'branca de neve', 'snow white', 'peter pan', 'pinocchio', 'pinóquio', 'mulan', 'tarzan',
+        // Cross-pollinate Pixar hits because users expect them in Disney
+        'toy story', 'cars', 'carros', 'finding nemo', 'procurando nemo', 'monsters', 'monstros'
+    ]
 };
 
 interface PageProps {
@@ -33,13 +56,27 @@ export default async function SearchPage({ searchParams }: PageProps) {
         const lowerQ = query.toLowerCase().trim();
 
         // Check if query matches a known brand key
-        const brandKey = Object.keys(BRAND_KEYWORDS).find(k => k.includes(lowerQ) || lowerQ.includes(k));
+        // Using "includes" here is okay for the key selection, e.g. "disney movies" -> "disney"
+        const brandKey = Object.keys(BRAND_KEYWORDS).find(k => lowerQ.includes(k) || k.includes(lowerQ));
         const searchTerms = brandKey ? BRAND_KEYWORDS[brandKey] : [lowerQ];
 
-        const matches = (text: string | undefined) => {
+        // Advanced Regex Matching with Word Boundaries
+        const matches = (text: string | undefined): boolean => {
             if (!text) return false;
-            const t = text.toLowerCase();
-            return searchTerms.some(term => t.includes(term));
+            // Iterate terms to create regexes (cacheing this outside would be better but Vercel lambda is ephemeral)
+            return searchTerms.some(term => {
+                // Escape special characters to avoid regex errors
+                const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+                // If term is very short (<= 3 chars), force strict word boundary
+                // If term is longer, we can allow partials IF it's not a brand search, but for brands strict is better.
+                // However, user might search "bat" for "batman"? No, brands are strict lists.
+                // Let's use word boundary for EVERYTHING in the list to correct "encanto" matching "desencanto".
+                // Note: \b in regex handles accents poorly in JS sometimes, so we cleaner approach:
+
+                const regex = new RegExp(`(^|\\s|\\.|,|-)${escaped}($|\\s|\\.|,|-)`, 'i');
+                return regex.test(text);
+            });
         };
 
         const filteredMovies = allMovies.filter(m =>
@@ -80,7 +117,6 @@ export default async function SearchPage({ searchParams }: PageProps) {
                                     className={styles.card}
                                 >
                                     <div className={styles.imageWrapper}>
-                                        {/* Using Standard IMG tag exactly like Categories Page */}
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
                                             src={(() => {
