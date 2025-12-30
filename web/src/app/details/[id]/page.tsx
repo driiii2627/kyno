@@ -209,6 +209,25 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         ))}
                     </div>
 
+                    {/* Desktop Actions (Hidden on Mobile) */}
+                    <div className={styles.desktopActions}>
+                        <TrackedLink
+                            href={playerRoute}
+                            className={styles.playButton}
+                            genres={details.genres?.map(g => g.name) || []}
+                        >
+                            <Play fill="currentColor" size={24} />
+                            Assistir
+                        </TrackedLink>
+
+                        <button className={styles.actionIconBtn}>
+                            <Plus size={22} />
+                        </button>
+                        <button className={styles.actionIconBtn}>
+                            <Info size={22} />
+                        </button>
+                    </div>
+
                     {/* Optimized Description with Read More (NOW ABOVE CONTROL BOX) */}
                     <ExpandableText text={details.overview} className={styles.overview} />
 
