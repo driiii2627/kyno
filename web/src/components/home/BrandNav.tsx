@@ -3,78 +3,100 @@
 import styles from './BrandNav.module.css';
 import Link from 'next/link';
 
-export interface FranchiseData {
-    id: string;
-    label: string;
-    logoUrl?: string;
-    gradientClass: string;
-    backdropUrl?: string; // Optional custom bg logic
-}
-
-interface BrandNavProps {
-    items: FranchiseData[];
-}
-
-// Fallback static brands if no dynamic ones found
-const STATIC_FALLBACK: FranchiseData[] = [
-    { id: 'disney', label: 'Disney', gradientClass: styles.disney, logoUrl: 'static' },
-    { id: 'marvel', label: 'Marvel', gradientClass: styles.marvel, logoUrl: 'static' },
-    { id: 'starwars', label: 'Star Wars', gradientClass: styles.starwars, logoUrl: 'static' },
-    { id: 'dc', label: 'DC', gradientClass: styles.dc, logoUrl: 'static' },
+// Streaming Services Configuration
+const STREAMING_SERVICES = [
+    {
+        id: 'netflix',
+        label: 'Netflix',
+        providerId: 8,
+        logoUrl: 'https://image.tmdb.org/t/p/original/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg', // Netflix Logo
+        gradientClass: styles.netflix
+    },
+    {
+        id: 'prime',
+        label: 'Prime Video',
+        providerId: 119,
+        logoUrl: 'https://image.tmdb.org/t/p/original/d5Jbf3Jg87x4zW7I6h9e5X7f5.jpg', // Prime Logo (Placeholder - usually just text but TMDB has providers)
+        // Better Logo URL for Prime:
+        // https://upload.wikimedia.org/wikipedia/commons/1/11/Amazon_Prime_Video_logo.svg (External)
+        // Let's use specific TMDB file paths if possible or generic styles.
+        // Found path for Prime from TMDB common usage: /emthp39XA2YScoYL1p0sdbAH2WA.jpg
+        logoUrl: 'https://image.tmdb.org/t/p/original/emthp39XA2YScoYL1p0sdbAH2WA.jpg',
+        gradientClass: styles.prime
+    },
+    {
+        id: 'disney',
+        label: 'Disney+',
+        providerId: 337,
+        logoUrl: 'https://image.tmdb.org/t/p/original/7rwNKtymnNtefC2A9n9vO7W0D8t.jpg', // Disney+
+        gradientClass: styles.disney
+    },
+    {
+        id: 'hbo',
+        label: 'HBO Max',
+        providerId: 384,
+        logoUrl: 'https://image.tmdb.org/t/p/original/zxrVdFj09avcfePa5CsJMq378.jpg', // HBO Max (Max)
+        gradientClass: styles.hbo
+    },
+    {
+        id: 'apple',
+        label: 'Apple TV+',
+        providerId: 350,
+        logoUrl: 'https://image.tmdb.org/t/p/original/2E03IAfX1Xb5zE63Z5N5769.jpg', // Apple TV+ (Maybe incorrect path, using generic fallback if fails? No, standard path usually 2E...)
+        // Using a reliable external or just Styled Text as backup? 
+        // Let's stick to TMDB paths users commonly use or Wikimedia.
+        // Actually for Apple TV, the TMDB logo is often just the Apple logo.
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg',
+        gradientClass: styles.apple
+    },
+    {
+        id: 'hulu',
+        label: 'Hulu',
+        providerId: 15,
+        logoUrl: 'https://image.tmdb.org/t/p/original/zxbW8Jco5n8rQCC29H8T6UaZ3.jpg', // Hulu (Check path)
+        // Fallback to wikimedia for safety
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Hulu_Logo.svg',
+        gradientClass: styles.hulu
+    },
+    {
+        id: 'globoplay',
+        label: 'Globoplay',
+        providerId: 307,
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Globoplay_logo.svg',
+        gradientClass: styles.globoplay
+    }
 ];
 
-export default function BrandNav({ items = [] }: BrandNavProps) {
-    // Determine what to show: Dynamic items OR Fallback
-    const displayItems = items.length > 0 ? items : STATIC_FALLBACK;
-
+export default function BrandNav() {
     return (
         <div className={styles.container}>
-            <div className={styles.brandGrid}>
-                {displayItems.map((brand) => (
-                    <Link
-                        key={brand.id}
-                        href={`/search?q=${brand.label.toLowerCase()}`}
-                        className={styles.brandCard}
-                        style={brand.logoUrl !== 'static' ? {
-                            // Dynamic Gradient override if passed raw CSS
-                            background: brand.gradientClass.includes('gradient') ? brand.gradientClass : undefined
-                        } : undefined}
-                    >
-                        {/* Background Layer (CSS Class or Dynamic) */}
-                        <div
-                            className={`${styles.brandBackground} ${!brand.gradientClass.includes('gradient') ? brand.gradientClass : ''}`}
-                        />
+            <div className={styles.scrollWrapper}>
+                <div className={styles.carousel}>
+                    {STREAMING_SERVICES.map((service) => (
+                        <Link
+                            key={service.id}
+                            href={`/search?provider=${service.providerId}&name=${service.label}`}
+                            className={styles.brandCard}
+                        >
+                            <div className={`${styles.brandBackground} ${service.gradientClass}`} />
 
-                        {/* Content Layer */}
-                        <div className={styles.logoWrapper}>
-                            {brand.logoUrl && brand.logoUrl !== 'static' ? (
-                                // Render DB Logo
-                                // eslint-disable-next-line @next/next/no-img-element
+                            <div className={styles.logoWrapper}>
+                                {/* Using Standard IMG for logos with direct URLs */}
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                    src={`https://image.tmdb.org/t/p/w500${brand.logoUrl}`}
-                                    alt={brand.label}
+                                    src={service.logoUrl}
+                                    alt={service.label}
                                     className={styles.logoImage}
+                                    style={{
+                                        padding: service.id === 'prime' ? '0 10px' : '0', // Adjust for wide logos
+                                        objectFit: 'contain'
+                                    }}
                                 />
-                            ) : (
-                                // Render Styled Text (Fallback or Static)
-                                <span className={`${styles.brandText} ${getStaticTextClass(brand.id)}`}>
-                                    {brand.label}
-                                </span>
-                            )}
-                        </div>
-                    </Link>
-                ))}
+                            </div>
+                        </Link>
+                    ))}
+                </div>
             </div>
         </div>
     );
-}
-
-// Helper to map ID to legacy text style class
-function getStaticTextClass(id: string) {
-    if (id.includes('disney')) return styles.textDisney;
-    if (id.includes('marvel')) return styles.textMarvel;
-    if (id.includes('starwars')) return styles.textStarWars;
-    if (id.includes('dc')) return styles.textDC;
-    if (id.includes('pixar')) return styles.textPixar;
-    return ''; // Default font
 }

@@ -131,8 +131,8 @@ export default async function Home() {
       {/* Hero */}
       {heroMovies.length > 0 && <Hero movies={heroMovies} />}
 
-      {/* Dynamic Brand Nav (Franchises) */}
-      <BrandNav items={detectFranchises([...catalogMovies, ...catalogSeries])} />
+      {/* Streaming Services Carousel */}
+      <BrandNav />
 
       <div style={{ position: 'relative', zIndex: 10, marginTop: '1.5rem' }}>
 
