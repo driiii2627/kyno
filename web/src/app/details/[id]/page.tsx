@@ -209,6 +209,9 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         ))}
                     </div>
 
+                    {/* Optimized Description with Read More (ABOVE BUTTONS on Desktop) */}
+                    <ExpandableText text={details.overview} className={styles.overview} />
+
                     {/* Desktop Actions (Hidden on Mobile) */}
                     <div className={styles.desktopActions}>
                         <TrackedLink
@@ -227,9 +230,6 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                             <Info size={22} />
                         </button>
                     </div>
-
-                    {/* Optimized Description with Read More (NOW ABOVE CONTROL BOX) */}
-                    <ExpandableText text={details.overview} className={styles.overview} />
 
                     {/* Glass Control Box */}
                     <div className={styles.controlBox}>

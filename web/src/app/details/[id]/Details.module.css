@@ -230,11 +230,11 @@
     }
 
     .content {
-        margin-top: 25vh;
-        /* Moved even higher up */
+        margin-top: 20vh;
+        /* Moved higher (was 25vh) */
         padding: 0 1.5rem;
-        gap: 0.25rem;
-        /* Minimal gap */
+        gap: 0;
+        /* Remove gap to tighter control */
     }
 
     .title {
@@ -243,11 +243,17 @@
 
     /* Adjust Logo on mobile */
     .logoImage {
-        max-width: 180px;
-        /* Smaller (was 280px) */
+        max-width: 150px;
+        /* Reduced to 150px (was 180px) */
         max-height: 100px;
         margin: 0 auto 1rem auto;
         margin-left: 0;
+    }
+
+    /* Add spacing between overview and control box specifically on mobile */
+    .overview {
+        margin-bottom: 1.5rem !important;
+        /* Force spacing */
     }
 
     /* Move metadata below title/logo */
