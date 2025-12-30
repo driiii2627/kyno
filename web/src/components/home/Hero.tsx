@@ -233,7 +233,7 @@ export default function Hero({ movies }: HeroProps) {
                             Assistir
                         </button>
                     </TrackedLink>
-                    <Link href={linkHref} className={styles.infoBtn}>
+                    <Link href={`/details/${currentMovie.supabase_id}`} className={styles.infoBtn}>
                         <Info size={24} />
                     </Link>
                 </div>
