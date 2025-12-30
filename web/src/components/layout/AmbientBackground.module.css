@@ -11,18 +11,23 @@
 }
 
 /* 
-    Subtle Static Gradient 
-    - No Animation over time
-    - Deep Blue (#0a1525) fading to transparent
-    - Located at bottom center to give depth without distraction
+    Updated Gradient: 
+    - Full height linear gradient to ensure visibility
+    - Transitions from Black (top) to Deep Blue (bottom)
+    - Stronger blue component (#0b1c36) to be visible on screens
 */
 .gradient {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 100%,
-            rgba(10, 25, 45, 0.4) 0%,
-            rgba(5, 12, 20, 0.2) 40%,
-            transparent 70%);
+    background: linear-gradient(to bottom,
+            #000000 0%,
+            #000000 40%,
+            #050e1e 70%,
+            /* Dark Blue transition */
+            #0b1c36 100%
+            /* Visible Deep Blue at bottom */
+        );
     opacity: 1;
+    /* Full opacity */
     pointer-events: none;
 }
