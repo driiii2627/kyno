@@ -35,7 +35,7 @@ export default async function MoviePlayerPage({ params }: PageProps) {
 
     const { tmdb_id, video_url } = movieData;
     // We use the DB video_url as the source of truth
-    const playerUrl = video_url;
+    const playerUrl = `${video_url}#noLink#noEpList#color:3b82f6`;
 
     return (
         <div className="relative w-full h-screen bg-black overflow-hidden flex flex-col">
