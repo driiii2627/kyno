@@ -187,11 +187,11 @@
     }
 
     .content {
-        margin-top: 40vh;
-        /* Moved up (was 50vh) */
+        margin-top: 30vh;
+        /* Moved WAY up (was 40vh, before 50vh) */
         padding: 0 1.5rem;
-        gap: 1rem;
-        /* Tighter gap */
+        gap: 0.5rem;
+        /* Even tighter gap */
     }
 
     .title {

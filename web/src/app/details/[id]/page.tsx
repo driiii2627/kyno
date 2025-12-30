@@ -241,8 +241,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         </div>
                     </div>
 
-                    {/* Optimized Description with Read More */}
-                    <ExpandableText text={details.overview} className={styles.overview} />
+
                 </div>
 
                 {/* Interactive Details Tabs (Episodes / Recommendations) - Full Width */}
