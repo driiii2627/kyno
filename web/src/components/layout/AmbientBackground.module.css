@@ -6,73 +6,23 @@
     height: 100%;
     z-index: -1;
     overflow: hidden;
-    background-color: #020202;
-    /* Almost pure black */
+    background-color: #000000;
+    /* Pure Black Base */
 }
 
 /* 
-    Updated Blob:
-    - Smaller (85vw)
-    - Darker (Deep Navy/Cyan)
-    - Faster Movement
+    Subtle Static Gradient 
+    - No Animation over time
+    - Deep Blue (#0a1525) fading to transparent
+    - Located at bottom center to give depth without distraction
 */
-.blob {
+.gradient {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 85vmax;
-    /* Smaller, contained */
-    height: 85vmax;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle,
-            rgba(12, 35, 50, 0.7) 0%,
-            /* Deep Dark Blue */
-            rgba(8, 20, 30, 0.4) 40%,
+    inset: 0;
+    background: radial-gradient(circle at 50% 100%,
+            rgba(10, 25, 45, 0.4) 0%,
+            rgba(5, 12, 20, 0.2) 40%,
             transparent 70%);
-    filter: blur(80px);
-    /* Slightly less blur to keep shape definition */
-    animation: moveBlob 12s ease-in-out infinite alternate;
-    opacity: 0.8;
-    will-change: transform;
-}
-
-/* 
-    Updated Glass Overlay:
-    - Stronger Noise
-    - overlay blend mode to interact with the blue
-    - Added a subtle vignette to darken edges further
-*/
-.glassOverlay {
-    position: absolute;
-    inset: 0;
-    /* Stronger noise pattern */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.4'/%3E%3C/svg%3E");
-    opacity: 0.25;
-    /* Visible grain */
-    mix-blend-mode: overlay;
+    opacity: 1;
     pointer-events: none;
-    z-index: 2;
-}
-
-/* Optional: Extra subtle vignette to focus center */
-.vignette {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, transparent 40%, black 100%);
-    z-index: 1;
-    pointer-events: none;
-}
-
-@keyframes moveBlob {
-    0% {
-        transform: translate(-30%, -30%) rotate(0deg) scale(1);
-    }
-
-    50% {
-        transform: translate(-70%, -40%) rotate(15deg) scale(1.1);
-    }
-
-    100% {
-        transform: translate(-40%, -70%) rotate(-15deg) scale(0.9);
-    }
 }
