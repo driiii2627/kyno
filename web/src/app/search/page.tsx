@@ -29,13 +29,13 @@ export default async function SearchPage({ searchParams }: PageProps) {
         const lowerQ = query.toLowerCase();
 
         movies = allMovies.filter(m =>
-            m.title.toLowerCase().includes(lowerQ) ||
+            m.title?.toLowerCase().includes(lowerQ) ||
             m.overview?.toLowerCase().includes(lowerQ) ||
             m.genre?.toLowerCase().includes(lowerQ)
         );
 
         series = allSeries.filter(s =>
-            s.name.toLowerCase().includes(lowerQ) ||
+            s.name?.toLowerCase().includes(lowerQ) ||
             s.overview?.toLowerCase().includes(lowerQ) ||
             s.genre?.toLowerCase().includes(lowerQ)
         );
