@@ -210,7 +210,10 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                     </div>
 
                     {/* Optimized Description with Read More (ABOVE BUTTONS on Desktop) */}
-                    <ExpandableText text={details.overview} className={styles.overview} />
+                    {/* Optimized Description with Read More (ABOVE BUTTONS on Desktop) */}
+                    <div style={{ marginBottom: '2rem' }}>
+                        <ExpandableText text={details.overview} className={styles.overview} />
+                    </div>
 
                     {/* Desktop Actions (Hidden on Mobile) */}
                     <div className={styles.desktopActions}>
