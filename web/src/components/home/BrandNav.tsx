@@ -7,33 +7,39 @@ import Image from 'next/image';
 const BRANDS = [
     {
         id: 'disney',
-        logoUrl: 'https://image.tmdb.org/t/p/original/wdrCwmRnLFJhEoH8GSf1Sebols3.png',
+        // Disney+ White Logo
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg',
         href: '/search?q=disney',
         gradientClass: styles.disney
     },
     {
-        id: 'pixar',
-        logoUrl: 'https://image.tmdb.org/t/p/original/1TjvGVDMYpwCS0xIEHZAdmfb5Hz.png',
-        href: '/search?q=pixar',
-        gradientClass: styles.pixar
+        id: 'national-geographic',
+        // National Geographic Yellow Box Logo
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/65/National_Geographic_Logo.svg',
+        href: '/search?q=national geographic',
+        gradientClass: styles.national
     },
     {
         id: 'marvel',
-        logoUrl: 'https://image.tmdb.org/t/p/original/hUzeosd33nzE5MCNsZxCGEKTXaQ.png',
+        // Marvel Studios White/Red Logo
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/w/w4/Marvel_Studios_2016_logo.svg',
         href: '/search?q=marvel',
         gradientClass: styles.marvel
     },
     {
         id: 'starwars',
-        logoUrl: 'https://image.tmdb.org/t/p/original/o86DbpburjxrqAzEDhXZcyE8pDb.png',
+        // Star Wars White Logo
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Star_wars2.svg',
         href: '/search?q=star wars',
         gradientClass: styles.starwars
     },
     {
         id: 'dc',
-        logoUrl: 'https://image.tmdb.org/t/p/original/2Tc1P3Ac8M479naPp1kYT3izLS5.png',
+        // DC Comics White Logo (Blue standard, but white fits dark mode better - using a white variant or standard blue which is visible)
+        // Using standard blue/white sticker
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/DC_Comics_2016.svg',
         href: '/search?q=dc comics',
-        gradientClass: styles.national
+        gradientClass: styles.dc
     }
 ];
 
@@ -51,10 +57,10 @@ export default function BrandNav() {
                             <Image
                                 src={brand.logoUrl}
                                 alt={brand.id}
-                                // Clean sizing: Contain within the box, center it.
                                 width={300}
                                 height={150}
                                 className={styles.logoImage}
+                                unoptimized={true} // Needed for external SVG/Wikimedia
                             />
                         </div>
                     </Link>
