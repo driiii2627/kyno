@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Enable Vercel Image Optimization for faster loading (resize/cache)
-    unoptimized: false,
+    // Disable Vercel Image Optimization to save usage limits
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

@@ -137,7 +137,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
     // Format Data
     const tmdbBackdrop = details.backdrop_path
-        ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
+        ? `https://image.tmdb.org/t/p/w1280${details.backdrop_path}`
         : null;
 
     // Fallback: Use Database URL if TMDB failed/missing
