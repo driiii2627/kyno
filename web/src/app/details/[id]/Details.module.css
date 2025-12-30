@@ -297,7 +297,29 @@
     gap: 1.5rem;
     overflow-x: auto;
     padding-bottom: 1rem;
-    /* Hide Scrollbar */
+
+    .logoImage {
+        max-width: 400px;
+        max-height: 180px;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        margin-bottom: 2rem;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+        display: block;
+        /* Ensure it doesn't break layout */
+    }
+
+    @media (max-width: 768px) {
+        .logoImage {
+            max-width: 280px;
+            max-height: 120px;
+            margin: 0 auto 1.5rem auto;
+            /* Center on mobile */
+            margin-left: 0;
+        }
+    }
+
     scrollbar-width: none;
 }
 

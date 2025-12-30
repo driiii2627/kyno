@@ -175,7 +175,15 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             <div className={styles.content}>
                 {/* Info */}
                 <div className={styles.infoColumn}>
-                    <h1 className={styles.title}>{title}</h1>
+                    {item.logo_url ? (
+                        <img
+                            src={item.logo_url}
+                            alt={title}
+                            className={styles.logoImage}
+                        />
+                    ) : (
+                        <h1 className={styles.title}>{title}</h1>
+                    )}
 
                     <div className={styles.metadata}>
                         {details.vote_average > 0 && (

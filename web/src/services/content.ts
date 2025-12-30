@@ -63,10 +63,10 @@ export const contentService = {
     /**
      * Get a single movie by UUID (Lightweight lookup for Player)
      */
-    async getMovieById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null } | null> {
+    async getMovieById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null } | null> {
         const { data, error } = await supabase
             .from('movies')
-            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url')
+            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url, logo_url')
             .eq('id', uuid)
             .single();
 
@@ -76,17 +76,18 @@ export const contentService = {
             video_url: data.video_url,
             trailer_url: data.trailer_url,
             show_trailer: data.show_trailer,
-            backdrop_url: data.backdrop_url
+            backdrop_url: data.backdrop_url,
+            logo_url: data.logo_url
         };
     },
 
     /**
      * Get a single series by UUID
      */
-    async getSeriesById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null } | null> {
+    async getSeriesById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null } | null> {
         const { data, error } = await supabase
             .from('series')
-            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url')
+            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url, logo_url')
             .eq('id', uuid)
             .single();
 
@@ -96,14 +97,15 @@ export const contentService = {
             video_url: data.video_url,
             trailer_url: data.trailer_url,
             show_trailer: data.show_trailer,
-            backdrop_url: data.backdrop_url
+            backdrop_url: data.backdrop_url,
+            logo_url: data.logo_url
         };
     },
 
     /**
      * Generic lookup to find item by UUID in either table
      */
-    async getItemByUuid(uuid: string): Promise<{ type: 'movie' | 'tv'; tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null } | null> {
+    async getItemByUuid(uuid: string): Promise<{ type: 'movie' | 'tv'; tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null } | null> {
         // Run both checks in parallel
         const [movie, series] = await Promise.all([
             this.getMovieById(uuid),
