@@ -230,11 +230,10 @@
     }
 
     .content {
-        margin-top: 20vh;
-        /* Moved higher (was 25vh) */
+        margin-top: 25vh;
+        /* Reverted to 25vh (Sweet spot) */
         padding: 0 1.5rem;
         gap: 0;
-        /* Remove gap to tighter control */
     }
 
     .title {
@@ -243,11 +242,13 @@
 
     /* Adjust Logo on mobile */
     .logoImage {
-        max-width: 150px;
-        /* Reduced to 150px (was 180px) */
-        max-height: 100px;
-        margin: 0 auto 1rem auto;
-        margin-left: 0;
+        max-width: 100px;
+        /* Really small (was 150px) */
+        max-height: 80px;
+        margin: 0 0 1rem 0;
+        /* Left aligned (removed auto) */
+        align-self: flex-start;
+        /* Double ensure left align */
     }
 
     /* Add spacing between overview and control box specifically on mobile */
