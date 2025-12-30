@@ -1,7 +1,7 @@
 
 import { contentService } from '@/services/content';
 import { supabase } from '@/lib/supabase';
-import { tmdb } from '@/services/tmdb';
+import { tmdb, getImageUrl } from '@/services/tmdb';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Play, Plus, Info, Users, ArrowLeft } from 'lucide-react';
