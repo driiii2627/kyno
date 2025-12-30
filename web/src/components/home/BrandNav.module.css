@@ -1,0 +1,168 @@
+.container {
+    padding: 0 4%;
+    margin-top: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.brandGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+}
+
+.brandCard {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.95) 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* Glass/Shine Effect Layer */
+.brandCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(105deg,
+            transparent 20%,
+            rgba(255, 255, 255, 0.1) 40%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0.1) 60%,
+            transparent 80%);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.brandCard:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.brandCard:hover::before {
+    transform: translateX(100%);
+    /* Shine passes through on hover */
+    transition: transform 0.8s;
+}
+
+/* Background "Video" Placeholder (Animated Gradient) */
+.brandBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 0;
+    /* Create a moving gradient to simulate "video" */
+    background-size: 200% 200%;
+    animation: gradientMove 3s ease infinite;
+}
+
+.brandCard:hover .brandBackground {
+    opacity: 1;
+}
+
+.logoText {
+    position: relative;
+    z-index: 2;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(180deg, #fff 0%, #ccc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Brand Specific Colors for Hover Gradient */
+.disney {
+    background-image: linear-gradient(135deg, #113CCF 0%, #000 100%);
+}
+
+.pixar {
+    background-image: linear-gradient(135deg, #D6D6D6 0%, #000 100%);
+}
+
+.marvel {
+    background-image: linear-gradient(135deg, #ED1D24 0%, #000 100%);
+}
+
+.starwars {
+    background-image: linear-gradient(135deg, #FFE81F 0%, #000 100%);
+}
+
+.national {
+    background-image: linear-gradient(135deg, #FFCC00 0%, #000 100%);
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@media (max-width: 768px) {
+    .brandGrid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 cols on tablet */
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 1rem;
+        margin-top: 1rem;
+        overflow-x: auto;
+        /* Scrollable on mobile */
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .container::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari */
+    }
+
+    .brandGrid {
+        display: flex;
+        /* Flex row for scrolling */
+        width: max-content;
+        gap: 0.75rem;
+        padding-bottom: 0.5rem;
+        /* Space for shadow */
+    }
+
+    .brandCard {
+        width: 140px;
+        /* Fixed width for horizontal scroll */
+        flex-shrink: 0;
+    }
+}
