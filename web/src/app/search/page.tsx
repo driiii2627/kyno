@@ -1,8 +1,6 @@
 import { contentService } from '@/services/content';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
-import OptimizedImage from '@/components/ui/OptimizedImage';
-import { getImageUrl } from '@/services/tmdb';
 import styles from './Search.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +32,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
         const lowerQ = query.toLowerCase().trim();
 
-        // Check if query matches a known brand key (e.g. "dc comics" or just "marvel")
+        // Check if query matches a known brand key
         const brandKey = Object.keys(BRAND_KEYWORDS).find(k => k.includes(lowerQ) || lowerQ.includes(k));
         const searchTerms = brandKey ? BRAND_KEYWORDS[brandKey] : [lowerQ];
 
@@ -82,21 +80,31 @@ export default async function SearchPage({ searchParams }: PageProps) {
                                     className={styles.card}
                                 >
                                     <div className={styles.imageWrapper}>
-                                        <OptimizedImage
-                                            src={getImageUrl(item.poster_path, 'w500')}
-                                            tinySrc={getImageUrl(item.poster_path, 'w92')}
-                                            alt={item.title || item.name}
-                                            fill
+                                        {/* Using Standard IMG tag exactly like Categories Page */}
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={(() => {
+                                                const path = item.poster_path || item.backdrop_path;
+                                                if (!path) return '/placeholder.png';
+                                                const trimmed = path.trim();
+                                                if (trimmed.startsWith('http')) return trimmed;
+                                                return `https://image.tmdb.org/t/p/w500${trimmed}`;
+                                            })()}
+                                            alt={item.title || item.name || 'Cover'}
                                             className={styles.image}
-                                            sizes="(max-width: 768px) 50vw, 25vw"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
+                                            loading="lazy"
                                         />
                                     </div>
                                     <div className={styles.overlay}>
                                         <div className={styles.cardTitle}>{item.title || item.name}</div>
                                         <div className={styles.cardMeta}>
-                                            <span>{new Date(item.release_date || item.first_air_date || Date.now()).getFullYear()}</span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#FFD700', fontWeight: 700 }}>
+                                                <Star size={12} fill="currentColor" />
+                                                <span>{item.vote_average?.toFixed(1) || '0.0'}</span>
+                                            </div>
                                             <span>•</span>
-                                            <span>★ {item.vote_average?.toFixed(1)}</span>
+                                            <span>{new Date(item.release_date || item.first_air_date || Date.now()).getFullYear()}</span>
                                         </div>
                                     </div>
                                 </Link>
