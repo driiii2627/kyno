@@ -35,7 +35,7 @@ export async function GET() {
         if (movies && movies.length > 0) {
             await Promise.all(movies.map(async (m) => {
                 try {
-                    const details = await tmdb.getMovieDetails(m.tmdb_id);
+                    const details = await tmdb.getDetails(m.tmdb_id, 'movie');
                     if (details && details.genres) {
                         const genreString = details.genres.map((g: any) => g.name).join(', ');
 
@@ -69,7 +69,7 @@ export async function GET() {
         if (series && series.length > 0) {
             await Promise.all(series.map(async (s) => {
                 try {
-                    const details = await tmdb.getTVDetails(s.tmdb_id);
+                    const details = await tmdb.getDetails(s.tmdb_id, 'tv');
                     if (details && details.genres) {
                         const genreString = details.genres.map((g: any) => g.name).join(', ');
 
