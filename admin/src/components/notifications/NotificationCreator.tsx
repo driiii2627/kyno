@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { sendNotification } from '@/app/actions/sendNotification';
 import { Plus, Trash2, Smartphone, Monitor, Send, Eye } from 'lucide-react';
 
 interface ActionButton {
@@ -12,7 +12,6 @@ interface ActionButton {
 }
 
 export function NotificationCreator({ onSuccess }: { onSuccess: () => void }) {
-    const supabase = createClient();
     const [loading, setLoading] = useState(false);
 
     // Form State
@@ -50,17 +49,16 @@ export function NotificationCreator({ onSuccess }: { onSuccess: () => void }) {
         setLoading(true);
 
         try {
-            const { error } = await supabase.from('notifications').insert({
+            const result = await sendNotification({
                 title,
                 message,
-                image_url: imageUrl || null,
+                image_url: imageUrl,
                 action_buttons: actionButtons,
                 type,
-                target_audience: targetAudience,
-                is_active: true
+                target_audience: targetAudience
             });
 
-            if (error) throw error;
+            if (!result.success) throw new Error(result.error);
 
             // Reset Form
             setTitle('');
@@ -69,9 +67,9 @@ export function NotificationCreator({ onSuccess }: { onSuccess: () => void }) {
             setActionButtons([]);
             alert('Notificação enviada com sucesso!');
             onSuccess();
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert('Erro ao enviar notificação.');
+            alert(`Erro ao enviar notificação: ${err.message || 'Erro desconhecido'}`);
         } finally {
             setLoading(false);
         }
