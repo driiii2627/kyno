@@ -2,42 +2,78 @@
     position: fixed;
     inset: 0;
     z-index: 99999;
-    /* Very high */
-    background-color: rgba(5, 5, 5, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background-color: rgba(5, 5, 5, 0.96);
+    /* Slightly darker for better contrast */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     display: flex;
     flex-direction: column;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Custom Scrollbar */
+.body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.body::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+}
+
+.body::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.trendingRow::-webkit-scrollbar {
+    height: 4px;
+    /* Thin horizontal scroll */
+}
+
+.trendingRow::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.trendingRow::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
 .header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    padding-top: max(1.5rem, env(safe-area-inset-top));
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+    gap: 1.5rem;
+    /* Increased gap */
+    padding: 2rem 2rem 1.5rem 2rem;
+    /* More breathing room */
+    padding-top: max(2rem, env(safe-area-inset-top));
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
 }
 
 .inputWrapper {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0 1rem;
-    height: 3.5rem;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Softer border */
+    padding: 0 1.25rem;
+    height: 4rem;
+    /* Taller input */
     border-radius: 9999px;
-    /* Pill shape */
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .inputWrapper:focus-within {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    /* Softer glow */
 }
 
 .input {
@@ -45,18 +81,20 @@
     background: transparent;
     border: none;
     color: white;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+    /* Larger text */
     outline: none;
     height: 100%;
 }
 
 .input::placeholder {
-    color: #888;
+    color: #666;
+    font-weight: 400;
 }
 
 .closeBtn {
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 4rem;
+    height: 4rem;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 50%;
     border: none;
@@ -65,47 +103,85 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
 .closeBtn:hover {
     background: rgba(255, 255, 255, 0.15);
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
 }
 
 .body {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem 1.5rem 3rem 1.5rem;
+    padding: 1.5rem 2rem 4rem 2rem;
+    /* More padding */
+}
+
+/* Empty State */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    text-align: center;
+    color: #888;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.emoji {
+    font-size: 5rem;
+    /* HUGE emoji */
+    margin-bottom: 1.5rem;
+    filter: grayscale(0.5);
+    transition: transform 0.3s;
+}
+
+.emptyState:hover .emoji {
+    transform: scale(1.2) rotate(10deg);
+    filter: grayscale(0);
+}
+
+.emptyText {
+    font-size: 1.2rem;
+    font-weight: 500;
+    max-width: 300px;
+    line-height: 1.5;
 }
 
 .resultItem {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    padding: 0.75rem;
-    border-radius: 16px;
-    /* Rounded items */
+    gap: 1.5rem;
+    /* More space */
+    padding: 1rem;
+    border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s;
     background: transparent;
     border: 1px solid transparent;
+    margin-bottom: 0.5rem;
+    /* Separation between items */
 }
 
 .resultItem:hover {
     background: rgba(255, 255, 255, 0.08);
-    transform: scale(1.01);
+    /* Brighter hover */
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
 .posterWrapper {
-    width: 56px;
-    height: 84px;
-    border-radius: 10px;
+    width: 64px;
+    /* Larger poster */
+    height: 96px;
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
     background: #222;
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .poster {
@@ -121,9 +197,9 @@
 
 .title {
     color: white;
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin: 0 0 0.25rem 0;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -133,30 +209,31 @@
 .meta {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    font-size: 0.85rem;
+    gap: 1rem;
+    font-size: 0.9rem;
     color: #aaa;
 }
 
 .badge {
     background: rgba(255, 255, 255, 0.1);
     color: white;
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
     font-weight: 700;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .badgeTv {
-    background: rgba(168, 85, 247, 0.25);
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.1));
     color: #e9d5ff;
+    border: 1px solid rgba(168, 85, 247, 0.2);
 }
 
 .dot {
-    width: 4px;
-    height: 4px;
+    width: 5px;
+    height: 5px;
     background: #555;
     border-radius: 50%;
 }
@@ -165,23 +242,27 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
+    max-width: 250px;
+    color: #888;
 }
 
 .sectionTitle {
-    color: #888;
-    font-size: 0.8rem;
-    font-weight: 700;
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 1.25rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 1.5rem;
     padding-left: 0.5rem;
 }
 
 .genresGrid {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 1rem;
+    /* More gap */
+    margin-bottom: 3rem;
+    /* Space between sections */
 }
 
 @media (min-width: 768px) {
@@ -191,16 +272,16 @@
 }
 
 .genreCard {
-    padding: 0.75rem 1.5rem;
-    background: rgba(255, 255, 255, 0.08);
+    padding: 0.85rem 1.75rem;
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 9999px;
-    /* Pill */
-    color: #ddd;
+    /* Very subtle */
+    border-radius: 100px;
+    color: #ccc;
     text-align: center;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.2s;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     text-decoration: none;
     display: inline-block;
 }
@@ -208,59 +289,67 @@
 .genreCard:hover {
     background: white;
     color: black;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
+    border-color: white;
 }
 
 .trendingRow {
     display: flex;
-    gap: 1.25rem;
+    gap: 1.5rem;
     overflow-x: auto;
-    padding: 0.5rem 0.5rem 1.5rem 0.5rem;
+    padding: 1rem 0.5rem 2rem 0.5rem;
     scroll-snap-type: x mandatory;
 }
 
 .trendingItem {
-    width: 6.5rem;
+    width: 8.5rem;
+    /* Larger items */
     flex-shrink: 0;
     cursor: pointer;
     scroll-snap-align: start;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
 }
 
 .trendingItem:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px);
 }
 
 .trendingPoster {
     aspect-ratio: 2/3;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     background: #222;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     position: relative;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.3s;
+}
+
+.trendingItem:hover .trendingPoster {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
 }
 
 .trendingImg {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.2s;
+    transition: opacity 0.3s, transform 0.5s;
 }
 
 .trendingItem:hover .trendingImg {
-    opacity: 0.8;
+    opacity: 0.9;
+    transform: scale(1.05);
 }
 
 .trendingTitle {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: #ccc;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 @keyframes fadeIn {
