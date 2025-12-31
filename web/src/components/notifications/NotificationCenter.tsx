@@ -93,12 +93,7 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
             {/* Bell Icon - Premium Glass Style */}
             <button
                 onClick={toggleInbox}
-                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all border
-                    ${isOpen
-                        ? 'bg-white/20 text-white border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.1)]' // Bright Glass active state
-                        : 'bg-white/5 backdrop-blur-md border-white/5 text-gray-300 hover:bg-white/10 hover:text-white hover:border-white/20' // Default Glass
-                    }
-                `}
+                className={`${styles.iconBtn} ${isOpen ? styles.iconBtnActive : ''} relative`}
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -134,8 +129,8 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                                         className="w-full text-left p-4 hover:bg-white/5 transition flex gap-3 items-start group"
                                     >
                                         <div className={`mt-1 w-2 h-2 rounded-full shrink-0 group-hover:scale-125 transition-transform ${n.type === 'promo' ? 'bg-purple-500' :
-                                                n.type === 'warning' ? 'bg-orange-500' :
-                                                    'bg-blue-500'
+                                            n.type === 'warning' ? 'bg-orange-500' :
+                                                'bg-blue-500'
                                             }`} />
                                         <div>
                                             <p className="text-sm font-medium text-white leading-snug mb-1 group-hover:text-blue-400 transition-colors">
