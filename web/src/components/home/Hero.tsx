@@ -136,6 +136,29 @@ export default function Hero({ movies }: HeroProps) {
     // Background Image
     const backdropUrl = getImageUrl(currentMovie.backdrop_path || '', 'original');
 
+    // Preference Notification State
+    const [prefNotification, setPrefNotification] = useState<{ visible: boolean, message: string }>({ visible: false, message: '' });
+
+    const showNotification = (msg: string) => {
+        setPrefNotification({ visible: true, message: msg });
+        setTimeout(() => setPrefNotification(prev => ({ ...prev, visible: false })), 3000);
+    };
+
+    const togglePlay = () => {
+        const newState = !isPlaying;
+        setIsPlaying(newState);
+
+        // Smart Preference: Save user's choice
+        localStorage.setItem(PREFERENCE_KEY, String(newState));
+
+        // Notify
+        if (newState) {
+            showNotification("Trailers automáticos: Ativados 🎬");
+        } else {
+            showNotification("Trailers automáticos: Pausados (Banner primeiro) 🖼️");
+        }
+    };
+
     return (
         <section className={styles.hero}>
             <div className={styles.heroBackground}>
@@ -185,6 +208,14 @@ export default function Hero({ movies }: HeroProps) {
                 <div className={`${styles.gradientOverlay} ${(trailerId && userTrailerPref && !showImageFallback) ? styles.videoMode : ''}`} />
                 <div className={styles.leftVignette} />
                 <div className={styles.bottomVignette} />
+
+                {/* Preference Toast */}
+                {prefNotification.visible && (
+                    <div className={styles.preferenceToast}>
+                        <Info size={16} className="text-sky-400" />
+                        {prefNotification.message}
+                    </div>
+                )}
             </div>
 
             {/* Controls Layer */}
@@ -196,7 +227,7 @@ export default function Hero({ movies }: HeroProps) {
                             <div className={styles.dubBadge}>DUB</div>
                         )}
 
-                        <button onClick={() => setIsPlaying(!isPlaying)} className={styles.controlBtnMain}>
+                        <button onClick={togglePlay} className={styles.controlBtnMain}>
                             {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
                         </button>
 

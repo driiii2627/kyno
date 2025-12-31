@@ -263,26 +263,77 @@
     margin-bottom: 2.5rem;
 }
 
+/* Watch Button Refinement */
 .watchBtn {
     display: flex;
     align-items: center;
+    justify-content: center;
+    /* Ensure contents are centered */
     gap: 1rem;
     background-color: #fff;
     color: #0F2027;
-    padding: 1.2rem 3.5rem;
-    /* Increased padding */
+    padding: 1.1rem 3.5rem;
+    /* Slight vertical adjustment */
     border-radius: 50px;
-    font-size: 1.5rem;
-    /* Increased from 1.2rem */
+    font-size: 1.6rem;
+    /* Slightly larger */
+    font-family: var(--font-outfit), sans-serif;
+    /* Ensure premium font */
     font-weight: 800;
-    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    line-height: 1;
+    /* Fix vertical alignment issues */
+    letter-spacing: -0.5px;
+    /* Tighter, more modern */
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, box-shadow 0.2s;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    margin-top: -5px;
+    /* Micro adjustment for optical alignment with icon */
+}
+
+.watchBtn svg {
+    /* Ensure icon is visually balanced */
+    transform: translateY(-1px);
 }
 
 .watchBtn:hover {
     transform: scale(1.05);
     background-color: #fff;
     box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+}
+
+/* Preference Toast Notification */
+.preferenceToast {
+    position: absolute;
+    bottom: 150px;
+    /* Above controls */
+    right: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    animation: slideInToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+@keyframes slideInToast {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .actionBtn {
