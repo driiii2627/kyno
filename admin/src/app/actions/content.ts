@@ -180,6 +180,8 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 video_url: videoUrl,
                 trailer_url: trailerUrl, // New Column
                 show_trailer: true,      // Default True
+                genre: details.genres?.map((g: any) => g.name).join(', ') || null,
+                genres: details.genres || [],
                 release_year: details.release_date ? parseInt(details.release_date.split('-')[0]) : null,
                 rating: details.vote_average,
                 created_at: new Date().toISOString()
@@ -200,6 +202,8 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 video_url: videoUrl,
                 trailer_url: trailerUrl, // New Column
                 show_trailer: true,      // Default True
+                genre: details.genres?.map((g: any) => g.name).join(', ') || null,
+                genres: details.genres || [],
                 release_year: details.first_air_date ? parseInt(details.first_air_date.split('-')[0]) : null,
                 rating: details.vote_average,
                 created_at: new Date().toISOString()
@@ -470,6 +474,8 @@ export async function syncContentAction(id: number, type: 'movie' | 'tv', tmdbId
             backdrop_url: details.backdrop_path,
             logo_url: logoPath,
             trailer_url: trailerUrl, // Update Trailer
+            genre: details.genres?.map((g: any) => g.name).join(', ') || null,
+            genres: details.genres || [],
             release_year: (details.first_air_date || details.release_date || '').split('-')[0] || null,
             rating: details.vote_average,
             // NOT updating video_url to avoid breaking custom links

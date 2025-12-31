@@ -253,23 +253,48 @@ export function ContentManager() {
 
     // START NEW FUNCTION
     const handleSyncGenres = async () => {
-        if (!confirm('Iniciar sincronização de gêneros para itens incompletos?')) return;
+        // Find items without genres (null or empty string)
+        const itemsToSync = libraryResults.filter(item => !item.genre || item.genre.trim() === '');
+
+        if (itemsToSync.length === 0) {
+            alert('Todos os itens já possuem gênero cadastrado!');
+            return;
+        }
+
+        if (!confirm(`Encontrados ${itemsToSync.length} itens sem gênero. Iniciar sincronização sequencial?`)) return;
 
         setProcessingQueue(true);
-        // Fake progress for UI feedback
-        setQueueProgress({ current: 0, total: 100, failed: 0 });
+        setQueueProgress({ current: 0, total: itemsToSync.length, failed: 0 });
 
-        const res = await syncGenresAction();
+        // Process Queue Client-Side
+        for (let i = 0; i < itemsToSync.length; i++) {
+            const item = itemsToSync[i];
+
+            // Security Delay (500ms to avoid rate limits)
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            try {
+                // Using syncContentAction which now properly updates genres
+                const res = await syncContentAction(item.id, item.media_type, item.tmdb_id);
+
+                if (res.success) {
+                    // Good
+                } else {
+                    console.error(`Failed to sync genre for ${item.title}`, res.error);
+                    setQueueProgress(prev => prev ? { ...prev, failed: prev.failed + 1 } : null);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
+            setQueueProgress(prev => prev ? { ...prev, current: prev.current + 1 } : null);
+        }
 
         setProcessingQueue(false);
         setQueueProgress(null);
 
-        if (res.success) {
-            alert(`Sincronização concluída!\nAtualizados: ${res.count}\nErros: ${res.errors}`);
-            loadLibrary();
-        } else {
-            alert('Erro: ' + res.error);
-        }
+        loadLibrary(); // Refresh list to fill in the new genres
+        alert('Sincronização de gêneros concluída!');
     };
     // END NEW FUNCTION
 
