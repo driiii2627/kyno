@@ -121,26 +121,29 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                                 Nenhuma notificação nova.
                             </div>
                         ) : (
-                            <div className="divide-y divide-zinc-800">
+                            <div className={styles.list}>
                                 {notifications.map((n) => (
                                     <button
                                         key={n.id}
                                         onClick={() => handleNotificationClick(n)}
-                                        className="w-full text-left p-4 hover:bg-white/5 transition flex gap-3 items-start group"
+                                        className={styles.listItem}
                                     >
-                                        <div className={`mt-1 w-2 h-2 rounded-full shrink-0 group-hover:scale-125 transition-transform ${n.type === 'promo' ? 'bg-purple-500' :
-                                            n.type === 'warning' ? 'bg-orange-500' :
-                                                'bg-blue-500'
-                                            }`} />
-                                        <div>
-                                            <p className="text-sm font-medium text-white leading-snug mb-1 group-hover:text-blue-400 transition-colors">
+                                        <div
+                                            className={styles.unreadIndicator}
+                                            style={{
+                                                backgroundColor: n.type === 'promo' ? '#a855f7' : n.type === 'warning' ? '#f97316' : '#3b82f6',
+                                                color: n.type === 'promo' ? '#a855f7' : n.type === 'warning' ? '#f97316' : '#3b82f6'
+                                            }}
+                                        />
+                                        <div className={styles.contentCol}>
+                                            <p className={styles.itemTitle}>
                                                 {n.title}
                                             </p>
-                                            <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                                            <p className={styles.itemMessage}>
                                                 {n.message}
                                             </p>
-                                            <span className="text-[10px] text-zinc-600 mt-2 block">
-                                                {new Date(n.created_at).toLocaleDateString()}
+                                            <span className={styles.itemDate}>
+                                                {new Date(n.created_at).toLocaleDateString('pt-BR')}
                                             </span>
                                         </div>
                                     </button>
