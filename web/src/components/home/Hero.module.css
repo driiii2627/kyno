@@ -54,13 +54,21 @@
 }
 
 /* 
-   When video is paused, we show the banner ON TOP of the video.
-   z-index must be > 1 (trailer) but < 100 (controls).
+   Trailer Overlay Strategy:
+   When trailer is active, we keep the image ON TOP of the video (z-index 2).
+   We accept clicks via pointer-events: none (so controls work).
+   We toggle opacity based on play state.
 */
-.visibleOverride {
-    opacity: 1 !important;
+.trailerActive {
     z-index: 5 !important;
-    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out !important;
+    /* Faster transition for UI feedback */
+    opacity: 1;
+}
+
+.trailerActive.trailerPlaying {
+    opacity: 0 !important;
 }
 
 /* Cleaner, less intrusive overlay with SUBTLE BLUE hint at edges */

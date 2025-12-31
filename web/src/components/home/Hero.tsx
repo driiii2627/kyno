@@ -156,23 +156,18 @@ export default function Hero({ movies }: HeroProps) {
                 )}
 
                 {/* 
-                    Image Layer (Fade Transition)
-                    We only render the CURRENT image directly. 
-                    For crossfade, Next.js Image optimization usually handles cache swap well, 
-                    but simpler is better for performance.
-                */}
-                {/* 
-                    Image Layer (Fade Transition)
-                    Show if:
-                    1. No trailer active (normal image mode)
-                    2. Trailer active BUT paused (User requested banner overlay on pause)
+                    Image Layer (Fade Transition) with Stable Z-Index Strategy
+                    - trailerActive: Lifts image to Z-5 (above video)
+                    - trailerPlaying: Sets opacity to 0 (shows video)
+                    - Removing trailerPlaying: Sets opacity to 1 (shows image)
                 */}
                 <div
                     key={currentMovie.id}
                     className={`
                         ${styles.heroImage} 
                         ${styles.active} 
-                        ${(trailerId && userTrailerPref && !showImageFallback && !isPlaying) ? styles.visibleOverride : ''}
+                        ${(trailerId && userTrailerPref && !showImageFallback) ? styles.trailerActive : ''}
+                        ${(trailerId && userTrailerPref && !showImageFallback && isPlaying) ? styles.trailerPlaying : ''}
                     `}
                 >
                     <OptimizedImage
