@@ -1,6 +1,6 @@
 import Hero from '@/components/home/Hero';
 import MovieRow from '@/components/home/MovieRow';
-import AutoGenreSyncer from '@/components/maintenance/AutoGenreSyncer';
+
 import { tmdb } from '@/services/tmdb';
 import { contentService } from '@/services/content';
 import { hashedSort, randomShuffle, getTimeSeed } from '@/lib/utils';
@@ -140,7 +140,7 @@ export default async function Home() {
       {/* Hero */}
       {heroMovies.length > 0 && <Hero movies={heroMovies} />}
 
-      <AutoGenreSyncer />
+
 
 
 

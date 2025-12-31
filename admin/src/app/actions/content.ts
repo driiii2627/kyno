@@ -485,3 +485,78 @@ export async function syncContentAction(id: number, type: 'movie' | 'tv', tmdbId
         return { error: err.message };
     }
 }
+
+/**
+ * Syncs ALL items with empty genres in the database.
+ * Used for database maintenance.
+ */
+export async function syncGenresAction() {
+    try {
+        const admin = await createAdminClient();
+        console.log('[SyncGenres] Starting...');
+
+        // 1. Fetch Movies
+        const { data: movies } = await admin
+            .from('movies')
+            .select('id, tmdb_id')
+            .is('genre', null)
+            .limit(50); // Batch size
+
+        // 2. Fetch Series
+        const { data: series } = await admin
+            .from('series')
+            .select('id, tmdb_id')
+            .is('genre', null)
+            .limit(50);
+
+        let count = 0;
+        let errors = 0;
+
+        // Process Movies
+        if (movies) {
+            for (const m of movies) {
+                try {
+                    const details = await tmdb.getDetails(m.tmdb_id, 'movie');
+                    if (details.genres) {
+                        const genreStr = details.genres.map(g => g.name).join(', ');
+                        await admin.from('movies').update({
+                            genre: genreStr,
+                            genres: details.genres
+                        }).eq('id', m.id);
+                        count++;
+                    }
+                } catch (e) {
+                    console.error(`Error syncing movie ${m.tmdb_id}`, e);
+                    errors++;
+                }
+            }
+        }
+
+        // Process Series
+        if (series) {
+            for (const s of series) {
+                try {
+                    const details = await tmdb.getDetails(s.tmdb_id, 'tv');
+                    if (details.genres) {
+                        const genreStr = details.genres.map(g => g.name).join(', ');
+                        await admin.from('series').update({
+                            genre: genreStr,
+                            genres: details.genres
+                        }).eq('id', s.id);
+                        count++;
+                    }
+                } catch (e) {
+                    console.error(`Error syncing series ${s.tmdb_id}`, e);
+                    errors++;
+                }
+            }
+        }
+
+        revalidatePath('/');
+        return { success: true, count, errors, remaining: (movies?.length || 0) + (series?.length || 0) };
+
+    } catch (err: any) {
+        console.error('Sync Genres Error:', err);
+        return { error: err.message };
+    }
+}
