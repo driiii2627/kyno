@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import NotificationPopup from './NotificationPopup';
 import styles from './Notifications.module.css';
+import { useNotification } from '@/context/NotificationContext';
 
 interface NotificationCenterProps {
     isMobile?: boolean; // If true, adapts styling for mobile navbar
@@ -15,7 +15,10 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
     const [notifications, setNotifications] = useState<any[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
-    const [activePopup, setActivePopup] = useState<any>(null);
+
+    // Global Notification Context
+    const { openNotification } = useNotification();
+
     const popupRef = useRef<HTMLDivElement>(null);
 
     // Fetch Notifications
@@ -40,9 +43,6 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                 const unread = data.filter(n => !viewedIds.includes(n.id)).length;
                 setUnreadCount(unread);
                 setNotifications(data);
-
-                // Auto-trigger latest popup if it's very distinct? 
-                // Nah, intrusive. Let user click.
             }
         };
 
@@ -83,7 +83,8 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
     };
 
     const handleNotificationClick = (notification: any) => {
-        setActivePopup(notification);
+        // Trigger Global Popup
+        openNotification(notification);
         setIsOpen(false);
     };
 
@@ -155,14 +156,6 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                         )}
                     </div>
                 </div>
-            )}
-
-            {/* Full Popup Modal - Only render when active to ensure lifecycle hooks run correctly */}
-            {activePopup && (
-                <NotificationPopup
-                    notification={activePopup}
-                    onClose={() => setActivePopup(null)}
-                />
             )}
         </div>
     );
