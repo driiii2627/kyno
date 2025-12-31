@@ -111,18 +111,28 @@ export default async function Home() {
 
   // 6. Genres Filtering (From DB Data)
   // Check both 'genre' string (Database fallback) and 'genres' array (TMDB Hydrated)
+  // 6. Genres Filtering (From DB Data)
+  // Check both 'genre' string (Database fallback) and 'genres' array (TMDB Hydrated)
   const filterByGenre = (items: import('@/services/content').CatalogItem[], keywords: string[]) => {
     return items.filter(m => {
       const dbGenre = m.genre?.toLowerCase() || '';
       const tmdbGenres = m.genres?.map(g => g.name.toLowerCase()).join(' ') || '';
-      const combined = `${dbGenre} ${tmdbGenres}`;
-      return keywords.some(k => combined.includes(k));
+
+      // Normalize str to remove accents for better matching
+      const combined = `${dbGenre} ${tmdbGenres}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      return keywords.some(k => {
+        const normK = k.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return combined.includes(normK);
+      });
     });
   };
 
-  const actionMovies = filterByGenre(catalogMovies, ['ação', 'action']).slice(0, 15);
-  const comedyMovies = filterByGenre(catalogMovies, ['comédia', 'comedy']).slice(0, 15);
-  const horrorMovies = filterByGenre(catalogMovies, ['terror', 'horror']).slice(0, 15);
+  const actionMovies = filterByGenre(catalogMovies, ['ação', 'action', 'aventura', 'adventure']).slice(0, 15);
+  const comedyMovies = filterByGenre(catalogMovies, ['comédia', 'comedy', 'stand-up', 'stand up', 'comedia', 'humor', 'engraçado', 'familia']).slice(0, 15);
+  const horrorMovies = filterByGenre(catalogMovies, ['terror', 'horror', 'suspense', 'thriller', 'medo', 'assustador']).slice(0, 15);
+  const animationMovies = filterByGenre(catalogMovies, ['animação', 'animation', 'anime', 'animes', 'desenho', 'cartoon', 'infantil']).slice(0, 15);
+  const scifiMovies = filterByGenre(catalogMovies, ['ficção', 'fiction', 'sci-fi', 'scifi', 'futuro', 'espaço', 'space']).slice(0, 15);
 
 
   return (
@@ -178,11 +188,19 @@ export default async function Home() {
         )}
 
         {comedyMovies.length > 0 && (
-          <MovieRow title="Comédia" movies={comedyMovies} viewAllLink="/category/comedia" />
+          <MovieRow title="Comédia e Família" movies={comedyMovies} viewAllLink="/category/comedia" />
+        )}
+
+        {animationMovies.length > 0 && (
+          <MovieRow title="Animação" movies={animationMovies} viewAllLink="/category/animacao" />
+        )}
+
+        {scifiMovies.length > 0 && (
+          <MovieRow title="Ficção Científica" movies={scifiMovies} viewAllLink="/category/ficcao" />
         )}
 
         {horrorMovies.length > 0 && (
-          <MovieRow title="Terror" movies={horrorMovies} viewAllLink="/category/terror" />
+          <MovieRow title="Terror e Suspense" movies={horrorMovies} viewAllLink="/category/terror" />
         )}
       </div>
     </div>
