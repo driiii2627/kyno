@@ -81,7 +81,9 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
         }
     }, [isOpen]);
 
-    // Perform Search
+    const [activeFilter, setActiveFilter] = useState('Todos');
+
+    // Perform Search & Filter
     useEffect(() => {
         if (!query.trim() || !fuse) {
             setResults([]);
@@ -89,8 +91,22 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
         }
 
         const fuseResults = fuse.search(query);
-        setResults(fuseResults.map(r => r.item).slice(0, 10)); // Top 10
-    }, [query, fuse]);
+        let finalResults = fuseResults.map(r => r.item);
+
+        // Client-side filtering
+        if (activeFilter !== 'Todos') {
+            finalResults = finalResults.filter(item => {
+                if (activeFilter === 'Filmes') return item.media_type === 'movie';
+                if (activeFilter === 'Séries') return item.media_type === 'tv';
+
+                // Genre matching (e.g. "Action, Adventure" includes "Ação" -> normalized check needed if data is in PT)
+                // Assuming item.genre is a string like "Ação, Aventura"
+                return item.genre?.includes(activeFilter);
+            });
+        }
+
+        setResults(finalResults.slice(0, 50)); // Increase limit for filtered results
+    }, [query, fuse, activeFilter]);
 
     const handleNavigation = (item: any) => {
         // Always navigate to the universal details page
@@ -98,7 +114,10 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
         router.push(route);
         onClose();
         setQuery('');
+        setActiveFilter('Todos'); // Reset filter
     };
+
+    const filters = ['Todos', 'Filmes', 'Séries', 'Animação', 'Terror', 'Comédia', 'Ação', 'Ficção'];
 
     // Only render on client and if open
     if (!mounted || !isOpen) return null;
@@ -123,6 +142,21 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
                     <X size={24} />
                 </button>
             </div>
+
+            {/* Filter Bar - Only show when there is a query or results */}
+            {query && (
+                <div className={styles.filterBar}>
+                    {filters.map(f => (
+                        <button
+                            key={f}
+                            onClick={() => setActiveFilter(f)}
+                            className={`${styles.filterChip} ${activeFilter === f ? styles.filterChipActive : ''}`}
+                        >
+                            {f}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* Content Body */}
             <div className={styles.body}>
