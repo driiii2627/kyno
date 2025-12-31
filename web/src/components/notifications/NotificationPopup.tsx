@@ -11,30 +11,40 @@ interface NotificationPopupProps {
 }
 
 export default function NotificationPopup({ notification, onClose }: NotificationPopupProps) {
-    // Safety check for action_buttons
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    if (!mounted || !notification) return null;
     const buttons = Array.isArray(notification.action_buttons) ? notification.action_buttons : [];
 
-    // Removed createPortal to avoid stacking context issues. 
-    // Rendered directly as fixed overlay.
-    return (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 pointer-events-auto">
+    // Use Portal to escape Navbar stacking context
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                 onClick={(e) => {
                     e.stopPropagation();
-                    console.log('Closing popup via backdrop');
                     onClose();
                 }}
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-[100000]">
+            <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-[100000] animate-in fade-in zoom-in-95 duration-200">
                 {/* Close Button */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        console.log('Closing popup via button');
                         onClose();
                     }}
                     className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors"
@@ -82,6 +92,7 @@ export default function NotificationPopup({ notification, onClose }: Notificatio
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
