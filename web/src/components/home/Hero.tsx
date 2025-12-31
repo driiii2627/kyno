@@ -39,6 +39,9 @@ export default function Hero({ movies }: HeroProps) {
     // User Preference
     const [userTrailerPref, setUserTrailerPref] = useState<boolean>(true); // Default true for desktop
 
+    // Preference Notification State
+    const [prefNotification, setPrefNotification] = useState<{ visible: boolean, message: string }>({ visible: false, message: '' });
+
     // INIT: Shuffle & Preferences
     useEffect(() => {
         // 1. Shuffle Movies (Fisher-Yates) on Mount
@@ -57,7 +60,9 @@ export default function Hero({ movies }: HeroProps) {
         const savedPref = localStorage.getItem(PREFERENCE_KEY);
 
         if (savedPref !== null) {
-            setUserTrailerPref(savedPref === 'true');
+            const shouldPlay = savedPref === 'true';
+            setUserTrailerPref(shouldPlay);
+            setIsPlaying(shouldPlay); // Sync initial playing state with preference
         } else {
             // Default: Image on touch, Trailer on PC
             setUserTrailerPref(!isTouch);
@@ -77,7 +82,12 @@ export default function Hero({ movies }: HeroProps) {
     useEffect(() => {
         setShowImageFallback(false);
         setTrailerProgress(0);
-        setIsPlaying(true); // Always start playing new slide
+
+        // Check preference again to set initial play state for new slide
+        const savedPref = localStorage.getItem(PREFERENCE_KEY);
+        // If preference is explicitly false, start paused. Else play.
+        setIsPlaying(savedPref === 'false' ? false : true);
+
         // Mute state persists across slides
     }, [currentIndex]);
 
@@ -101,12 +111,13 @@ export default function Hero({ movies }: HeroProps) {
 
         // If a trailer IS supposed to play, don't rotate on timer (wait for onEnded)
         const isVideoActive = trailerId && userTrailerPref && !showImageFallback;
-        if (isVideoActive) return;
+        // Also don't rotate if user actively paused it (isPlaying === false) and is watching the banner
+        if (isVideoActive && isPlaying) return;
 
         const delay = 7000; // 7 seconds for images
         const timer = setTimeout(handleNext, delay);
         return () => clearTimeout(timer);
-    }, [currentIndex, trailerId, userTrailerPref, showImageFallback, currentMovie, handleNext]);
+    }, [currentIndex, trailerId, userTrailerPref, showImageFallback, currentMovie, handleNext, isPlaying]);
 
     // Scroll Logic (Pause on scroll)
     useEffect(() => {
@@ -114,30 +125,18 @@ export default function Hero({ movies }: HeroProps) {
             if (window.scrollY > window.innerHeight * 0.5) {
                 if (isPlaying) setIsPlaying(false);
             } else {
-                if (!isPlaying && !isAutoPausedRef.current) setIsPlaying(true);
+                // Only auto-resume if user didn't explicitly pause via preference
+                // Simple check: if not scrolled, we might resume, but let's respect the preference
+                // For simplicity, we won't auto-resume on scroll-up if user set preference to paused.
+                const savedPref = localStorage.getItem(PREFERENCE_KEY);
+                if (!isPlaying && savedPref !== 'false' && !isAutoPausedRef.current) setIsPlaying(true);
             }
         };
         // Debounce or simplistic check
         const isAutoPausedRef = { current: false }; // Simplified for this scope
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    if (!currentMovie) return null;
-
-    // Data Presentation
-    const year = new Date(currentMovie.release_date || currentMovie.first_air_date || Date.now()).getFullYear();
-    const rating = currentMovie.vote_average ? currentMovie.vote_average.toFixed(1) : 'N/A';
-    const title = currentMovie.title || currentMovie.name || '';
-    const genres = currentMovie.genres?.map(g => g.name).join(', ') || currentMovie.genre || 'Filme';
-    const isTv = !!currentMovie.first_air_date;
-    const linkHref = isTv ? `/serie/${currentMovie.supabase_id}` : `/filme/${currentMovie.supabase_id}`;
-
-    // Background Image
-    const backdropUrl = getImageUrl(currentMovie.backdrop_path || '', 'original');
-
-    // Preference Notification State
-    const [prefNotification, setPrefNotification] = useState<{ visible: boolean, message: string }>({ visible: false, message: '' });
+    }, [isPlaying]);
 
     const showNotification = (msg: string) => {
         setPrefNotification({ visible: true, message: msg });
@@ -158,6 +157,8 @@ export default function Hero({ movies }: HeroProps) {
             showNotification("Trailers automáticos: Pausados (Banner primeiro) 🖼️");
         }
     };
+
+    if (!currentMovie) return null;
 
     return (
         <section className={styles.hero}>
