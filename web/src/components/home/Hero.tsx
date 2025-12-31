@@ -220,14 +220,6 @@ export default function Hero({ movies }: HeroProps) {
                 <div className={`${styles.gradientOverlay} ${(trailerId && userTrailerPref && !showImageFallback) ? styles.videoMode : ''}`} />
                 <div className={styles.leftVignette} />
                 <div className={styles.bottomVignette} />
-
-                {/* Preference Toast */}
-                {prefNotification.visible && (
-                    <div className={styles.preferenceToast}>
-                        <Info size={16} className="text-sky-400" />
-                        {prefNotification.message}
-                    </div>
-                )}
             </div>
 
             {/* Controls Layer */}
