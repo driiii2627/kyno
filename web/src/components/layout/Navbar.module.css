@@ -110,7 +110,7 @@
 /* Profile Menu */
 .profileMenuContainer {
     position: relative;
-    margin-left: 1rem;
+    /* margin-left: 1rem; -- Removed to fix spacing inconsistency */
     z-index: 200;
 }
 
