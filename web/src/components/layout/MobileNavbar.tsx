@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 import { Home, Search, Heart, Sparkles } from 'lucide-react';
 import styles from './MobileNavbar.module.css';
 
+import { useState } from 'react';
+import SearchBar from '@/components/search/SearchBar';
+
 export default function MobileNavbar() {
     const pathname = usePathname();
 
@@ -37,23 +40,38 @@ export default function MobileNavbar() {
         }
     ];
 
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+
     return (
-        <nav className={styles.mobileNav}>
-            <div className={styles.navItems}>
-                {navItems.map((item) => (
-                    <Link
-                        key={item.label}
-                        href={item.href}
-                        className={`
-                            ${item.isFeatured ? styles.featuredItem : styles.navItem} 
-                            ${item.isActive ? styles.activeItem : ''}
-                        `}
-                    >
-                        <item.icon size={item.isFeatured ? 28 : 24} strokeWidth={item.isActive ? 2.5 : 2} />
-                        <span>{item.label}</span>
-                    </Link>
-                ))}
-            </div>
-        </nav>
+        <>
+            <SearchBar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+            <nav className={styles.mobileNav}>
+                <div className={styles.navItems}>
+                    {navItems.map((item) => {
+                        const isSearch = item.label === 'Buscar';
+                        const Component = isSearch ? 'button' : Link;
+                        const props = isSearch ? {
+                            onClick: () => setIsSearchOpen(true),
+                            className: `${item.isFeatured ? styles.featuredItem : styles.navItem} ${isSearchOpen ? styles.activeItem : ''}`,
+                            type: 'button' as 'button'
+                        } : {
+                            href: item.href,
+                            className: `${item.isFeatured ? styles.featuredItem : styles.navItem} ${item.isActive ? styles.activeItem : ''}`
+                        };
+
+                        return (
+                            // @ts-ignore
+                            <Component
+                                key={item.label}
+                                {...props}
+                            >
+                                <item.icon size={item.isFeatured ? 28 : 24} strokeWidth={item.isActive || (isSearch && isSearchOpen) ? 2.5 : 2} />
+                                <span>{item.label}</span>
+                            </Component>
+                        );
+                    })}
+                </div>
+            </nav>
+        </>
     );
 }

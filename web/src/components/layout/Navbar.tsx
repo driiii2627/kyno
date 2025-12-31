@@ -7,8 +7,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
 import { getProfilesAction, getActiveProfileAction, switchProfileAction, signOutAction } from '@/app/profiles/actions';
 
+import SearchBar from '@/components/search/SearchBar';
+
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const pathname = usePathname();
 
     useEffect(() => {
@@ -45,6 +48,9 @@ export default function Navbar() {
                 </div>
             )}
 
+            {/* Search Overlay */}
+            <SearchBar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
             {/* Desktop Nav Links */}
             <div className={styles.navLinks}>
                 <Link href="/" className={`${styles.link} ${pathname === '/' ? styles.active : ''}`}>Home</Link>
@@ -56,7 +62,10 @@ export default function Navbar() {
             {/* Icons - Hide on Category Pages */}
             {!isCategoryPage && (
                 <div className={styles.actions}>
-                    <button className={`${styles.iconBtn} ${styles.desktopOnly}`}>
+                    <button
+                        className={`${styles.iconBtn} ${styles.desktopOnly}`}
+                        onClick={() => setIsSearchOpen(true)}
+                    >
                         <Search size={22} />
                     </button>
                     <button className={`${styles.iconBtn} ${styles.desktopOnly}`}>
