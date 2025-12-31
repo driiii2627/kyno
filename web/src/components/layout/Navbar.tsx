@@ -75,9 +75,10 @@ export default function Navbar() {
                     </button>
                     <button className={`${styles.iconBtn} ${styles.desktopOnly}`}>
                         <Bookmark size={22} />
+                    </button>
 
-                        {/* Profile Menu instead of static User icon */}
-                        <ProfileMenu />
+                    {/* Profile Menu instead of static User icon */}
+                    <ProfileMenu />
                 </div>
             )}
         </nav>

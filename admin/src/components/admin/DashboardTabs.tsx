@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { UsersTable } from './UsersTable';
 import { ContentManager } from '@/components/content/ContentManager';
