@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, createPortal } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, X, Loader2, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Fuse from 'fuse.js';
