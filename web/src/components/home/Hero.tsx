@@ -16,7 +16,7 @@ interface HeroProps {
 
 import HeroTrailer from './HeroTrailer';
 
-const PREFERENCE_KEY = 'kyno_hero_trailer_pref';
+
 
 export default function Hero({ movies }: HeroProps) {
     // ... existing state
@@ -40,7 +40,7 @@ export default function Hero({ movies }: HeroProps) {
     const [userTrailerPref, setUserTrailerPref] = useState<boolean>(true); // Default true for desktop
 
     // Preference Notification State
-    const [prefNotification, setPrefNotification] = useState<{ visible: boolean, message: string }>({ visible: false, message: '' });
+
 
     // INIT: Shuffle & Preferences
     useEffect(() => {
@@ -57,16 +57,8 @@ export default function Hero({ movies }: HeroProps) {
 
         // 2. Check Device/Pref
         const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        const savedPref = localStorage.getItem(PREFERENCE_KEY);
-
-        if (savedPref !== null) {
-            const shouldPlay = savedPref === 'true';
-            setUserTrailerPref(shouldPlay);
-            setIsPlaying(shouldPlay); // Sync initial playing state with preference
-        } else {
-            // Default: Image on touch, Trailer on PC
-            setUserTrailerPref(!isTouch);
-        }
+        // Default: Image on touch, Trailer on PC
+        setUserTrailerPref(!isTouch);
     }, [movies]);
 
     // Derived State (Instant, No Async)
@@ -83,10 +75,8 @@ export default function Hero({ movies }: HeroProps) {
         setShowImageFallback(false);
         setTrailerProgress(0);
 
-        // Check preference again to set initial play state for new slide
-        const savedPref = localStorage.getItem(PREFERENCE_KEY);
-        // If preference is explicitly false, start paused. Else play.
-        setIsPlaying(savedPref === 'false' ? false : true);
+        // Always start playing new slide (Default behavior)
+        setIsPlaying(true);
 
         // Mute state persists across slides
     }, [currentIndex]);
@@ -138,24 +128,13 @@ export default function Hero({ movies }: HeroProps) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [isPlaying]);
 
-    const showNotification = (msg: string) => {
-        setPrefNotification({ visible: true, message: msg });
-        setTimeout(() => setPrefNotification(prev => ({ ...prev, visible: false })), 3000);
-    };
+
 
     const togglePlay = () => {
         const newState = !isPlaying;
         setIsPlaying(newState);
 
-        // Smart Preference: Save user's choice
-        localStorage.setItem(PREFERENCE_KEY, String(newState));
 
-        // Notify
-        if (newState) {
-            showNotification("Trailers automáticos: Ativados 🎬");
-        } else {
-            showNotification("Trailers automáticos: Pausados (Banner primeiro) 🖼️");
-        }
     };
 
     if (!currentMovie) return null;
