@@ -266,6 +266,9 @@ export function ContentManager() {
         setProcessingQueue(true);
         setQueueProgress({ current: 0, total: itemsToSync.length, failed: 0 });
 
+        let successCount = 0;
+        let failCount = 0;
+
         // Process Queue Client-Side
         for (let i = 0; i < itemsToSync.length; i++) {
             const item = itemsToSync[i];
@@ -278,13 +281,15 @@ export function ContentManager() {
                 const res = await syncContentAction(item.id, item.media_type, item.tmdb_id);
 
                 if (res.success) {
-                    // Good
+                    successCount++;
                 } else {
                     console.error(`Failed to sync genre for ${item.title}`, res.error);
+                    failCount++;
                     setQueueProgress(prev => prev ? { ...prev, failed: prev.failed + 1 } : null);
                 }
             } catch (e) {
                 console.error(e);
+                failCount++;
             }
 
             setQueueProgress(prev => prev ? { ...prev, current: prev.current + 1 } : null);
@@ -294,7 +299,7 @@ export function ContentManager() {
         setQueueProgress(null);
 
         loadLibrary(); // Refresh list to fill in the new genres
-        alert('Sincronização de gêneros concluída!');
+        alert(`Sincronização finalizada!\n\n✅ Sucessos: ${successCount}\n❌ Falhas: ${failCount}\n\nSe houve falhas, verifique o console ou as chaves de API.`);
     };
     // END NEW FUNCTION
 

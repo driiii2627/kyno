@@ -475,7 +475,7 @@ export async function syncContentAction(id: number, type: 'movie' | 'tv', tmdbId
             logo_url: logoPath,
             trailer_url: trailerUrl, // Update Trailer
             genre: details.genres?.map((g: any) => g.name).join(', ') || null,
-            genres: details.genres || [],
+            // genres: details.genres || [], // Commented out to prevent errors if column missing
             release_year: (details.first_air_date || details.release_date || '').split('-')[0] || null,
             rating: details.vote_average,
             // NOT updating video_url to avoid breaking custom links
