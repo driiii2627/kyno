@@ -90,12 +90,13 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
     return (
         <div className="relative" ref={popupRef}>
             {/* Bell Icon - Premium Glass Style */}
+            {/* Bell Icon - Premium Glass Style (Matches Navbar.module.css .iconBtn) */}
             <button
                 onClick={toggleInbox}
                 className={`relative flex items-center justify-center w-10 h-10 rounded-full transition-all border
                     ${isOpen
                         ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]'
-                        : 'bg-white/5 backdrop-blur-md border-white/10 text-gray-300 hover:bg-white/15 hover:text-white hover:border-white/20'
+                        : 'bg-white/10 backdrop-blur-md border-white/5 text-gray-300 hover:bg-white/20 hover:text-white hover:border-white/30'
                     }
                 `}
             >

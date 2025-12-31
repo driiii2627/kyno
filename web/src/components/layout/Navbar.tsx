@@ -67,14 +67,12 @@ export default function Navbar() {
                     <NotificationCenter />
 
                     {/* Search Trigger */}
+                    {/* Search Trigger */}
                     <button
                         onClick={() => setIsSearchOpen(true)}
-                        className={styles.iconButton}
+                        className={styles.iconBtn}
                     >
                         <Search size={22} />
-                    </button>
-                    <button className={`${styles.iconBtn} ${styles.desktopOnly}`}>
-                        <Bookmark size={22} />
                     </button>
 
                     {/* Profile Menu instead of static User icon */}
