@@ -161,7 +161,20 @@ export default function Hero({ movies }: HeroProps) {
                     For crossfade, Next.js Image optimization usually handles cache swap well, 
                     but simpler is better for performance.
                 */}
-                <div key={currentMovie.id} className={`${styles.heroImage} ${styles.active}`}>
+                {/* 
+                    Image Layer (Fade Transition)
+                    Show if:
+                    1. No trailer active (normal image mode)
+                    2. Trailer active BUT paused (User requested banner overlay on pause)
+                */}
+                <div
+                    key={currentMovie.id}
+                    className={`
+                        ${styles.heroImage} 
+                        ${styles.active} 
+                        ${(trailerId && userTrailerPref && !showImageFallback && !isPlaying) ? styles.visibleOverride : ''}
+                    `}
+                >
                     <OptimizedImage
                         src={backdropUrl}
                         tinySrc={getImageUrl(currentMovie.backdrop_path || '', 'w92')}

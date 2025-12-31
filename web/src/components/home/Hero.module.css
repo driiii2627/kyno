@@ -53,6 +53,16 @@
     /* Subtle zoom while active */
 }
 
+/* 
+   When video is paused, we show the banner ON TOP of the video.
+   z-index must be > 1 (trailer) but < 100 (controls).
+*/
+.visibleOverride {
+    opacity: 1 !important;
+    z-index: 5 !important;
+    transition: opacity 0.5s ease-in-out;
+}
+
 /* Cleaner, less intrusive overlay with SUBTLE BLUE hint at edges */
 .gradientOverlay {
     position: absolute;
