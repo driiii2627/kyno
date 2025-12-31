@@ -115,11 +115,10 @@ export default function Hero({ movies }: HeroProps) {
             if (window.scrollY > window.innerHeight * 0.5) {
                 if (isPlaying) setIsPlaying(false);
             } else {
-                // Only auto-resume if user didn't explicitly pause via preference
-                // Simple check: if not scrolled, we might resume, but let's respect the preference
-                // For simplicity, we won't auto-resume on scroll-up if user set preference to paused.
-                const savedPref = localStorage.getItem(PREFERENCE_KEY);
-                if (!isPlaying && savedPref !== 'false' && !isAutoPausedRef.current) setIsPlaying(true);
+                // Simplified auto-resume: if we scroll back up, just resume.
+                // Since we don't have persistence, we can't know if the user "explicitly" paused it 
+                // vs just auto-paused. So this behavior is acceptable for "default" mode.
+                if (!isPlaying && !isAutoPausedRef.current) setIsPlaying(true);
             }
         };
         // Debounce or simplistic check
