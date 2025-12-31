@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/utils/supabase/admin'; // Use Admin client for updates
+import { getServiceSupabase } from '@/lib/supabase'; // Use Admin client for updates
 import { tmdb } from '@/services/tmdb';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +16,8 @@ export async function GET() {
 
         // Let's assume separate tables as per standard Kyno structure, or 'content' table?
         // Service uses 'getCatalogMovies', likely distinct tables.
+
+        const supabaseAdmin = getServiceSupabase();
 
         const { data: movies, error: mError } = await supabaseAdmin
             .from('movies')
