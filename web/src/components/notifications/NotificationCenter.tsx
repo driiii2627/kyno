@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase';
 import NotificationPopup from './NotificationPopup';
 import styles from './Notifications.module.css';
 
@@ -11,7 +11,7 @@ interface NotificationCenterProps {
 }
 
 export default function NotificationCenter({ isMobile = false }: NotificationCenterProps) {
-    const supabase = createClient();
+    // const supabase = createClient(); // uses singleton now
     const [notifications, setNotifications] = useState<any[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
