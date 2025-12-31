@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface NotificationPopupProps {
     notification: any;
@@ -25,19 +24,28 @@ export default function NotificationPopup({ notification, onClose }: Notificatio
 
     if (!mounted || !notification) return null;
 
+    // Safety check for action_buttons
+    const buttons = Array.isArray(notification.action_buttons) ? notification.action_buttons : [];
+
     return createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
-                onClick={onClose}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                }}
             />
 
             {/* Modal */}
             <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
                 {/* Close Button */}
                 <button
-                    onClick={onClose}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClose();
+                    }}
                     className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors"
                 >
                     <X size={20} />
@@ -66,10 +74,10 @@ export default function NotificationPopup({ notification, onClose }: Notificatio
 
                     {/* Action Buttons */}
                     <div className="space-y-3">
-                        {notification.action_buttons?.map((btn: any, idx: number) => (
+                        {buttons.map((btn: any, idx: number) => (
                             <Link
                                 key={idx}
-                                href={btn.url}
+                                href={btn.url || '#'}
                                 onClick={onClose}
                                 className="block w-full py-3.5 rounded-xl font-bold text-center transition-transform active:scale-95 text-white"
                                 style={{
