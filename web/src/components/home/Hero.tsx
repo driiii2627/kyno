@@ -158,6 +158,9 @@ export default function Hero({ movies }: HeroProps) {
         }
     };
 
+    // Background Image
+    const backdropUrl = getImageUrl(currentMovie.backdrop_path || '', 'original');
+
     if (!currentMovie) return null;
 
     return (
