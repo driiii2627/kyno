@@ -8,7 +8,7 @@ import styles from './Navbar.module.css';
 import { getProfilesAction, getActiveProfileAction, switchProfileAction, signOutAction } from '@/app/profiles/actions';
 
 import SearchBar from '@/components/search/SearchBar';
-import NotificationCenter from '@/components/notifications/NotificationCenter';
+{/* Search Trigger */ }
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -63,9 +63,6 @@ export default function Navbar() {
             {/* Icons - Hide on Category Pages */}
             {!isCategoryPage && (
                 <div className={styles.actions}>
-                    {/* Notifications (Replaces List/Bell) */}
-                    <NotificationCenter />
-
                     {/* Search Trigger */}
                     {/* Search Trigger */}
                     <button
