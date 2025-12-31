@@ -551,13 +551,22 @@ export function ContentManager() {
                             />
                             {/* Sync Trailers Button (Only visible in 'trailers' or 'all' filter) */}
                             {['trailers', 'all'].includes(filterType) && (
-                                <button
-                                    onClick={handleSyncMissingTrailers}
-                                    title="Sincronizar Trailers Ausentes"
-                                    className="p-2 bg-white/5 border border-white/10 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                                >
-                                    <RefreshCw size={16} />
-                                </button>
+                                <>
+                                    <button
+                                        onClick={handleSyncMissingTrailers}
+                                        title="Sincronizar Trailers Ausentes"
+                                        className="p-2 bg-white/5 border border-white/10 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                                    >
+                                        <RefreshCw size={16} />
+                                    </button>
+                                    <button
+                                        onClick={handleSyncGenres}
+                                        title="Reparar Gêneros (Sync DB)"
+                                        className="p-2 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 hover:text-white hover:bg-blue-600 transition-colors"
+                                    >
+                                        <Layers size={16} />
+                                    </button>
+                                </>
                             )}
                         </div>
                     </div>
