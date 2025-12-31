@@ -163,6 +163,19 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
     recommendations = validRecommendations.slice(0, 15); // Final Limit
 
+    // Prepare Season Browser Node
+    let seasonBrowserNode = null;
+    if (item.type === 'tv' && initialSeasonData && 'seasons' in details) {
+        seasonBrowserNode = (
+            <SeasonBrowser
+                tmdbId={item.tmdb_id}
+                uuid={uuid}
+                seasons={details.seasons || []}
+                initialSeasonData={initialSeasonData}
+            />
+        );
+    }
+
     // Format Data
     const tmdbBackdrop = details.backdrop_path
         ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
