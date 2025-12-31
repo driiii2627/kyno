@@ -25,6 +25,27 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
     const [mounted, setMounted] = useState(false); // New state for hydration
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    const [emptyState, setEmptyState] = useState({ emoji: '🤔', text: '' });
+
+    // Funny Empty States
+    const emptyStates = [
+        { emoji: '🤷‍♂️', text: 'Nada por aqui... Será que o Thanos estalou os dedos?' },
+        { emoji: '🕵️‍♂️', text: 'Tentei achar, mas se escondeu melhor que o Mestre dos Magos.' },
+        { emoji: '🎬', text: 'Corta! Não achamos nada nessa cena.' },
+        { emoji: '👽', text: 'Houston, temos um problema. Título não identificado.' },
+        { emoji: '🧹', text: 'Vazio... tipo a minha carteira no final do mês.' },
+        { emoji: '🧟', text: 'Parece que esse filme virou zumbi e sumiu.' },
+        { emoji: '🤖', text: 'Bip Bop... Erro 404: Diversão não encontrada.' },
+        { emoji: '🍿', text: 'A pipoca esfriou esperando você digitar algo certo.' },
+        { emoji: '🦖', text: 'Extinto! Assim como os dinossauros.' }
+    ];
+
+    useEffect(() => {
+        if (!query) {
+            const random = emptyStates[Math.floor(Math.random() * emptyStates.length)];
+            setEmptyState(random);
+        }
+    }, [query]);
 
     // Init Mounted state
     useEffect(() => {
@@ -149,37 +170,11 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
                                 </div>
                             ))
                         ) : (
-    const [emptyState, setEmptyState] = useState({emoji: '🤔', text: '' });
-
-                        // Funny Empty States
-                        const emptyStates = [
-                        {emoji: '🤷‍♂️', text: 'Nada por aqui... Será que o Thanos estalou os dedos?' },
-                        {emoji: '🕵️‍♂️', text: 'Tentei achar, mas se escondeu melhor que o Mestre dos Magos.' },
-                        {emoji: '🎬', text: 'Corta! Não achamos nada nessa cena.' },
-                        {emoji: '👽', text: 'Houston, temos um problema. Título não identificado.' },
-                        {emoji: '🧹', text: 'Vazio... tipo a minha carteira no final do mês.' },
-                        {emoji: '🧟', text: 'Parece que esse filme virou zumbi e sumiu.' },
-                        {emoji: '🤖', text: 'Bip Bop... Erro 404: Diversão não encontrada.' },
-                        {emoji: '🍿', text: 'A pipoca esfriou esperando você digitar algo certo.' },
-                        {emoji: '🦖', text: 'Extinto! Assim como os dinossauros.' }
-                        ];
-
-    useEffect(() => {
-        if (!query) {
-            const random = emptyStates[Math.floor(Math.random() * emptyStates.length)];
-                        setEmptyState(random);
-        }
-    }, [query]);
-
-                        // ... (rest of code)
-
-                        // ... inside render:
-                        ) : (
-                        <div className={styles.emptyState}>
-                            <div className={styles.emoji}>{emptyState.emoji}</div>
-                            <p className={styles.emptyText}>{emptyState.text}</p>
-                            <p className="text-sm mt-2 text-gray-600">"{query}" não retornou nada.</p>
-                        </div>
+                            <div className={styles.emptyState}>
+                                <div className={styles.emoji}>{emptyState.emoji}</div>
+                                <p className={styles.emptyText}>{emptyState.text}</p>
+                                <p className="text-sm mt-2 text-gray-600">"{query}" não retornou nada.</p>
+                            </div>
                         )}
                     </div>
                 ) : (
