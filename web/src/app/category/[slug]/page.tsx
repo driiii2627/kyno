@@ -47,7 +47,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         } else if (slug === 'terror') {
             title = 'Terror e Suspense';
             const allMovies = await contentService.getCatalogMovies();
-            items = filterItems(allMovies, ['terror', 'horror', 'suspense', 'thriller', 'medo', 'assustador']);
+            items = filterItems(allMovies, ['terror', 'horror', 'suspense', 'thriller', 'medo', 'assustador']).filter(m => {
+                const combined = (m.genre || '') + (m.genres?.map((g: any) => g.name).join(' ') || '');
+                const isAction = /ação|action|aventura|adventure/i.test(combined);
+                const isHorror = /terror|horror/i.test(combined);
+                if (isAction && !isHorror) return false;
+                return true;
+            });
         } else if (slug === 'animacao') {
             title = 'Animação';
             const allMovies = await contentService.getCatalogMovies();

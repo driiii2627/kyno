@@ -130,7 +130,18 @@ export default async function Home() {
 
   const actionMovies = filterByGenre(catalogMovies, ['ação', 'action', 'aventura', 'adventure']).slice(0, 15);
   const comedyMovies = filterByGenre(catalogMovies, ['comédia', 'comedy', 'stand-up', 'stand up', 'comedia', 'humor', 'engraçado', 'familia']).slice(0, 15);
-  const horrorMovies = filterByGenre(catalogMovies, ['terror', 'horror', 'suspense', 'thriller', 'medo', 'assustador']).slice(0, 15);
+  const horrorMovies = filterByGenre(catalogMovies, ['terror', 'horror', 'suspense', 'thriller', 'medo', 'assustador'])
+    .filter(m => {
+      // Smart Filter: Exclude "Action Thrillers" that are not explicitly Horror
+      // "Fast & Furious" (Action, Thriller) -> Exclude
+      // "Alien" (Action, Horror) -> Keep
+      const combined = (m.genre || '') + (m.genres?.map(g => g.name).join(' ') || '');
+      const isAction = /ação|action|aventura|adventure/i.test(combined);
+      const isHorror = /terror|horror/i.test(combined);
+      if (isAction && !isHorror) return false;
+      return true;
+    })
+    .slice(0, 15);
   const animationMovies = filterByGenre(catalogMovies, ['animação', 'animation', 'anime', 'animes', 'desenho', 'cartoon', 'infantil']).slice(0, 15);
   const scifiMovies = filterByGenre(catalogMovies, ['ficção', 'fiction', 'sci-fi', 'scifi', 'futuro', 'espaço', 'space']).slice(0, 15);
 
