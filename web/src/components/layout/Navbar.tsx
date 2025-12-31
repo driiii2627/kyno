@@ -8,6 +8,7 @@ import styles from './Navbar.module.css';
 import { getProfilesAction, getActiveProfileAction, switchProfileAction, signOutAction } from '@/app/profiles/actions';
 
 import SearchBar from '@/components/search/SearchBar';
+import NotificationCenter from '@/components/notifications/NotificationCenter';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -62,18 +63,21 @@ export default function Navbar() {
             {/* Icons - Hide on Category Pages */}
             {!isCategoryPage && (
                 <div className={styles.actions}>
+                    {/* Notifications (Replaces List/Bell) */}
+                    <NotificationCenter />
+
+                    {/* Search Trigger */}
                     <button
-                        className={`${styles.iconBtn} ${styles.desktopOnly}`}
                         onClick={() => setIsSearchOpen(true)}
+                        className={styles.iconButton}
                     >
                         <Search size={22} />
                     </button>
                     <button className={`${styles.iconBtn} ${styles.desktopOnly}`}>
                         <Bookmark size={22} />
-                    </button>
 
-                    {/* Profile Menu instead of static User icon */}
-                    <ProfileMenu />
+                        {/* Profile Menu instead of static User icon */}
+                        <ProfileMenu />
                 </div>
             )}
         </nav>

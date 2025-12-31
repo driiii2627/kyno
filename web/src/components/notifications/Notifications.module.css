@@ -1,0 +1,14 @@
+/* Notifications.module.css */
+/* Minimal scrollbar for the inbox */
+.inboxList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.inboxList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.inboxList::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
