@@ -28,10 +28,10 @@ export default function NotificationPopup({ notification, onClose }: Notificatio
     const buttons = Array.isArray(notification.action_buttons) ? notification.action_buttons : [];
 
     return createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                 onClick={(e) => {
                     e.stopPropagation();
                     onClose();
@@ -39,7 +39,7 @@ export default function NotificationPopup({ notification, onClose }: Notificatio
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+            <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
                 {/* Close Button */}
                 <button
                     onClick={(e) => {
