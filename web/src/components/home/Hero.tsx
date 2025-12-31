@@ -196,6 +196,10 @@ export default function Hero({ movies }: HeroProps) {
                 </div>
 
                 <div className={`${styles.gradientOverlay} ${(trailerId && userTrailerPref && !showImageFallback) ? styles.videoMode : ''}`} />
+
+                {/* Paused Overlay: Darkens the screen when video is paused for better readability */}
+                <div className={`${styles.pausedOverlay} ${(!isPlaying && trailerId && userTrailerPref && !showImageFallback) ? styles.visible : ''}`} />
+
                 <div className={styles.leftVignette} />
                 <div className={styles.bottomVignette} />
             </div>
