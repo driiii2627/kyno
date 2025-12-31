@@ -163,6 +163,17 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
     recommendations = validRecommendations.slice(0, 15); // Final Limit
 
+    // Format Data
+    const tmdbBackdrop = details.backdrop_path
+        ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
+        : null;
+
+    // Fallback: Use Database URL if TMDB failed/missing
+    // Support both full URLs and relative paths
+    const dbBackdrop = item.backdrop_url
+        ? (item.backdrop_url.startsWith('http') ? item.backdrop_url : `https://image.tmdb.org/t/p/original${item.backdrop_url}`)
+        : null;
+
     const backdropUrl = tmdbBackdrop || dbBackdrop;
 
     const posterUrl = details.poster_path
