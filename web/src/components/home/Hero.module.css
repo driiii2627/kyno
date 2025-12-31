@@ -802,8 +802,8 @@
     /* Subtle dim */
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
-    z-index: 3;
-    /* Above gradient (1), vignettes (2), but below content (10) */
+    z-index: 6;
+    /* Above gradient (1), vignettes (2), active image (5), but below content (10) */
     pointer-events: none;
 }
 

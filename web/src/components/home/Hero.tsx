@@ -101,8 +101,11 @@ export default function Hero({ movies }: HeroProps) {
 
         // If a trailer IS supposed to play, don't rotate on timer (wait for onEnded)
         const isVideoActive = trailerId && userTrailerPref && !showImageFallback;
-        // Also don't rotate if user actively paused it (isPlaying === false) and is watching the banner
-        if (isVideoActive && isPlaying) return;
+
+        // FIX: Never rotate on timer if video is active (whether playing or paused).
+        // If playing -> onEnded handles rotation.
+        // If paused -> User wants to stay on this slide.
+        if (isVideoActive) return;
 
         const delay = 7000; // 7 seconds for images
         const timer = setTimeout(handleNext, delay);
