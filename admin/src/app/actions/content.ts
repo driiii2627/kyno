@@ -181,7 +181,6 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 trailer_url: trailerUrl, // New Column
                 show_trailer: true,      // Default True
                 genre: details.genres?.map((g: any) => g.name).join(', ') || null,
-                genre: details.genres?.map((g: any) => g.name).join(', ') || null,
                 // genres property removed as column does not exist
                 release_year: details.release_date ? parseInt(details.release_date.split('-')[0]) : null,
                 rating: details.vote_average,
@@ -203,7 +202,6 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 video_url: videoUrl,
                 trailer_url: trailerUrl, // New Column
                 show_trailer: true,      // Default True
-                genre: details.genres?.map((g: any) => g.name).join(', ') || null,
                 genre: details.genres?.map((g: any) => g.name).join(', ') || null,
                 // genres property removed as column does not exist
                 release_year: details.first_air_date ? parseInt(details.first_air_date.split('-')[0]) : null,
