@@ -171,8 +171,8 @@
 }
 
 .minimize {
-    transform: scale(0.75) translateY(50px);
-    /* Shrink and push down slightly */
+    transform: scale(0.85) translateY(50px);
+    /* Shrink slightly to "Standard" size */
 }
 
 .originalLabel {
@@ -204,27 +204,29 @@
 }
 
 .title {
-    font-size: 5.5rem;
+    font-size: 7rem;
+    /* Increased from 5.5 */
     font-weight: 900;
-    line-height: 1;
+    line-height: 0.95;
     margin-bottom: 1.5rem;
     color: #fff;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    max-width: 900px;
+    max-width: 1000px;
     transition: font-size 0.3s ease;
 }
 
 .titleLong {
-    font-size: 3.5rem;
+    font-size: 4.5rem;
     line-height: 1.1;
 }
 
 .meta {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    /* Increased from 1rem */
 }
 
 .year {
@@ -243,7 +245,7 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: #fbbf24 !important;
     /* Force Yellow */
     font-weight: 700;
@@ -264,12 +266,14 @@
 .watchBtn {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1rem;
     background-color: #fff;
     color: #0F2027;
-    padding: 1rem 3rem;
+    padding: 1.2rem 3.5rem;
+    /* Increased padding */
     border-radius: 50px;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
+    /* Increased from 1.2rem */
     font-weight: 800;
     transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
@@ -278,7 +282,7 @@
 .watchBtn:hover {
     transform: scale(1.05);
     background-color: #fff;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
 }
 
 .actionBtn {
@@ -304,16 +308,19 @@
 }
 
 .description {
-    max-width: 650px;
+    max-width: 800px;
+    /* Wider description */
     color: #d1d5db;
-    font-size: 1.15rem;
+    font-size: 1.35rem;
+    /* Increased from 1.15rem */
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    font-weight: 500;
 }
 
 .genres {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     color: #9ca3af;
     font-weight: 500;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
@@ -339,7 +346,8 @@
 /* Logo Styles */
 .logoContainer {
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
+    /* Larger logo container */
     /* Removed fixed height constraint to allow badges to sit closer */
     min-height: 100px;
     display: flex;
@@ -355,8 +363,8 @@
 .heroLogo {
     width: auto;
     max-width: 100%;
-    max-height: 180px;
-    /* Max height limit */
+    max-height: 250px;
+    /* Increased logo height */
     object-fit: contain;
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
     transition: opacity 0.5s ease;
@@ -364,8 +372,9 @@
 
 /* New Buttons Styling */
 .infoBtn {
-    width: 50px;
-    height: 50px;
+    width: 64px;
+    height: 64px;
+    /* Larger info btn */
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
