@@ -285,6 +285,7 @@
     overflow-x: auto;
     /* Hide scrollbar */
     scrollbar-width: none;
+    /* Allow scrolling if many profiles */
 }
 
 .profilesRow::-webkit-scrollbar {
@@ -293,46 +294,53 @@
 
 .miniProfileWrapper {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Horizontal Card */
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.8rem;
     cursor: pointer;
-    transition: transform 0.2s;
-    min-width: 50px;
+    transition: all 0.2s;
+    min-width: 140px;
+    /* Wider card */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.6rem;
+    border-radius: 12px;
 }
 
 .miniProfileWrapper:hover {
     transform: translateY(-2px);
-}
-
-.miniAvatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 2px solid transparent;
-    transition: border-color 0.2s;
-}
-
-.miniProfileWrapper:hover .miniAvatar {
+    background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.3);
 }
 
+.miniAvatar {
+    width: 40px;
+    /* Slightly larger for card */
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid transparent;
+}
+
 .miniName {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 500;
-    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
 }
 
-/* Add Profile Button */
+/* Add Profile Button - Keep square/compact to distinct it */
 .addProfileBtn {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
+    /* Match height roughly */
+    flex-shrink: 0;
+    /* Prevent squish */
     border-radius: 12px;
     border: 1px dashed rgba(255, 255, 255, 0.3);
     display: flex;
@@ -349,11 +357,13 @@
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.8);
     color: #fff;
+    transform: translateY(-2px);
 }
 
 .addLabel {
     font-size: 0.6rem;
-    margin-top: 2px;
+    margin-top: 4px;
+    font-weight: 500;
 }
 
 /* Divider */
