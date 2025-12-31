@@ -80,7 +80,11 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     const candidateIds = recommendations.map((r: any) => r.id);
     let validRecommendations: any[] = [];
 
+    // existingIds to prevent duplicates
+    const existingIds = new Set<string>();
+
     if (candidateIds.length > 0) {
+        // ... (Keep existing validation logic, but populate existingIds) ...
         const { data: validMovies } = await supabase
             .from('movies')
             .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
@@ -115,36 +119,49 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             type: 'tv'
         }));
 
-        // Re-construct the list preserving TMDB relevance order if possible, 
-        // or just use the found list. Using found list is faster.
         validRecommendations = [...safeMovies, ...safeSeries];
+        validRecommendations.forEach(r => existingIds.add(r.supabase_id));
     }
 
-    recommendations = validRecommendations.slice(0, 15); // Limit limit
+    // 5. Fallback: "Same Genre" Recommendations (If list is too short)
+    if (validRecommendations.length < 10 && details.genres && details.genres.length > 0) {
+        const primaryGenre = details.genres[0].name;
+        const limit = 15 - validRecommendations.length;
 
-    // Prepare Season Browser Node
-    let seasonBrowserNode = null;
-    if (item.type === 'tv' && initialSeasonData && 'seasons' in details) {
-        seasonBrowserNode = (
-            <SeasonBrowser
-                tmdbId={item.tmdb_id}
-                uuid={uuid}
-                seasons={details.seasons || []}
-                initialSeasonData={initialSeasonData}
-            />
-        );
+        // Fetch from the SAME table (movies or series)
+        const table = item.type === 'movie' ? 'movies' : 'series';
+
+        const { data: genreData } = await supabase
+            .from(table)
+            .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
+            .ilike('genre', `%${primaryGenre}%`)
+            .neq('id', uuid) // Exclude current
+            .limit(limit);
+
+        if (genreData) {
+            const genreItems = genreData.map((d: any) => ({
+                id: d.tmdb_id,
+                supabase_id: d.id,
+                title: d.title,
+                name: d.title,
+                overview: d.description,
+                poster_path: d.poster_url,
+                backdrop_path: d.backdrop_url,
+                vote_average: d.rating,
+                type: item.type
+            }));
+
+            // Add non-duplicate items
+            genreItems.forEach((g: any) => {
+                if (!existingIds.has(g.supabase_id)) {
+                    validRecommendations.push(g);
+                    existingIds.add(g.supabase_id);
+                }
+            });
+        }
     }
 
-    // Format Data
-    const tmdbBackdrop = details.backdrop_path
-        ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
-        : null;
-
-    // Fallback: Use Database URL if TMDB failed/missing
-    // Support both full URLs and relative paths
-    const dbBackdrop = item.backdrop_url
-        ? (item.backdrop_url.startsWith('http') ? item.backdrop_url : `https://image.tmdb.org/t/p/original${item.backdrop_url}`)
-        : null;
+    recommendations = validRecommendations.slice(0, 15); // Final Limit
 
     const backdropUrl = tmdbBackdrop || dbBackdrop;
 
