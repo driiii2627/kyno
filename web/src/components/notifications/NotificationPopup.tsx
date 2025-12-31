@@ -40,7 +40,7 @@ export default function NotificationPopup({ notification, onClose }: Notificatio
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-[100000] animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-md bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-[100000]">
                 {/* Close Button */}
                 <button
                     onClick={(e) => {
