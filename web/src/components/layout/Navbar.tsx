@@ -140,7 +140,7 @@ function ProfileMenu() {
     }
 
     return (
-    return (
+
         <div className={styles.profileMenuContainer}>
             <div
                 className={styles.profileTrigger}
