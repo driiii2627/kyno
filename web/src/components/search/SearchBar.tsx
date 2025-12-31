@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, createPortal } from 'react';
 import { Search, X, Loader2, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Fuse from 'fuse.js';
@@ -21,8 +21,14 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
     const [isLoading, setIsLoading] = useState(false); // Start false, only true when fetching
     const [hasLoaded, setHasLoaded] = useState(false);
     const [fuse, setFuse] = useState<Fuse<any> | null>(null);
+    const [mounted, setMounted] = useState(false); // New state for hydration
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+
+    // Init Mounted state
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Lazy Fetch Index on First Open
     useEffect(() => {
@@ -71,23 +77,27 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
         setQuery('');
     };
 
-    if (!isOpen) return null;
+    // Only render on client and if open
+    if (!mounted || !isOpen) return null;
 
-    return (
+    // Use Portal to break out of Navbar stacking context
+    return createPortal(
         <div className={styles.overlay}>
             {/* Header */}
             <div className={styles.header}>
-                <Search size={22} color="#888" />
-                <input
-                    ref={inputRef}
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={placeholder}
-                    className={styles.input}
-                />
+                <div className={styles.inputWrapper}>
+                    <Search size={20} color="#888" />
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder={placeholder}
+                        className={styles.input}
+                    />
+                </div>
                 <button onClick={onClose} className={styles.closeBtn}>
-                    <X size={20} />
+                    <X size={24} />
                 </button>
             </div>
 
@@ -139,13 +149,13 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
                         ) : (
                             <div className="text-center py-20 text-gray-500">
                                 <p className="text-xl font-medium mb-2">🤔</p>
-                                Nenhum resultado encontrado para "{query}"
+                                <p>Nenhum resultado encontrado para "{query}"</p>
                             </div>
                         )}
                     </div>
                 ) : (
                     /* Default State */
-                    <div className="max-w-4xl mx-auto space-y-8 fade-in">
+                    <div className="max-w-4xl mx-auto space-y-12 fade-in">
                         <div>
                             <h2 className={styles.sectionTitle}>Explorar Gêneros</h2>
                             <div className={styles.genresGrid}>
@@ -185,6 +195,7 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
                     </div>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
