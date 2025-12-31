@@ -217,7 +217,7 @@ export default function Hero({ movies }: HeroProps) {
             )}
 
             {/* Content Layer */}
-            <div className={styles.content}>
+            <div className={`${styles.content} ${(trailerId && userTrailerPref && !showImageFallback && isPlaying) ? styles.minimize : ''}`}>
                 {currentMovie.logo_url ? (
                     <div className={styles.logoContainer}>
                         <img src={getImageUrl(currentMovie.logo_url, 'w500')} alt={title} className={styles.heroLogo} />
@@ -234,6 +234,13 @@ export default function Hero({ movies }: HeroProps) {
                     <span className={styles.genresText}>{genres}</span>
                 </div>
 
+                {/* Description MOVED ABOVE BUTTONS */}
+                <div className={styles.description}>
+                    {currentMovie.overview && currentMovie.overview.length > 200
+                        ? currentMovie.overview.slice(0, 200) + '...'
+                        : currentMovie.overview}
+                </div>
+
                 <div className={styles.buttons}>
                     <TrackedLink href={linkHref} genres={currentMovie.genres?.map(g => g.name) || []}>
                         <button className={styles.watchBtn}>
@@ -244,12 +251,6 @@ export default function Hero({ movies }: HeroProps) {
                     <Link href={`/details/${currentMovie.supabase_id}`} className={styles.infoBtn}>
                         <Info size={24} />
                     </Link>
-                </div>
-
-                <div className={styles.description}>
-                    {currentMovie.overview && currentMovie.overview.length > 200
-                        ? currentMovie.overview.slice(0, 200) + '...'
-                        : currentMovie.overview}
                 </div>
             </div>
         </section>

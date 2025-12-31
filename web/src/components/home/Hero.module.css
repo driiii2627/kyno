@@ -165,6 +165,14 @@
     /* Adjust offset from center */
     padding-top: 8rem;
     /* Clear header */
+    transform-origin: left center;
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s ease;
+    /* Ultra smooth 'Netflix-like' ease */
+}
+
+.minimize {
+    transform: scale(0.75) translateY(50px);
+    /* Shrink and push down slightly */
 }
 
 .originalLabel {
