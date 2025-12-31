@@ -125,7 +125,10 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                                 {notifications.map((n) => (
                                     <button
                                         key={n.id}
-                                        onClick={() => handleNotificationClick(n)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleNotificationClick(n);
+                                        }}
                                         className={styles.listItem}
                                     >
                                         <div
@@ -154,11 +157,13 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                 </div>
             )}
 
-            {/* Full Popup Modal */}
-            <NotificationPopup
-                notification={activePopup}
-                onClose={() => setActivePopup(null)}
-            />
+            {/* Full Popup Modal - Only render when active to ensure lifecycle hooks run correctly */}
+            {activePopup && (
+                <NotificationPopup
+                    notification={activePopup}
+                    onClose={() => setActivePopup(null)}
+                />
+            )}
         </div>
     );
 }
