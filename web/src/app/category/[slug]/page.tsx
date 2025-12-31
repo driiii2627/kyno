@@ -6,6 +6,21 @@ import CategoryClient from './CategoryClient';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// Shared Helper (Should ideally be a utility, but keeping inline for simplicity as per current pattern)
+const filterItems = (items: any[], keywords: string[]) => {
+    return items.filter(m => {
+        const dbGenre = m.genre?.toLowerCase() || '';
+        const tmdbGenres = m.genres?.map((g: any) => g.name.toLowerCase()).join(' ') || '';
+        // Normalize for accent-insensitive matching
+        const combined = `${dbGenre} ${tmdbGenres}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        return keywords.some(k => {
+            const normK = k.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return combined.includes(normK);
+        });
+    });
+}
+
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
 
@@ -23,24 +38,24 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         } else if (slug === 'acao') {
             title = 'Filmes de Ação';
             const allMovies = await contentService.getCatalogMovies();
-            items = allMovies.filter(m => {
-                const combined = (m.genre?.toLowerCase() || '') + ' ' + (m.genres?.map(g => g.name.toLowerCase()).join(' ') || '');
-                return combined.includes('ação') || combined.includes('action');
-            });
+            items = filterItems(allMovies, ['ação', 'action', 'aventura', 'adventure']);
         } else if (slug === 'comedia') {
             title = 'Comédia';
             const allMovies = await contentService.getCatalogMovies();
-            items = allMovies.filter(m => {
-                const combined = (m.genre?.toLowerCase() || '') + ' ' + (m.genres?.map(g => g.name.toLowerCase()).join(' ') || '');
-                return combined.includes('comédia') || combined.includes('comedy');
-            });
+            // Expanded keywords
+            items = filterItems(allMovies, ['comédia', 'comedy', 'stand-up', 'stand up', 'comedia', 'humor', 'engraçado']);
         } else if (slug === 'terror') {
-            title = 'Terror';
+            title = 'Terror e Suspense';
             const allMovies = await contentService.getCatalogMovies();
-            items = allMovies.filter(m => {
-                const combined = (m.genre?.toLowerCase() || '') + ' ' + (m.genres?.map(g => g.name.toLowerCase()).join(' ') || '');
-                return combined.includes('terror') || combined.includes('horror');
-            });
+            items = filterItems(allMovies, ['terror', 'horror', 'suspense', 'thriller', 'medo', 'assustador']);
+        } else if (slug === 'animacao') {
+            title = 'Animação';
+            const allMovies = await contentService.getCatalogMovies();
+            items = filterItems(allMovies, ['animação', 'animation', 'anime', 'animes', 'desenho', 'cartoon', 'infantil']);
+        } else if (slug === 'ficcao') {
+            title = 'Ficção Científica';
+            const allMovies = await contentService.getCatalogMovies();
+            items = filterItems(allMovies, ['ficção', 'fiction', 'sci-fi', 'scifi', 'futuro', 'espaço', 'space']);
         } else {
             return notFound();
         }
