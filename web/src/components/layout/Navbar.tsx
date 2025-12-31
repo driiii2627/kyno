@@ -101,18 +101,28 @@ function ProfileMenu() {
     const handleSwitch = async (profileId: string) => {
         if (activeProfile?.id === profileId) return;
 
-        // 1. Trigger Animation
-        setSwitchingProfileId(profileId);
+        // 1. Optimistic Update (Immediate Feedback)
+        const targetProfile = profiles.find(p => p.id === profileId);
+        if (targetProfile) {
+            setActiveProfile(targetProfile);
+            setSwitchingProfileId(profileId);
+        }
 
         // 2. Perform Switch in Background
         const { success } = await switchProfileAction(profileId);
 
         if (success) {
-            // 3. Wait for animation to finish then "hard refresh"
+            // 3. Soft Refresh via Next.js Router (No hard reload)
+            // Wait slighty for animation to feel natural, then refresh data
             setTimeout(() => {
-                window.location.reload();
-            }, 800); // Match CSS transition time
+                refresh();
+                setSwitchingProfileId(null);
+                setOpen(false); // Close menu
+            }, 600);
         } else {
+            // Revert on failure (rare)
+            const { profile } = await getActiveProfileAction();
+            if (profile) setActiveProfile(profile);
             setSwitchingProfileId(null);
         }
     };
