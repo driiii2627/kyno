@@ -72,7 +72,8 @@ export default function SearchBar({ isOpen, onClose, placeholder = 'O que você 
     }, [query, fuse]);
 
     const handleNavigation = (item: any) => {
-        const route = item.media_type === 'movie' ? `/filme/${item.id}` : `/serie/${item.id}`;
+        // Always navigate to the universal details page
+        const route = `/details/${item.id}`;
         router.push(route);
         onClose();
         setQuery('');
