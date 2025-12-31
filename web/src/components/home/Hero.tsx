@@ -158,10 +158,18 @@ export default function Hero({ movies }: HeroProps) {
         }
     };
 
+    if (!currentMovie) return null;
+
+    // Data Presentation
+    const year = new Date(currentMovie.release_date || currentMovie.first_air_date || Date.now()).getFullYear();
+    const rating = currentMovie.vote_average ? currentMovie.vote_average.toFixed(1) : 'N/A';
+    const title = currentMovie.title || currentMovie.name || '';
+    const genres = currentMovie.genres?.map(g => g.name).join(', ') || currentMovie.genre || 'Filme';
+    const isTv = !!currentMovie.first_air_date;
+    const linkHref = isTv ? `/serie/${currentMovie.supabase_id}` : `/filme/${currentMovie.supabase_id}`;
+
     // Background Image
     const backdropUrl = getImageUrl(currentMovie.backdrop_path || '', 'original');
-
-    if (!currentMovie) return null;
 
     return (
         <section className={styles.hero}>
