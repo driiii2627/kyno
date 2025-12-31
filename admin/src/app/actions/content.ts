@@ -181,7 +181,8 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 trailer_url: trailerUrl, // New Column
                 show_trailer: true,      // Default True
                 genre: details.genres?.map((g: any) => g.name).join(', ') || null,
-                genres: details.genres || [],
+                genre: details.genres?.map((g: any) => g.name).join(', ') || null,
+                // genres property removed as column does not exist
                 release_year: details.release_date ? parseInt(details.release_date.split('-')[0]) : null,
                 rating: details.vote_average,
                 created_at: new Date().toISOString()
@@ -203,7 +204,8 @@ export async function importContentAction(tmdbId: number, type: 'movie' | 'tv') 
                 trailer_url: trailerUrl, // New Column
                 show_trailer: true,      // Default True
                 genre: details.genres?.map((g: any) => g.name).join(', ') || null,
-                genres: details.genres || [],
+                genre: details.genres?.map((g: any) => g.name).join(', ') || null,
+                // genres property removed as column does not exist
                 release_year: details.first_air_date ? parseInt(details.first_air_date.split('-')[0]) : null,
                 rating: details.vote_average,
                 created_at: new Date().toISOString()
@@ -526,8 +528,7 @@ export async function syncGenresAction() {
                     if (details.genres) {
                         const genreStr = details.genres.map(g => g.name).join(', ');
                         await admin.from('movies').update({
-                            genre: genreStr,
-                            genres: details.genres
+                            genre: genreStr
                         }).eq('id', m.id);
                         count++;
                     }
@@ -546,8 +547,7 @@ export async function syncGenresAction() {
                     if (details.genres) {
                         const genreStr = details.genres.map(g => g.name).join(', ');
                         await admin.from('series').update({
-                            genre: genreStr,
-                            genres: details.genres
+                            genre: genreStr
                         }).eq('id', s.id);
                         count++;
                     }
