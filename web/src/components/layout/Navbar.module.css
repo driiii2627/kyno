@@ -150,162 +150,269 @@
 /* Premium Glass Dropdown */
 .dropdown {
     position: absolute;
-    top: 50px;
+    top: 60px;
     right: 0;
-    width: 260px;
-    /* Dark Glass Background - Neutral Black */
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    /* Larger radius */
-    padding: 0.5rem;
+    width: 340px;
+    /* Wider for the new layout */
+    background: rgba(15, 15, 20, 0.85);
+    /* Darker, richer base */
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    /* Very rounded corners */
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    animation: fadeIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     z-index: 202;
-    /* overflow: hidden; - Removed to allow flying avatar */
+    overflow: hidden;
 }
 
+/* Section Header */
 .dropdownHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1rem 0.5rem 1rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+    padding: 0 0.2rem;
 }
 
 .dropdownLabel {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #94a3b8;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     text-transform: uppercase;
+    opacity: 0.8;
 }
 
 .manageLink {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.7);
-    /* Neutral White */
-    font-weight: 600;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .manageLink:hover {
-    color: #7dd3fc;
-    /* Sky 300 */
+    color: #fff;
 }
 
-/* Profiles List */
-.profilesList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    padding: 0 0.5rem;
-}
-
-.profileItem {
+/* Active Profile Card */
+.activeProfileCard {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    padding: 0.6rem 0.8rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
+    gap: 1.2rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1rem;
+    border-radius: 18px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    cursor: default;
     position: relative;
+    overflow: hidden;
 }
 
-.profileItem:hover {
-    background: rgba(255, 255, 255, 0.05);
+/* Highlight effect on active card */
+.activeProfileCard::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
 }
 
-.activeProfileItem {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.miniAvatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    /* Rounded square avatar inside list */
+.largeAvatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
     object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.profileNameList {
-    font-size: 0.9rem;
-    color: #e2e8f0;
-    font-weight: 500;
+.activeProfileInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
 }
 
-.activeDot {
+.activeNameRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.activeName {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.activeStatusDot {
     width: 6px;
     height: 6px;
     background-color: #4ade80;
-    /* Green active dot */
     border-radius: 50%;
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
-    margin-left: auto;
-    /* Push to right */
+    box-shadow: 0 0 8px #4ade80;
+}
+
+.lastActivity {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Profiles Row (Horizontal List) */
+.profilesRow {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+}
+
+.profilesRow::-webkit-scrollbar {
+    display: none;
+}
+
+.miniProfileWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    min-width: 50px;
+}
+
+.miniProfileWrapper:hover {
+    transform: translateY(-2px);
+}
+
+.miniAvatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.miniProfileWrapper:hover .miniAvatar {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.miniName {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Add Profile Button */
+.addProfileBtn {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.addProfileBtn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: #fff;
+}
+
+.addLabel {
+    font-size: 0.6rem;
+    margin-top: 2px;
 }
 
 /* Divider */
 .dropdownDivider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.08);
-    margin: 0.5rem 1rem;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    width: 100%;
+    margin: 0.5rem 0;
 }
 
-/* Menu Links */
-.menuLinks {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 0 0.5rem;
-}
-
-.menuLink {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.6rem 0.8rem;
-    border-radius: 8px;
-    color: #cbd5e1;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.menuLink:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
-    transform: translateX(2px);
-}
-
-/* Sign Out - Bottom */
-.signOutItem {
+/* Footer Actions (Horizontal Split) */
+.footerActionRow {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.8rem;
-    color: #94a3b8;
+    padding: 0.8rem 0 0.5rem 0;
+    gap: 1rem;
+}
+
+.footerActionLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     transition: color 0.2s;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    margin-top: 0.2rem;
+}
+
+.footerActionLink:hover {
+    color: #fff;
+}
+
+.footerDivider {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Sign Out */
+.signOutItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* Aligned left per typical design, or center? Reference says "Sair" at bottom */
+    padding: 0.8rem 0.2rem;
+    color: #ef4444;
+    /* Red 500 */
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+    gap: 0.5rem;
+    opacity: 0.8;
 }
 
 .signOutItem:hover {
-    color: #f87171;
-    /* Red hover for exit */
-    background: rgba(255, 0, 0, 0.02);
+    opacity: 1;
+    transform: translateX(2px);
 }
 
 @keyframes fadeIn {

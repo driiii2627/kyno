@@ -140,6 +140,7 @@ function ProfileMenu() {
     }
 
     return (
+    return (
         <div className={styles.profileMenuContainer}>
             <div
                 className={styles.profileTrigger}
@@ -157,27 +158,43 @@ function ProfileMenu() {
                         }}
                     />
                     <div className={styles.dropdown}>
+                        {/* Header: Label + Manage */}
                         <div className={styles.dropdownHeader}>
-                            <span className={styles.dropdownLabel}>PERFIS</span>
+                            <span className={styles.dropdownLabel}>PERFIL ATIVO</span>
                             <Link href="/profiles?manage=true" className={styles.manageLink}>
                                 <Edit2 size={12} />
                                 Gerenciar
                             </Link>
                         </div>
 
-                        <div className={styles.profilesList}>
-                            {profiles.map(p => (
+                        {/* 1. Large Active Profile Card */}
+                        <div className={styles.activeProfileCard}>
+                            <img src={activeProfile.avatar_url} alt={activeProfile.name} className={styles.largeAvatar} />
+                            <div className={styles.activeProfileInfo}>
+                                <div className={styles.activeNameRow}>
+                                    <span className={styles.activeName}>{activeProfile.name}</span>
+                                    <div className={styles.activeStatusDot} />
+                                </div>
+                                <span className={styles.lastActivity}>Última atividade: Hoje</span>
+                            </div>
+                        </div>
+
+                        {/* 2. Secondary Profiles (Horizontal Row) */}
+                        <div className={styles.dropdownHeader} style={{ marginBottom: '0.2rem' }}>
+                            <span className={styles.dropdownLabel}>PERFIS</span>
+                        </div>
+
+                        <div className={styles.profilesRow}>
+                            {profiles.filter(p => p.id !== activeProfile.id).map(p => (
                                 <div
                                     key={p.id}
-                                    className={`
-                                        ${styles.profileItem} 
-                                        ${activeProfile.id === p.id ? styles.activeProfileItem : ''}
-                                    `}
-                                    onClick={(e) => {
-                                        handleSwitch(p.id);
-                                    }}
+                                    className={styles.miniProfileWrapper}
+                                    onClick={() => handleSwitch(p.id)}
                                 >
-                                    {/* Ghost Image for Animation */}
+                                    <img src={p.avatar_url} className={styles.miniAvatar} />
+                                    <span className={styles.miniName}>{p.name}</span>
+
+                                    {/* Animation Clone */}
                                     {switchingProfileId === p.id && (
                                         <img
                                             src={p.avatar_url}
@@ -189,42 +206,40 @@ function ProfileMenu() {
                                             }}
                                         />
                                     )}
-
-                                    {/* Static Image (Keeps layout stable) */}
-                                    <img src={p.avatar_url} className={styles.miniAvatar} />
-
-                                    <span className={styles.profileNameList}>{p.name}</span>
-                                    {activeProfile.id === p.id && <div className={styles.activeDot} />}
-                                    {switchingProfileId === p.id && (
-                                        <div style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#4ade80' }}>
-                                            Trocando...
-                                        </div>
-                                    )}
                                 </div>
                             ))}
+
+                            {/* Add Profile Button */}
+                            <Link href="/profiles?add=true" className={styles.addProfileBtn}>
+                                <div style={{ fontSize: '1.2rem', lineHeight: 1 }}>+</div>
+                                <span className={styles.addLabel}>Adicionar</span>
+                            </Link>
                         </div>
 
                         <div className={styles.dropdownDivider} />
 
-                        <div className={styles.menuLinks}>
-                            <div className={styles.menuLink}>
-                                <Bookmark size={16} />
+                        {/* 3. Footer Actions (Horizontal Split) */}
+                        <div className={styles.footerActionRow}>
+                            <div className={styles.footerActionLink}>
+                                <Bookmark size={14} />
                                 <span>Minha Lista</span>
                             </div>
-                            <div className={styles.menuLink}>
-                                <User size={16} />
+                            <div className={styles.footerDivider} />
+                            <div className={styles.footerActionLink}>
+                                <User size={14} />
                                 <span>Conta</span>
                             </div>
                         </div>
 
-                        <div className={styles.dropdownDivider} />
-
+                        {/* 4. Sign Out */}
                         <div className={styles.signOutItem} onClick={handleSignOut}>
+                            <span style={{ fontSize: '1.1rem' }}>⎋</span>
                             <span>Sair da Conta</span>
                         </div>
                     </div>
                 </>
             )}
         </div>
+    );
     );
 }
