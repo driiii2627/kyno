@@ -90,13 +90,13 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
     return (
         <div className="relative" ref={popupRef}>
             {/* Bell Icon - Premium Glass Style */}
-            {/* Bell Icon - Premium Glass Style (Matches Navbar.module.css .iconBtn) */}
+            {/* Bell Icon - Premium Glass Style */}
             <button
                 onClick={toggleInbox}
-                className={`relative flex items-center justify-center w-10 h-10 rounded-full transition-all border
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all border
                     ${isOpen
-                        ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]'
-                        : 'bg-white/10 backdrop-blur-md border-white/5 text-gray-300 hover:bg-white/20 hover:text-white hover:border-white/30'
+                        ? 'bg-white/20 text-white border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.1)]' // Bright Glass active state
+                        : 'bg-white/5 backdrop-blur-md border-white/5 text-gray-300 hover:bg-white/10 hover:text-white hover:border-white/20' // Default Glass
                     }
                 `}
             >
@@ -106,13 +106,11 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                 )}
             </button>
 
-            {/* Inbox Dropdown */}
+            {/* Inbox Dropdown (CSS Module) */}
             {isOpen && (
-                <div className={`absolute z-50 w-80 max-w-[90vw] bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right
-                    ${isMobile ? 'top-full left-1/2 -translate-x-1/2 mt-4' : 'top-full right-0 mt-4'}
-                `}>
-                    <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-                        <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <div className={styles.dropdown}>
+                    <div className={styles.header}>
+                        <h4 className={styles.headerTitle}>
                             <Bell size={14} className="text-blue-400" /> Notificações
                         </h4>
                         {unreadCount > 0 && (
@@ -122,7 +120,7 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                         )}
                     </div>
 
-                    <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+                    <div className={`${styles.list} ${styles.inboxList}`}>
                         {notifications.length === 0 ? (
                             <div className="p-8 text-center text-zinc-500 text-xs">
                                 Nenhuma notificação nova.
@@ -133,14 +131,14 @@ export default function NotificationCenter({ isMobile = false }: NotificationCen
                                     <button
                                         key={n.id}
                                         onClick={() => handleNotificationClick(n)}
-                                        className="w-full text-left p-4 hover:bg-white/5 transition flex gap-3 items-start"
+                                        className="w-full text-left p-4 hover:bg-white/5 transition flex gap-3 items-start group"
                                     >
-                                        <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${n.type === 'promo' ? 'bg-purple-500' :
-                                            n.type === 'warning' ? 'bg-orange-500' :
-                                                'bg-blue-500'
+                                        <div className={`mt-1 w-2 h-2 rounded-full shrink-0 group-hover:scale-125 transition-transform ${n.type === 'promo' ? 'bg-purple-500' :
+                                                n.type === 'warning' ? 'bg-orange-500' :
+                                                    'bg-blue-500'
                                             }`} />
                                         <div>
-                                            <p className="text-sm font-medium text-white leading-snug mb-1">
+                                            <p className="text-sm font-medium text-white leading-snug mb-1 group-hover:text-blue-400 transition-colors">
                                                 {n.title}
                                             </p>
                                             <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">

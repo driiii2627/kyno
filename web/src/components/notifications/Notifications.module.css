@@ -12,3 +12,89 @@
     background: #333;
     border-radius: 4px;
 }
+
+/* Notification Dropdown - Matches Navbar Profile Dropdown */
+.dropdown {
+    position: absolute;
+    top: 60px;
+    /* Aligned with navbar height */
+    right: 0;
+    width: 320px;
+    max-width: 90vw;
+    background: rgba(15, 23, 42, 0.95);
+    /* Darker Slate */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 0;
+    /* Content handles padding */
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    z-index: 202;
+    overflow: hidden;
+}
+
+.header {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headerTitle {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.inboxList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.inboxList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.inboxList::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .dropdown {
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        margin-top: 1rem;
+    }
+}
