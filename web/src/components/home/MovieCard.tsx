@@ -34,6 +34,14 @@ export default function MovieCard({ movie, index, isTop10 = false, priority = fa
 
     // Open: Triggered by hovering the card
     const handleMouseEnter = () => {
+        // Mobile/Touch Detection Guard
+        // 1. Check if device supports true hover (not emulated by touch)
+        // 2. Check screen width (Popup is ~340px, needs space)
+        const isTouch = window.matchMedia('(hover: none)').matches;
+        const isMobile = window.innerWidth < 1024; // Disabling on tablets/mobiles for better UX
+
+        if (isTouch || isMobile) return;
+
         setIsHovered(true);
 
         // If we were about to close, cancel it (user moved back to card)
