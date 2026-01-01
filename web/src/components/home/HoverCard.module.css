@@ -3,7 +3,7 @@
     position: absolute;
     z-index: 9999;
     /* Must be higher than everything */
-    width: 360px;
+    width: 340px;
     /* Larger size */
     background: rgba(15, 15, 20, 0.9);
     /* Darker, transparent base */

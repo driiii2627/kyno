@@ -21,25 +21,19 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
     useEffect(() => {
         setMounted(true);
         // Calculate Position
-        const popupWidth = 360; // Larger size
+        const popupWidth = 340; // Slightly smaller than 360
         const currentScrollX = window.scrollX;
         const currentScrollY = window.scrollY;
 
-        // Center Horizontally:
-        // Card Center = rect.left + rect.width / 2
-        // Popup Left = Card Center - popupWidth / 2
-        let left = (rect.left + currentScrollX) + (rect.width / 2) - (popupWidth / 2);
+        // Position: "Canto direito inferior... um pouco pra cima"
+        // Let's align the Left of the popup with the center of the card
+        // And match the Top to give a "stacking" feel.
 
-        // Position Vertically:
-        // Start from card top, but shift up slightly to hover nicely
-        // rect.top + currentScrollY -> Card Top in document
-        // - 60px -> Shift up
-        let top = (rect.top + currentScrollY) - 60;
+        let left = (rect.left + currentScrollX) + 20; // Shifted right
+        let top = (rect.top + currentScrollY) - 40; // Shifted up slightly less than before
 
-        // Boundary Check (Viewport)
-        // If it goes too far left?
+        // Boundary Check
         if (left < 10) left = 10;
-        // If it goes too far right?
         const maxLeft = window.innerWidth - popupWidth - 10;
         if (left > maxLeft) left = maxLeft;
 
@@ -51,6 +45,9 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
     }, [rect]);
 
     if (!mounted) return null;
+
+    // Type coercion for Supabase ID (known to exist if from CatalogItem/movie table)
+    const itemLink = `/details/${(movie as any).supabase_id || movie.id}`;
 
     // Use a portal to attach to document.body so it floats over everything
     return createPortal(
@@ -75,13 +72,13 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
             <div className={styles.content}>
                 {/* Controls */}
                 <div className={styles.controls}>
-                    <Link href={`/details/${movie.id}`} className={`${styles.circleBtn} ${styles.playBtn}`}>
+                    <Link href={itemLink} className={`${styles.circleBtn} ${styles.playBtn}`}>
                         <Play size={20} fill="black" />
                     </Link>
                     <button className={styles.circleBtn}>
                         <Plus size={20} />
                     </button>
-                    <Link href={`/details/${movie.id}`} className={styles.circleBtn}>
+                    <Link href={itemLink} className={styles.circleBtn}>
                         <Info size={20} />
                     </Link>
                 </div>
