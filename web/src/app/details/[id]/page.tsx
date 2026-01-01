@@ -8,6 +8,7 @@ import { Play, Plus, Info, Users, ArrowLeft, ThumbsUp, ThumbsDown } from 'lucide
 import styles from './Details.module.css';
 import SeasonBrowser from '@/components/details/SeasonBrowser';
 import DetailsBackground from '@/components/details/DetailsBackground';
+import SmartBackButton from '@/components/ui/SmartBackButton';
 
 import DetailsTabs from '@/components/details/DetailsTabs';
 import TrackedLink from '@/components/ui/TrackedLink';
@@ -215,10 +216,10 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
             {/* Background Hero (Image Only) */}
             <DetailsBackground backdropUrl={backdropUrl} />
 
-            {/* Back Button */}
-            <Link href="/" className={styles.backButton}>
+            {/* Smart Back Button */}
+            <SmartBackButton className={styles.backButton} iconSize={18}>
                 <ArrowLeft size={18} /> Voltar
-            </Link>
+            </SmartBackButton>
 
             {/* Main Content */}
             <div className={styles.content}>
