@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { CatalogItem } from '@/services/content';
 
 import RankNumber from './RankNumber';
+import MovieCard from './MovieCard';
+
 
 interface MovieRowProps {
     title: string;
@@ -67,46 +69,15 @@ export default function MovieRow({ title, movies, priority = false, variant = 'd
                     className={`${styles.listContainer} ${isTop10 ? styles.top10List : ''}`}
                     ref={listRef}
                 >
-                    {movies.map((movie, index) => {
-                        const item = movie as CatalogItem;
-                        const linkHref = `/details/${item.supabase_id || item.id}`; // Simple fallback
-
-                        return (
-                            <Link
-                                key={movie.id}
-                                href={linkHref}
-                                className={`${styles.card} ${isTop10 ? styles.top10Card : ''}`}
-                            >
-                                {isTop10 && <RankNumber rank={index + 1} />}
-
-                                <div className={styles.imageWrapper}>
-                                    <OptimizedImage
-                                        src={getImageUrl(movie.poster_path, 'original')} // Max resolution
-                                        tinySrc={getImageUrl(movie.poster_path, 'w92')} // Blur placeholder
-                                        alt={movie.title || movie.name || 'Movie'}
-                                        fill
-                                        className={styles.image}
-                                        sizes="(max-width: 768px) 150px, 300px"
-                                        quality={100} // Zero compression
-                                        priority={priority && index < 6}
-                                    />
-                                    {/* Overlay on Hover */}
-                                    <div className={styles.overlay}>
-                                        <h3 className={styles.movieTitle}>{movie.title || movie.name}</h3>
-                                        <div className={styles.metaRow}>
-                                            <div className={styles.rating}>
-                                                <Star size={12} fill="#fbbf24" stroke="#fbbf24" />
-                                                <span>{movie.vote_average?.toFixed(1) || '0.0'}</span>
-                                            </div>
-                                            <span className={styles.year}>
-                                                {new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear()}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        );
-                    })}
+                    {movies.map((movie, index) => (
+                        <MovieCard
+                            key={movie.id}
+                            movie={movie}
+                            index={index}
+                            isTop10={isTop10}
+                            priority={priority}
+                        />
+                    ))}
                 </div>
             </div>
         </div>

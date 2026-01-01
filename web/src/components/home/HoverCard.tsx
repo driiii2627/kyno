@@ -1,0 +1,102 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Play, Plus, Info, Check } from 'lucide-react';
+import styles from './HoverCard.module.css';
+import { Movie, getImageUrl } from '@/services/tmdb';
+import Link from 'next/link';
+
+interface HoverCardProps {
+    movie: Movie;
+    rect: DOMRect; // Source card position to calculate popup position
+    onClose: () => void;
+}
+
+export default function HoverCard({ movie, rect, onClose }: HoverCardProps) {
+    const [mounted, setMounted] = useState(false);
+    const [style, setStyle] = useState<React.CSSProperties>({});
+
+    useEffect(() => {
+        setMounted(true);
+        // Calculate Position
+        // Center the popup over the card, but slightly scaled up
+        // width of popup is defined in CSS (320px)
+        const popupWidth = 320;
+        const scaleFactor = 1.3; // Approx
+
+        // Center calculation
+        // Card Center X = rect.left + rect.width / 2
+        // Popup Left = Card Center X - Popup Width / 2
+        let left = (rect.left + window.scrollX) + (rect.width / 2) - (popupWidth / 2);
+        let top = (rect.top + window.scrollY) - 20; // Slight lift
+
+        // Edge Detection (Basic)
+        if (left < 10) left = 10;
+        // Simplified for now, can add right-edge check later
+
+        setStyle({
+            top: `${top}px`,
+            left: `${left}px`,
+        });
+
+    }, [rect]);
+
+    if (!mounted) return null;
+
+    // Use a portal to attach to document.body so it floats over everything
+    return createPortal(
+        <div
+            className={styles.hoverCardContainer}
+            style={style}
+            onMouseLeave={onClose}
+        >
+            {/* Banner Section */}
+            <div className={styles.imageSection}>
+                <img
+                    src={getImageUrl(movie.backdrop_path || movie.poster_path, 'w500')}
+                    alt={movie.title || movie.name}
+                    className={styles.image}
+                />
+                <div className={styles.overlay} />
+                <h4 className={styles.title}>{movie.title || movie.name}</h4>
+            </div>
+
+            {/* Content Section */}
+            <div className={styles.content}>
+                {/* Controls */}
+                <div className={styles.controls}>
+                    <Link href={`/details/${movie.id}`} className={`${styles.circleBtn} ${styles.playBtn}`}>
+                        <Play size={18} fill="black" />
+                    </Link>
+                    <button className={styles.circleBtn}>
+                        <Plus size={18} />
+                    </button>
+                    <Link href={`/details/${movie.id}`} className={styles.circleBtn}>
+                        <Info size={18} />
+                    </Link>
+                </div>
+
+                {/* Metadata */}
+                <div className={styles.metaRow}>
+                    <span className={styles.matchScore}>
+                        {(movie.vote_average * 10).toFixed(0)}% Match
+                    </span>
+                    <span className={styles.ageRating}>14+</span>
+                    <span className={styles.duration}>
+                        {new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear()}
+                    </span>
+                </div>
+
+                {/* Genres (Mocked/Simplified if not available in basic object) */}
+                <div className={styles.genres}>
+                    <span className={styles.genre}>Mistério</span>
+                    <span className={styles.dot} />
+                    <span className={styles.genre}>Sci-Fi</span>
+                    {/* In a real app we'd map movie.genre_ids to names */}
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+}
