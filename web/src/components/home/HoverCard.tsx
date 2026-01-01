@@ -25,6 +25,7 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
         const popupHeight = 300; // Approx height based on content
         const currentScrollX = window.scrollX;
         const currentScrollY = window.scrollY;
+        const viewportHeight = window.innerHeight;
 
         // "Canto Inferior Direito" Logic:
         // User Request: "Desce um pouco mais e poe um pouco mais pra direita"
@@ -35,7 +36,23 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
 
         // Shift Down (Less subtraction from bottom = Lower)
         // Previously was -40, now -10 implies it sits 30px lower than before
+        // Default Top: Card Bottom - (Popup Height / 2) - 10
         let top = (rect.bottom + currentScrollY) - (popupHeight / 2) - 10;
+
+        // Boundary Check (Bottom Edge)
+        // Check if the calculated top + height extends past the viewport
+        const popupBottomEdgeInViewport = (top - currentScrollY) + popupHeight;
+
+        // If it goes off-screen (bottom), shift it UP
+        if (popupBottomEdgeInViewport > viewportHeight - 20) {
+            // Logic: Flip it? or just Shift it?
+            // "Suba o pop up para ficar na melhor posição"
+            // Let's shift it so its bottom aligns with the viewport bottom (minus padding)
+            // OR align it relative to the Top of the card if it's really low.
+
+            const overflowAmount = popupBottomEdgeInViewport - (viewportHeight - 20);
+            top = top - overflowAmount;
+        }
 
         // Boundary Check
         if (left < 10) left = 10;
@@ -75,7 +92,7 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
                 {/* Logo or Text Fallback */}
                 {logoUrl ? (
                     <img
-                        src={getImageUrl(logoUrl, 'w500')}
+                        src={getImageUrl(logoUrl, 'original')}
                         alt={movie.title || movie.name}
                         className={styles.logo}
                     />
