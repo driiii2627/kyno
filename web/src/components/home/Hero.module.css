@@ -273,12 +273,12 @@
     background-color: #fff;
     color: #000;
     /* Pure black for contrast */
-    padding: 0.9rem 2.8rem;
-    /* Balanced padding */
+    padding: 1.05rem 3.2rem;
+    /* Increased for balance */
     border-radius: 99px;
     /* Maximum pill shape */
-    font-size: 1.3rem;
-    /* More elegant size */
+    font-size: 1.45rem;
+    /* Larger to match Info button presence */
     font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     /* Bold but not heavy */
