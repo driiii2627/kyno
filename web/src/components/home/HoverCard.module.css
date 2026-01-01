@@ -57,12 +57,11 @@
 
 .logo {
     position: absolute;
-    bottom: 1rem;
-    left: 1.2rem;
-    max-width: 70%;
-    /* Ensure it doesn't span full width unnecessarily */
-    max-height: 60%;
-    /* Keep it within reason */
+    bottom: 0.8rem;
+    left: 1rem;
+    max-width: 55%;
+    /* Smaller constraints */
+    max-height: 45%;
     object-fit: contain;
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.8));
     /* Slight animation */

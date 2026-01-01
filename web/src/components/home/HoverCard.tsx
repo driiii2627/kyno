@@ -27,16 +27,15 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
         const currentScrollY = window.scrollY;
 
         // "Canto Inferior Direito" Logic:
-        // Align center of popup to bottom-right of card
-        // Card Bottom Right X = rect.right
-        // Card Bottom Right Y = rect.bottom
+        // User Request: "Desce um pouco mais e poe um pouco mais pra direita"
 
-        // Left = Card Right - (Popup Width / 2)
-        let left = (rect.right + currentScrollX) - (popupWidth / 2);
+        // Align center(ish) of popup to bottom-right of card
+        // Shift Right (+40px)
+        let left = (rect.right + currentScrollX) - (popupWidth / 2) + 40;
 
-        // Top = Card Bottom - (Popup Height / 2)
-        // Shifting it slightly up as requested ("um pouco pra cima")
-        let top = (rect.bottom + currentScrollY) - (popupHeight / 2) - 40;
+        // Shift Down (Less subtraction from bottom = Lower)
+        // Previously was -40, now -10 implies it sits 30px lower than before
+        let top = (rect.bottom + currentScrollY) - (popupHeight / 2) - 10;
 
         // Boundary Check
         if (left < 10) left = 10;
