@@ -16,55 +16,74 @@ interface HoverCardProps {
 
 export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: HoverCardProps) {
     const [mounted, setMounted] = useState(false);
-    const [style, setStyle] = useState<React.CSSProperties>({});
+    const [style, setStyle] = useState<React.CSSProperties>({ opacity: 0 }); // Start hidden to measure
+    const cardRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setMounted(true);
-        // Calculate Position
+    }, []);
+
+    // Layout Effect to measure and position before paint (or immediately after render)
+    React.useLayoutEffect(() => {
+        if (!cardRef.current || !rect) return;
+
         const popupWidth = 340;
-        const popupHeight = 300; // Approx height based on content
+        // Measure actual height
+        const popupHeight = cardRef.current.offsetHeight || 300;
+
         const currentScrollX = window.scrollX;
         const currentScrollY = window.scrollY;
         const viewportHeight = window.innerHeight;
 
-        // "Canto Inferior Direito" Logic:
-        // User Request: "Desce um pouco mais e poe um pouco mais pra direita"
-
-        // Align center(ish) of popup to bottom-right of card
-        // Shift Right (+40px)
+        // --- Horizontal Logic ---
+        // "Mais pra direita". 
+        // Anchor: Center of popup aligns with Right Edge of Card?
+        // Let's try: Left = Card Right - (PopupWidth / 2) + 40
         let left = (rect.right + currentScrollX) - (popupWidth / 2) + 40;
 
-        // Shift Down (Less subtraction from bottom = Lower)
-        // Previously was -40, now -10 implies it sits 30px lower than before
-        // Default Top: Card Bottom - (Popup Height / 2) - 10
-        let top = (rect.bottom + currentScrollY) - (popupHeight / 2) - 10;
-
-        // Boundary Check (Bottom Edge)
-        // Check if the calculated top + height extends past the viewport
-        const popupBottomEdgeInViewport = (top - currentScrollY) + popupHeight;
-
-        // If it goes off-screen (bottom), shift it UP
-        if (popupBottomEdgeInViewport > viewportHeight - 20) {
-            // Logic: Flip it? or just Shift it?
-            // "Suba o pop up para ficar na melhor posição"
-            // Let's shift it so its bottom aligns with the viewport bottom (minus padding)
-            // OR align it relative to the Top of the card if it's really low.
-
-            const overflowAmount = popupBottomEdgeInViewport - (viewportHeight - 20);
-            top = top - overflowAmount;
-        }
-
-        // Boundary Check
+        // Boundary Check (Left/Right)
         if (left < 10) left = 10;
-        const maxLeft = window.innerWidth - popupWidth - 10;
+        // Prevent right overflow
+        const maxLeft = (window.innerWidth + currentScrollX) - popupWidth - 20;
         if (left > maxLeft) left = maxLeft;
+
+
+        // --- Vertical Logic ---
+        // "Desce um pouco mais"
+        // Base Anchor: Card Bottom + Scroll
+        // Let's center popup vertically on the bottom edge of the card, then shift down slightly.
+        // Card Bottom Y = rect.bottom + currentScrollY
+        // Popup Center Y = top + (height/2)
+        // Desired: Popup Center Y = Card Bottom Y + 10px?
+        // top = (rect.bottom + currentScrollY) - (popupHeight / 2) + 10;
+        // User complained it was too high before.
+        // Before was: (rect.bottom + currentScrollY) - (popupHeight / 2) - 10;
+        // Let's drop it lower.
+
+        let top = (rect.bottom + currentScrollY) - (popupHeight / 2) + 20;
+
+        // --- Vertical Boundary / "Borda" Logic ---
+        // Check if bottom of popup exceeds viewport bottom
+        // Popup Bottom (Absolute) = top + popupHeight
+        // Viewport Bottom (Absolute) = currentScrollY + viewportHeight
+
+        const popupBottomAbs = top + popupHeight;
+        const viewportBottomAbs = currentScrollY + viewportHeight;
+        const padding = 20;
+
+        if (popupBottomAbs > viewportBottomAbs - padding) {
+            // Collision detected!
+            // Shift UP to match viewport bottom
+            top = viewportBottomAbs - popupHeight - padding;
+        }
 
         setStyle({
             top: `${top}px`,
             left: `${left}px`,
+            opacity: 1 // Reveal
         });
 
-    }, [rect]);
+    }, [rect, mounted]); // dependency on rect ensures update on hover
 
     if (!mounted) return null;
 
@@ -75,6 +94,7 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
     // Use a portal to attach to document.body so it floats over everything
     return createPortal(
         <div
+            ref={cardRef}
             className={styles.hoverCardContainer}
             style={style}
             onMouseEnter={onMouseEnter}
@@ -92,7 +112,7 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
                 {/* Logo or Text Fallback */}
                 {logoUrl ? (
                     <img
-                        src={getImageUrl(logoUrl, 'original')}
+                        src={getImageUrl(logoUrl, 'w500')} // Reverted to w500 as requested
                         alt={movie.title || movie.name}
                         className={styles.logo}
                     />
