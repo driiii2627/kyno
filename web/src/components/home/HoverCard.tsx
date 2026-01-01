@@ -76,7 +76,7 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
                 {/* Logo or Text Fallback */}
                 {logoUrl ? (
                     <img
-                        src={logoUrl}
+                        src={getImageUrl(logoUrl, 'w500')}
                         alt={movie.title || movie.name}
                         className={styles.logo}
                     />
