@@ -21,16 +21,22 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
     useEffect(() => {
         setMounted(true);
         // Calculate Position
-        const popupWidth = 340; // Slightly smaller than 360
+        const popupWidth = 340;
+        const popupHeight = 300; // Approx height based on content
         const currentScrollX = window.scrollX;
         const currentScrollY = window.scrollY;
 
-        // Position: "Canto direito inferior... um pouco pra cima"
-        // Let's align the Left of the popup with the center of the card
-        // And match the Top to give a "stacking" feel.
+        // "Canto Inferior Direito" Logic:
+        // Align center of popup to bottom-right of card
+        // Card Bottom Right X = rect.right
+        // Card Bottom Right Y = rect.bottom
 
-        let left = (rect.left + currentScrollX) + 20; // Shifted right
-        let top = (rect.top + currentScrollY) - 40; // Shifted up slightly less than before
+        // Left = Card Right - (Popup Width / 2)
+        let left = (rect.right + currentScrollX) - (popupWidth / 2);
+
+        // Top = Card Bottom - (Popup Height / 2)
+        // Shifting it slightly up as requested ("um pouco pra cima")
+        let top = (rect.bottom + currentScrollY) - (popupHeight / 2) - 40;
 
         // Boundary Check
         if (left < 10) left = 10;
@@ -48,6 +54,7 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
 
     // Type coercion for Supabase ID (known to exist if from CatalogItem/movie table)
     const itemLink = `/details/${(movie as any).supabase_id || movie.id}`;
+    const logoUrl = (movie as any).logo_url;
 
     // Use a portal to attach to document.body so it floats over everything
     return createPortal(
@@ -60,12 +67,22 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
             {/* Banner Section */}
             <div className={styles.imageSection}>
                 <img
-                    src={getImageUrl(movie.backdrop_path || movie.poster_path, 'w780')}
+                    src={getImageUrl(movie.backdrop_path || movie.poster_path, 'w500')}
                     alt={movie.title || movie.name}
                     className={styles.image}
                 />
                 <div className={styles.overlay} />
-                <h4 className={styles.title}>{movie.title || movie.name}</h4>
+
+                {/* Logo or Text Fallback */}
+                {logoUrl ? (
+                    <img
+                        src={logoUrl}
+                        alt={movie.title || movie.name}
+                        className={styles.logo}
+                    />
+                ) : (
+                    <h4 className={styles.title}>{movie.title || movie.name}</h4>
+                )}
             </div>
 
             {/* Content Section */}

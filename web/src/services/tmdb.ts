@@ -12,6 +12,7 @@ export interface Movie {
   release_date?: string;
   first_air_date?: string;
   genre_ids: number[];
+  logo_url?: string | null; // Optional, populated from DB
 }
 
 export const getImageUrl = (path: string | null, size: 'original' | 'w500' | 'w342' | 'w780' | 'w1280' | 'w154' | 'w92' = 'original') => {

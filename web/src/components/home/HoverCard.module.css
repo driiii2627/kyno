@@ -55,6 +55,20 @@
     line-height: 1.1;
 }
 
+.logo {
+    position: absolute;
+    bottom: 1rem;
+    left: 1.2rem;
+    max-width: 70%;
+    /* Ensure it doesn't span full width unnecessarily */
+    max-height: 60%;
+    /* Keep it within reason */
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.8));
+    /* Slight animation */
+    animation: fadeIn 0.4s ease-out;
+}
+
 /* Content Area */
 .content {
     padding: 1.2rem;
@@ -174,5 +188,17 @@
     100% {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
