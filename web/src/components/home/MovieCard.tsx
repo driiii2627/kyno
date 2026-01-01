@@ -84,7 +84,7 @@ export default function MovieCard({ movie, index, isTop10 = false, priority = fa
                                 <Star size={12} fill="#fbbf24" stroke="#fbbf24" />
                                 <span>{movie.vote_average?.toFixed(1) || '0.0'}</span>
                             </div>
-                            <span className={styles.year}>
+                            <span className={styles.year} suppressHydrationWarning>
                                 {new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear()}
                             </span>
                         </div>
