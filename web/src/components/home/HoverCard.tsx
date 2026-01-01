@@ -21,20 +21,27 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
     useEffect(() => {
         setMounted(true);
         // Calculate Position
-        // Center the popup over the card, but slightly scaled up
-        // width of popup is defined in CSS (320px)
-        const popupWidth = 320;
-        const scaleFactor = 1.3; // Approx
+        const popupWidth = 360; // Larger size
+        const currentScrollX = window.scrollX;
+        const currentScrollY = window.scrollY;
 
-        // Center calculation
-        // Card Center X = rect.left + rect.width / 2
-        // Popup Left = Card Center X - Popup Width / 2
-        let left = (rect.left + window.scrollX) + (rect.width / 2) - (popupWidth / 2);
-        let top = (rect.top + window.scrollY) - 20; // Slight lift
+        // Center Horizontally:
+        // Card Center = rect.left + rect.width / 2
+        // Popup Left = Card Center - popupWidth / 2
+        let left = (rect.left + currentScrollX) + (rect.width / 2) - (popupWidth / 2);
 
-        // Edge Detection (Basic)
+        // Position Vertically:
+        // Start from card top, but shift up slightly to hover nicely
+        // rect.top + currentScrollY -> Card Top in document
+        // - 60px -> Shift up
+        let top = (rect.top + currentScrollY) - 60;
+
+        // Boundary Check (Viewport)
+        // If it goes too far left?
         if (left < 10) left = 10;
-        // Simplified for now, can add right-edge check later
+        // If it goes too far right?
+        const maxLeft = window.innerWidth - popupWidth - 10;
+        if (left > maxLeft) left = maxLeft;
 
         setStyle({
             top: `${top}px`,
@@ -56,7 +63,7 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
             {/* Banner Section */}
             <div className={styles.imageSection}>
                 <img
-                    src={getImageUrl(movie.backdrop_path || movie.poster_path, 'w500')}
+                    src={getImageUrl(movie.backdrop_path || movie.poster_path, 'w780')}
                     alt={movie.title || movie.name}
                     className={styles.image}
                 />
@@ -69,21 +76,19 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
                 {/* Controls */}
                 <div className={styles.controls}>
                     <Link href={`/details/${movie.id}`} className={`${styles.circleBtn} ${styles.playBtn}`}>
-                        <Play size={18} fill="black" />
+                        <Play size={20} fill="black" />
                     </Link>
                     <button className={styles.circleBtn}>
-                        <Plus size={18} />
+                        <Plus size={20} />
                     </button>
                     <Link href={`/details/${movie.id}`} className={styles.circleBtn}>
-                        <Info size={18} />
+                        <Info size={20} />
                     </Link>
                 </div>
 
                 {/* Metadata */}
                 <div className={styles.metaRow}>
-                    <span className={styles.matchScore}>
-                        {(movie.vote_average * 10).toFixed(0)}% Match
-                    </span>
+                    <span className={styles.qualityBadge}>HD</span>
                     <span className={styles.ageRating}>14+</span>
                     <span className={styles.duration}>
                         {new Date(movie.release_date || movie.first_air_date || Date.now()).getFullYear()}
@@ -95,6 +100,8 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
                     <span className={styles.genre}>Mistério</span>
                     <span className={styles.dot} />
                     <span className={styles.genre}>Sci-Fi</span>
+                    <span className={styles.dot} />
+                    <span className={styles.genre}>Outros</span>
                     {/* In a real app we'd map movie.genre_ids to names */}
                 </div>
             </div>
