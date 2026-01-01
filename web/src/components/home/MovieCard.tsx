@@ -24,33 +24,65 @@ export default function MovieCard({ movie, index, isTop10 = false, priority = fa
     // Hover Logic
     const [isHovered, setIsHovered] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
+
+    // Timeouts
     const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     const cardRef = useRef<HTMLAnchorElement>(null);
     const [rect, setRect] = useState<DOMRect | null>(null);
 
+    // Open: Triggered by hovering the card
     const handleMouseEnter = () => {
         setIsHovered(true);
-        // Delay popup by 600ms to avoid flashing while scrolling
-        hoverTimeoutRef.current = setTimeout(() => {
-            if (cardRef.current) {
-                setRect(cardRef.current.getBoundingClientRect());
-                setShowPopup(true);
-            }
-        }, 600);
+
+        // If we were about to close, cancel it (user moved back to card)
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
+
+        // If already open, keep it open. If not, start the open timer.
+        if (!showPopup) {
+            hoverTimeoutRef.current = setTimeout(() => {
+                if (cardRef.current) {
+                    setRect(cardRef.current.getBoundingClientRect());
+                    setShowPopup(true);
+                }
+            }, 600);
+        }
     };
 
+    // Close: Triggered by leaving the card OR the popup
     const handleMouseLeave = () => {
         setIsHovered(false);
+
+        // Cancel any pending open action
         if (hoverTimeoutRef.current) {
             clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
         }
-        setShowPopup(false);
+
+        // Start a grace period before actually closing
+        // This allows the user to move from Card -> Popup or Popup -> Card
+        closeTimeoutRef.current = setTimeout(() => {
+            setShowPopup(false);
+        }, 300); // 300ms grace period
+    };
+
+    // Keep Open: Triggered when entering the popup (cancels the close timer)
+    const handlePopupEnter = () => {
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
     };
 
     // Clean up on unmount
     useEffect(() => {
         return () => {
             if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+            if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
         };
     }, []);
 
@@ -97,7 +129,8 @@ export default function MovieCard({ movie, index, isTop10 = false, priority = fa
                 <HoverCard
                     movie={movie}
                     rect={rect}
-                    onClose={handleMouseLeave} // Close if they leave the popup area too (handled in component)
+                    onMouseEnter={handlePopupEnter} // Bridge: Keep open when hovering popup
+                    onMouseLeave={handleMouseLeave} // Bridge: Start close timer when leaving popup
                 />
             )}
         </>

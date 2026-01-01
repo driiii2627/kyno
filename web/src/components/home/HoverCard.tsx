@@ -10,10 +10,11 @@ import Link from 'next/link';
 interface HoverCardProps {
     movie: Movie;
     rect: DOMRect; // Source card position to calculate popup position
-    onClose: () => void;
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
 }
 
-export default function HoverCard({ movie, rect, onClose }: HoverCardProps) {
+export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: HoverCardProps) {
     const [mounted, setMounted] = useState(false);
     const [style, setStyle] = useState<React.CSSProperties>({});
 
@@ -49,7 +50,8 @@ export default function HoverCard({ movie, rect, onClose }: HoverCardProps) {
         <div
             className={styles.hoverCardContainer}
             style={style}
-            onMouseLeave={onClose}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
         >
             {/* Banner Section */}
             <div className={styles.imageSection}>
