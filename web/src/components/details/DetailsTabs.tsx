@@ -76,7 +76,7 @@ export default function DetailsTabs({ seasonBrowser, recommendations, uuid }: De
                                         >
                                             <div className={seasonStyles.thumbnailWrapper}>
                                                 <Image
-                                                    src={`https://image.tmdb.org/t/p/w500${rec.backdrop_path || rec.poster_path}`}
+                                                    src={`https://image.tmdb.org/t/p/w780${rec.backdrop_path || rec.poster_path}`}
                                                     alt={rec.title || rec.name || 'Title'}
                                                     fill
                                                     className={seasonStyles.thumbnailImage}
