@@ -66,9 +66,27 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     await Promise.all(conditionalPromises);
 
     // 4. Personalized Recommendations (Mixed Movies & Series)
-    // Uses the new algorithm: Sequels > User Pref > Genre Match > Quality
-    // TODO: Connect 'guest' to actual logged-in user ID when Auth is stable
-    const recommendations = await contentService.getPersonalizedRecommendations(item, 'guest');
+    // Construct a context object that satisfies CatalogItem interface
+    // We combine DB ID (uuid) with TMDB details
+    const recommendationContext: import('@/services/content').CatalogItem = {
+        id: item.tmdb_id, // Satisfy Movie interface (id is number)
+        supabase_id: uuid, // Required for filtering itself out
+        title: (details as any).title || (details as any).name,
+        name: (details as any).name,
+        overview: details.overview,
+        backdrop_path: details.backdrop_path,
+        poster_path: details.poster_path,
+        vote_average: details.vote_average,
+        genre_ids: [],
+        video_url: item.video_url || '',
+        logo_url: item.logo_url || undefined,
+        trailer_url: item.trailer_url || undefined,
+        textless_poster_url: item.textless_poster_url || undefined,
+        genre: details.genres?.map(g => g.name).join(', '),
+        genres: details.genres || []
+    };
+
+    const recommendations = await contentService.getPersonalizedRecommendations(recommendationContext, 'guest');
 
     // Prepare Season Browser Node
     let seasonBrowserNode = null;
