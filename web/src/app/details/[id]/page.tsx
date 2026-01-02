@@ -33,75 +33,87 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         );
     }
 
-    // 2. Fetch Data
+    // 2. Fetch Core Data (Parallel)
+    // We fetch recommendations early to speed up the waterfall, even though we filter them later.
     const detailsPromise = tmdb.getDetails(item.tmdb_id, item.type);
     const creditsPromise = tmdb.getCredits(item.tmdb_id, item.type);
+    const recommendationsPromise = tmdb.getRecommendations(item.tmdb_id, item.type);
 
-    const [details, credits] = await Promise.all([detailsPromise, creditsPromise]);
+    const [details, credits, rawRecommendations] = await Promise.all([
+        detailsPromise,
+        creditsPromise,
+        recommendationsPromise
+    ]);
 
-    // If Series, fetch first season
+    // 3. Conditional Fetches (Seasons or Collections)
     let initialSeasonData = null;
+    let extraCollectionParts: any[] = [];
+
+    const conditionalPromises: Promise<any>[] = [];
+
+    // A. Series: Get First Season
     if (item.type === 'tv' && 'seasons' in details && details.seasons?.length) {
-        const firstSeason = details.seasons.find(s => s.season_number > 0) || details.seasons[0];
+        const firstSeason = details.seasons.find((s: any) => s.season_number > 0) || details.seasons[0];
         if (firstSeason) {
-            initialSeasonData = await tmdb.getSeasonDetails(item.tmdb_id, firstSeason.season_number);
+            conditionalPromises.push(
+                tmdb.getSeasonDetails(item.tmdb_id, firstSeason.season_number)
+                    .then(res => { initialSeasonData = res; })
+                    .catch(() => null)
+            );
         }
     }
 
-    // 3. Fetch Recommendations & Collection (Sequels)
-    let recommendations = await tmdb.getRecommendations(item.tmdb_id, item.type);
-
-    // Prioritize Sequels (Collection) if Movie
+    // B. Movie: Get Collection
     if (item.type === 'movie' && (details as any).belongs_to_collection) {
-        try {
-            const collection = await tmdb.getCollectionDetails((details as any).belongs_to_collection.id);
-            if (collection && collection.parts) {
-                // Filter out current movie and sort by release date
-                const parts = collection.parts
-                    .filter((p: any) => p.id !== item.tmdb_id)
-                    .sort((a: any, b: any) => {
-                        const timeA = a.release_date ? new Date(a.release_date).getTime() : 0;
-                        const timeB = b.release_date ? new Date(b.release_date).getTime() : 0;
-                        return timeA - timeB;
-                    });
-
-                // Prepend collection parts to recommendations
-                recommendations = [...parts, ...recommendations];
-
-                // Deduplicate just in case
-                recommendations = Array.from(new Map(recommendations.map((m: any) => [m.id, m])).values());
-            }
-        } catch (e) {
-            console.error("Failed to fetch collection", e);
-        }
+        conditionalPromises.push(
+            tmdb.getCollectionDetails((details as any).belongs_to_collection.id)
+                .then(collection => {
+                    if (collection && collection.parts) {
+                        extraCollectionParts = collection.parts
+                            .filter((p: any) => p.id !== item.tmdb_id)
+                            .sort((a: any, b: any) => {
+                                const timeA = a.release_date ? new Date(a.release_date).getTime() : 0;
+                                const timeB = b.release_date ? new Date(b.release_date).getTime() : 0;
+                                return timeA - timeB;
+                            });
+                    }
+                })
+                .catch(e => console.error("Failed to fetch collection", e))
+        );
     }
 
-    // 4. Validate Recommendations against Supabase (Security Check)
-    // We only show items that are ALREADY in our database.
+    // Wait for conditional fetches
+    await Promise.all(conditionalPromises);
+
+    // Merge Collection into Recommendations
+    let recommendations = [...extraCollectionParts, ...rawRecommendations];
+    // Deduplicate
+    recommendations = Array.from(new Map(recommendations.map((m: any) => [m.id, m])).values());
+
+    // 4. Validate Recommendations against Supabase (Parallel Security Check)
     const candidateIds = recommendations.map((r: any) => r.id);
     let validRecommendations: any[] = [];
-
-    // existingIds to prevent duplicates
     const existingIds = new Set<string>();
 
     if (candidateIds.length > 0) {
-        // ... (Keep existing validation logic, but populate existingIds) ...
-        const { data: validMovies } = await supabase
+        const moviesQuery = supabase
             .from('movies')
             .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
             .in('tmdb_id', candidateIds);
 
-        const { data: validSeries } = await supabase
+        const seriesQuery = supabase
             .from('series')
             .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
             .in('tmdb_id', candidateIds);
 
-        // Map Valid Items to Catalog Schema
+        const [{ data: validMovies }, { data: validSeries }] = await Promise.all([moviesQuery, seriesQuery]);
+
+        // Map Valid Items...
         const safeMovies = (validMovies || []).map(m => ({
             id: m.tmdb_id,
             supabase_id: m.id,
             title: m.title,
-            overview: m.description, // DB column is description
+            overview: m.description,
             poster_path: m.poster_url,
             backdrop_path: m.backdrop_url,
             vote_average: m.rating,
@@ -111,7 +123,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         const safeSeries = (validSeries || []).map(s => ({
             id: s.tmdb_id,
             supabase_id: s.id,
-            name: s.title, // Series title in DB
+            name: s.title,
             title: s.title,
             overview: s.description,
             poster_path: s.poster_url,
@@ -124,19 +136,17 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         validRecommendations.forEach(r => existingIds.add(r.supabase_id));
     }
 
-    // 5. Fallback: "Same Genre" Recommendations (If list is too short)
+    // 5. Fallback: "Same Genre" Recommendations
     if (validRecommendations.length < 10 && details.genres && details.genres.length > 0) {
         const primaryGenre = details.genres[0].name;
         const limit = 15 - validRecommendations.length;
-
-        // Fetch from the SAME table (movies or series)
         const table = item.type === 'movie' ? 'movies' : 'series';
 
         const { data: genreData } = await supabase
             .from(table)
             .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
             .ilike('genre', `%${primaryGenre}%`)
-            .neq('id', uuid) // Exclude current
+            .neq('id', uuid)
             .limit(limit);
 
         if (genreData) {
@@ -152,7 +162,6 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                 type: item.type
             }));
 
-            // Add non-duplicate items
             genreItems.forEach((g: any) => {
                 if (!existingIds.has(g.supabase_id)) {
                     validRecommendations.push(g);
@@ -162,7 +171,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         }
     }
 
-    recommendations = validRecommendations.slice(0, 15); // Final Limit
+    recommendations = validRecommendations.slice(0, 15);
 
     // Prepare Season Browser Node
     let seasonBrowserNode = null;
