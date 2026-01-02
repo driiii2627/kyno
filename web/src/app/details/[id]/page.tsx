@@ -219,8 +219,12 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     }
     const logoUrl = getImageUrl(logoPath, 'w500');
 
-    // Fetch Textless Poster for Mobile (Server-side)
-    const textlessPosterPath = await tmdb.getTextlessPoster(item.tmdb_id, item.type);
+    // Fetch Textless Poster for Mobile (Optimized: DB Cache -> Fallback TMDB)
+    let textlessPosterPath = item.textless_poster_url;
+    if (!textlessPosterPath) {
+        // Fallback fetch if not synced yet
+        textlessPosterPath = await tmdb.getTextlessPoster(item.tmdb_id, item.type);
+    }
     const mobilePosterUrl = textlessPosterPath ? getImageUrl(textlessPosterPath, 'original') : null; // Max Quality (4K)
 
     return (

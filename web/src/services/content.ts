@@ -10,6 +10,7 @@ export interface SupabaseContent {
     description?: string; // DB column is description, not overview
     poster_url?: string;  // DB column is poster_url
     backdrop_url?: string; // DB column is backdrop_url
+    textless_poster_url?: string; // NEW: Cached separate vertical poster for mobile
     release_year?: number; // DB column is release_year
     rating?: number;       // DB column is rating
     genre?: string;
@@ -25,6 +26,7 @@ export interface CatalogItem extends Movie {
     supabase_id: string;
     logo_url?: string; // Passed from DB
     trailer_url?: string; // Passed from DB
+    textless_poster_url?: string; // Passed from DB
     genre?: string;
     genres?: { id: number; name: string }[];
     duration?: number;
@@ -60,13 +62,10 @@ export const contentService = {
     /**
      * Get a single movie by UUID (Lightweight lookup for Player)
      */
-    /**
-     * Get a single movie by UUID (Lightweight lookup for Player)
-     */
-    async getMovieById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null } | null> {
+    async getMovieById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null; textless_poster_url: string | null } | null> {
         const { data, error } = await supabase
             .from('movies')
-            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url, logo_url')
+            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url, logo_url, textless_poster_url')
             .eq('id', uuid)
             .single();
 
@@ -77,17 +76,18 @@ export const contentService = {
             trailer_url: data.trailer_url,
             show_trailer: data.show_trailer,
             backdrop_url: data.backdrop_url,
-            logo_url: data.logo_url
+            logo_url: data.logo_url,
+            textless_poster_url: data.textless_poster_url
         };
     },
 
     /**
      * Get a single series by UUID
      */
-    async getSeriesById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null } | null> {
+    async getSeriesById(uuid: string): Promise<{ tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null; textless_poster_url: string | null } | null> {
         const { data, error } = await supabase
             .from('series')
-            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url, logo_url')
+            .select('tmdb_id, video_url, trailer_url, show_trailer, backdrop_url, logo_url, textless_poster_url')
             .eq('id', uuid)
             .single();
 
@@ -98,14 +98,15 @@ export const contentService = {
             trailer_url: data.trailer_url,
             show_trailer: data.show_trailer,
             backdrop_url: data.backdrop_url,
-            logo_url: data.logo_url
+            logo_url: data.logo_url,
+            textless_poster_url: data.textless_poster_url
         };
     },
 
     /**
      * Generic lookup to find item by UUID in either table
      */
-    async getItemByUuid(uuid: string): Promise<{ type: 'movie' | 'tv'; tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null } | null> {
+    async getItemByUuid(uuid: string): Promise<{ type: 'movie' | 'tv'; tmdb_id: number; video_url: string | null; trailer_url: string | null; show_trailer: boolean; backdrop_url: string | null; logo_url: string | null; textless_poster_url: string | null } | null> {
         // Run both checks in parallel
         const [movie, series] = await Promise.all([
             this.getMovieById(uuid),
@@ -184,7 +185,8 @@ export const contentService = {
             duration: dbMovie.duration,
             logo_url: dbMovie.logo_url,
             // Prioritize Supabase managed trailer
-            trailer_url: dbMovie.trailer_url
+            trailer_url: dbMovie.trailer_url,
+            textless_poster_url: dbMovie.textless_poster_url
         })) as CatalogItem[];
     },
 
@@ -218,7 +220,8 @@ export const contentService = {
             genre: dbSeriesItem.genre,
             genres: dbSeriesItem.genre ? [{ id: 0, name: dbSeriesItem.genre }] : [],
             logo_url: dbSeriesItem.logo_url,
-            trailer_url: dbSeriesItem.trailer_url
+            trailer_url: dbSeriesItem.trailer_url,
+            textless_poster_url: dbSeriesItem.textless_poster_url
         })) as CatalogItem[];
     }
 };
