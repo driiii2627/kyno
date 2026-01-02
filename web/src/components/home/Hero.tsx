@@ -82,11 +82,19 @@ export default function Hero({ movies }: HeroProps) {
         // Mute state persists across slides
     }, [currentIndex]);
 
-    // Fetch Textless Poster for current movie (Client Side)
+    // Fetch Textless Poster for current movie (Client Side Fallback)
+    // ONLY scans if the DB does not have the poster cached
     useEffect(() => {
         if (!currentMovie) return;
 
+        // If we already have a cached poster from DB, clear any old fallback and return
+        if (currentMovie.textless_poster_url) {
+            setMobilePoster(null);
+            return;
+        }
+
         const fetchPoster = async () => {
+            // Only fetch on mobile
             if (window.innerWidth > 768) {
                 setMobilePoster(null);
                 return;
@@ -94,16 +102,16 @@ export default function Hero({ movies }: HeroProps) {
 
             try {
                 const type = currentMovie.title ? 'movie' : 'tv'; // Heuristic
-                const safeType = (currentMovie as any).type || type;
+                const safeType = (currentMovie as any).type || type; // Safety
 
                 const path = await tmdb.getTextlessPoster((currentMovie as any).tmdb_id || currentMovie.id, safeType as 'movie' | 'tv');
                 if (path) {
-                    setMobilePoster(getImageUrl(path, 'w780'));
+                    setMobilePoster(getImageUrl(path, 'original')); // Use Original for quality
                 } else {
                     setMobilePoster(null);
                 }
             } catch (error) {
-                console.error("Error fetching mobile poster", error);
+                console.error("Error fetching mobile poster fallback", error);
                 setMobilePoster(null);
             }
         };
@@ -217,15 +225,21 @@ export default function Hero({ movies }: HeroProps) {
                     `}
                 >
                     <OptimizedImage
-                        src={mobilePoster || backdropUrl}
+                        src={
+                            currentMovie.textless_poster_url
+                                ? getImageUrl(currentMovie.textless_poster_url, 'original')
+                                : (mobilePoster || backdropUrl)
+                        }
                         tinySrc={getImageUrl(currentMovie.textless_poster_url || currentMovie.backdrop_path || '', 'w92')}
                         alt={title}
                         fill
                         className={styles.image}
                         priority={true}
                         decoding="sync"
-                        quality={90}
+                        // Force Max Quality
+                        quality={100}
                         style={{ objectFit: 'cover', zIndex: 0 }}
+                        unoptimized={true}
                     />
                 </div>
 
