@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-// @ts-expect-error next-pwa types issues
+
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
