@@ -219,11 +219,15 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     }
     const logoUrl = getImageUrl(logoPath, 'w500');
 
+    // Fetch Textless Poster for Mobile (Server-side)
+    const textlessPosterPath = await tmdb.getTextlessPoster(item.tmdb_id, item.type);
+    const mobilePosterUrl = textlessPosterPath ? getImageUrl(textlessPosterPath, 'w780') : null; // High quality w780
+
     return (
         <div className={styles.container}>
             {/* Background Hero */}
             {/* Background Hero (Image Only) */}
-            <DetailsBackground backdropUrl={backdropUrl} />
+            <DetailsBackground backdropUrl={backdropUrl} mobilePoster={mobilePosterUrl} />
 
             {/* Smart Back Button */}
             <SmartBackButton className={styles.backButton} iconSize={18}>

@@ -91,6 +91,16 @@ export interface SeasonDetails {
   season_number: number;
 }
 
+export interface Image {
+  aspect_ratio: number;
+  height: number;
+  iso_639_1: string | null;
+  file_path: string;
+  vote_average: number;
+  vote_count: number;
+  width: number;
+}
+
 export const tmdb = {
   getTrending: async (type: 'movie' | 'tv' = 'movie') => {
     return fetchFromTMDB<{ results: Movie[] }>(`/trending/${type}/week`);
@@ -121,10 +131,32 @@ export const tmdb = {
     return fetchFromTMDB<{ parts: Movie[] }>(`/collection/${collectionId}`);
   },
   getImages: async (id: number, type: 'movie' | 'tv') => {
-    return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
+    // Include 'null' for textless/universal images
+    return fetchFromTMDB<{ logos: Image[], posters: Image[], backdrops: Image[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
   },
   getVideos: async (id: number, type: 'movie' | 'tv') => {
     return fetchFromTMDB<{ results: { key: string, site: string, type: string, iso_639_1: string, name: string, official: boolean }[] }>(`/${type}/${id}/videos?language=pt-BR,en-US`);
+  },
+  // NEW HELPER: Fetch best textless poster
+  getTextlessPoster: async (id: number, type: 'movie' | 'tv') => {
+    try {
+      const data = await tmdb.getImages(id, type);
+      // Filter for images with no language (often textless) or strictly 'xx' if used
+      // TMDB uses 'null' (json null) or 'xx' for no language.
+      const textless = data.posters.filter(p => p.iso_639_1 === null || p.iso_639_1 === 'xx');
+
+      if (textless.length > 0) {
+        // Return the highest rated one
+        return textless.sort((a, b) => b.vote_average - a.vote_average)[0].file_path;
+      }
+
+      // Fallback: If no strict textless, try to find one with highest vote overall (often clean art)
+      // or just return null to let the UI decide fallback
+      return null;
+    } catch (e) {
+      console.warn("Failed to fetch textless poster", e);
+      return null;
+    }
   }
 };
 
