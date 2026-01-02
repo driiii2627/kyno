@@ -107,8 +107,7 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
                                 <div className={styles.thumbnailWrapper}>
                                     {ep.still_path ? (
                                         <OptimizedImage
-                                            src={getImageUrl(ep.still_path || '', 'w342')}
-                                            tinySrc={getImageUrl(ep.still_path || '', 'w92')}
+                                            src={getImageUrl(ep.still_path || '', 'w185')}
                                             alt={ep.name}
                                             fill
                                             priority={index < 4} // Load first 4 instantly
