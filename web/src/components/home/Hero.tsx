@@ -218,7 +218,7 @@ export default function Hero({ movies }: HeroProps) {
                 >
                     <OptimizedImage
                         src={mobilePoster || backdropUrl}
-                        tinySrc={getImageUrl(mobilePoster ? mobilePoster : (currentMovie.backdrop_path || ''), 'w92')}
+                        tinySrc={getImageUrl(currentMovie.textless_poster_url || currentMovie.backdrop_path || '', 'w92')}
                         alt={title}
                         fill
                         className={styles.image}
