@@ -43,6 +43,16 @@ export default function Hero({ movies }: HeroProps) {
     // Preference Notification State
 
 
+    // Responsive State
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+        checkMobile(); // Initial check
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+
     // INIT: Shuffle & Preferences
     useEffect(() => {
         // 1. Shuffle Movies (Fisher-Yates) on Mount
@@ -226,11 +236,20 @@ export default function Hero({ movies }: HeroProps) {
                 >
                     <OptimizedImage
                         src={
-                            currentMovie.textless_poster_url
-                                ? getImageUrl(currentMovie.textless_poster_url, 'original')
-                                : (mobilePoster || backdropUrl)
+                            isMobile
+                                ? (currentMovie.textless_poster_url
+                                    ? getImageUrl(currentMovie.textless_poster_url, 'original')
+                                    : (mobilePoster || backdropUrl))
+                                : backdropUrl
                         }
-                        tinySrc={getImageUrl(currentMovie.textless_poster_url || currentMovie.backdrop_path || '', 'w92')}
+                        tinySrc={
+                            getImageUrl(
+                                isMobile
+                                    ? (currentMovie.textless_poster_url || currentMovie.backdrop_path || '')
+                                    : (currentMovie.backdrop_path || ''),
+                                'w92'
+                            )
+                        }
                         alt={title}
                         fill
                         className={styles.image}
