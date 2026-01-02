@@ -36,9 +36,9 @@ export default async function Home() {
 
       // NEW: Fetch Real TMDB Popularity for Ranks 1-3
       // We perform this here to satisfy the new ranking requirement
-      const pt = await tmdb.getList('movie', 'popular');
+      const pt = await tmdb.getPopular('movie');
       popularMovies = pt;
-      const st = await tmdb.getList('tv', 'popular');
+      const st = await tmdb.getPopular('tv'); // Use getPopular directly
       popularSeries = st;
 
     } catch (e) {
