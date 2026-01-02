@@ -221,7 +221,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
     // Fetch Textless Poster for Mobile (Server-side)
     const textlessPosterPath = await tmdb.getTextlessPoster(item.tmdb_id, item.type);
-    const mobilePosterUrl = textlessPosterPath ? getImageUrl(textlessPosterPath, 'w780') : null; // High quality w780
+    const mobilePosterUrl = textlessPosterPath ? getImageUrl(textlessPosterPath, 'original') : null; // Max Quality (4K)
 
     return (
         <div className={styles.container}>

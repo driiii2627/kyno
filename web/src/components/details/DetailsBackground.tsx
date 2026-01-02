@@ -44,9 +44,10 @@ export default function DetailsBackground({ backdropUrl, mobilePoster }: Details
                     alt="Background"
                     fill
                     priority
-                    quality={90}
+                    quality={100}
                     className={styles.image}
                     style={{ objectFit: 'cover', zIndex: 0 }}
+                    unoptimized={true}
                 />
             </div>
 
