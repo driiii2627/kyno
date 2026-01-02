@@ -23,4 +23,30 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// @ts-expect-error next-pwa types issues
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/image\.tmdb\.org\/.*/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'tmdb-images',
+        expiration: {
+          maxEntries: 1000,
+          maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
+    // Fallback to default caching for everything else
+    ...require('next-pwa/cache'),
+  ],
+});
+
+export default withPWA(nextConfig);
