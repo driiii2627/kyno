@@ -72,7 +72,7 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                                     if (!path) return '/placeholder.png';
                                     const trimmed = path.trim();
                                     if (trimmed.startsWith('http')) return trimmed;
-                                    return `https://image.tmdb.org/t/p/w1280${trimmed}`;
+                                    return `https://image.tmdb.org/t/p/w780${trimmed}`;
                                 })()}
                                 alt={item.title || item.name || 'Cover'}
                                 className={styles.image}
