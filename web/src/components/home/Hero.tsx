@@ -193,7 +193,6 @@ export default function Hero({ movies }: HeroProps) {
                         fill
                         className={styles.image}
                         priority={true} // Always prioritize the active hero
-                        decoding="sync" // Force immediate paint for LCP
                         quality={90}
                         style={{ objectFit: 'cover', zIndex: 0 }}
                     />
