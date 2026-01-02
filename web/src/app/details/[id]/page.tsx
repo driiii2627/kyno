@@ -37,12 +37,11 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     // We fetch recommendations early to speed up the waterfall, even though we filter them later.
     const detailsPromise = tmdb.getDetails(item.tmdb_id, item.type);
     const creditsPromise = tmdb.getCredits(item.tmdb_id, item.type);
-    const recommendationsPromise = tmdb.getRecommendations(item.tmdb_id, item.type);
+    // Recommendations fetched via contentService now
 
-    const [details, credits, rawRecommendations] = await Promise.all([
+    const [details, credits] = await Promise.all([
         detailsPromise,
-        creditsPromise,
-        recommendationsPromise
+        creditsPromise
     ]);
 
     // 3. Conditional Fetches (Seasons or Collections)
@@ -63,115 +62,13 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         }
     }
 
-    // B. Movie: Get Collection
-    if (item.type === 'movie' && (details as any).belongs_to_collection) {
-        conditionalPromises.push(
-            tmdb.getCollectionDetails((details as any).belongs_to_collection.id)
-                .then(collection => {
-                    if (collection && collection.parts) {
-                        extraCollectionParts = collection.parts
-                            .filter((p: any) => p.id !== item.tmdb_id)
-                            .sort((a: any, b: any) => {
-                                const timeA = a.release_date ? new Date(a.release_date).getTime() : 0;
-                                const timeB = b.release_date ? new Date(b.release_date).getTime() : 0;
-                                return timeA - timeB;
-                            });
-                    }
-                })
-                .catch(e => console.error("Failed to fetch collection", e))
-        );
-    }
-
     // Wait for conditional fetches
     await Promise.all(conditionalPromises);
 
-    // Merge Collection into Recommendations
-    let recommendations = [...extraCollectionParts, ...rawRecommendations];
-    // Deduplicate
-    recommendations = Array.from(new Map(recommendations.map((m: any) => [m.id, m])).values());
-
-    // 4. Validate Recommendations against Supabase (Parallel Security Check)
-    const candidateIds = recommendations.map((r: any) => r.id);
-    let validRecommendations: any[] = [];
-    const existingIds = new Set<string>();
-
-    if (candidateIds.length > 0) {
-        const moviesQuery = supabase
-            .from('movies')
-            .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
-            .in('tmdb_id', candidateIds);
-
-        const seriesQuery = supabase
-            .from('series')
-            .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
-            .in('tmdb_id', candidateIds);
-
-        const [{ data: validMovies }, { data: validSeries }] = await Promise.all([moviesQuery, seriesQuery]);
-
-        // Map Valid Items...
-        const safeMovies = (validMovies || []).map(m => ({
-            id: m.tmdb_id,
-            supabase_id: m.id,
-            title: m.title,
-            overview: m.description,
-            poster_path: m.poster_url,
-            backdrop_path: m.backdrop_url,
-            vote_average: m.rating,
-            type: 'movie'
-        }));
-
-        const safeSeries = (validSeries || []).map(s => ({
-            id: s.tmdb_id,
-            supabase_id: s.id,
-            name: s.title,
-            title: s.title,
-            overview: s.description,
-            poster_path: s.poster_url,
-            backdrop_path: s.backdrop_url,
-            vote_average: s.rating,
-            type: 'tv'
-        }));
-
-        validRecommendations = [...safeMovies, ...safeSeries];
-        validRecommendations.forEach(r => existingIds.add(r.supabase_id));
-    }
-
-    // 5. Fallback: "Same Genre" Recommendations
-    if (validRecommendations.length < 10 && details.genres && details.genres.length > 0) {
-        const primaryGenre = details.genres[0].name;
-        const limit = 15 - validRecommendations.length;
-        const table = item.type === 'movie' ? 'movies' : 'series';
-
-        const { data: genreData } = await supabase
-            .from(table)
-            .select('id, tmdb_id, title, description, poster_url, backdrop_url, rating')
-            .ilike('genre', `%${primaryGenre}%`)
-            .neq('id', uuid)
-            .limit(limit);
-
-        if (genreData) {
-            const genreItems = genreData.map((d: any) => ({
-                id: d.tmdb_id,
-                supabase_id: d.id,
-                title: d.title,
-                name: d.title,
-                overview: d.description,
-                poster_path: d.poster_url,
-                backdrop_path: d.backdrop_url,
-                vote_average: d.rating,
-                type: item.type
-            }));
-
-            genreItems.forEach((g: any) => {
-                if (!existingIds.has(g.supabase_id)) {
-                    validRecommendations.push(g);
-                    existingIds.add(g.supabase_id);
-                }
-            });
-        }
-    }
-
-    recommendations = validRecommendations.slice(0, 15);
+    // 4. Personalized Recommendations (Mixed Movies & Series)
+    // Uses the new algorithm: Sequels > User Pref > Genre Match > Quality
+    // TODO: Connect 'guest' to actual logged-in user ID when Auth is stable
+    const recommendations = await contentService.getPersonalizedRecommendations(item, 'guest');
 
     // Prepare Season Browser Node
     let seasonBrowserNode = null;

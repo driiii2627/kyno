@@ -224,4 +224,83 @@ export const contentService = {
             textless_poster_url: dbSeriesItem.textless_poster_url
         })) as CatalogItem[];
     }
+    /**
+     * Fetch user genre scores from profiles table
+     */
+    async getUserGenreScores(userId: string): Promise<Record<string, number>> {
+        if (!userId || userId === 'guest') return {};
+
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('genre_scores')
+                .eq('id', userId)
+                .single();
+
+            if (error || !data) return {};
+            return (data.genre_scores as Record<string, number>) || {};
+        } catch (e) {
+            console.error('Error fetching genre scores:', e);
+            return {};
+        }
+    },
+
+    /**
+     * Get Personalized Mixed Recommendations
+     */
+    async getPersonalizedRecommendations(currentItem: CatalogItem, userId: string = 'guest'): Promise<CatalogItem[]> {
+        // 1. Fetch Candidates (Mixed Catalog)
+        const [movies, series] = await Promise.all([
+            this.getCatalogMovies(),
+            this.getCatalogSeries()
+        ]);
+        const allContent = [...movies, ...series].filter(i => i.supabase_id !== currentItem.supabase_id);
+
+        // 2. Fetch User Preferences
+        const userScores = await this.getUserGenreScores(userId);
+
+        // 3. Helper: Normalize Title for Sequel Check
+        const normalize = (s: string) => s.toLowerCase().replace(/[:\-\s\d]+$/g, '').trim();
+        const currentTitleBase = normalize(currentItem.title || currentItem.name || '');
+
+        // 4. Score Items
+        const scoredItems = allContent.map(item => {
+            let score = 0;
+            const itemTitle = item.title || item.name || '';
+            const itemGenres = (item.genre || '').split(',').map(s => s.trim());
+
+            // A. Continution / Franchise Match (+1000)
+            const itemTitleBase = normalize(itemTitle);
+            if (currentTitleBase.length > 3 && (itemTitleBase.includes(currentTitleBase) || currentTitleBase.includes(itemTitleBase))) {
+                score += 1000;
+            } else {
+                // Prefix match heuristic
+                const commonPrefix = itemTitle.slice(0, 8);
+                if (commonPrefix.length >= 4 && currentItem.title?.startsWith(commonPrefix)) score += 500;
+            }
+
+            // B. User Preference (+ Score * 20)
+            itemGenres.forEach(genre => {
+                if (userScores[genre]) {
+                    score += userScores[genre] * 20;
+                }
+            });
+
+            // C. Content Similarity (+10 per matched genre)
+            const currentGenres = (currentItem.genre || '').split(',').map(s => s.trim());
+            const sharedGenres = itemGenres.filter(g => currentGenres.includes(g));
+            score += sharedGenres.length * 10;
+
+            // D. Quality Tie-Breaker (+ Rating)
+            score += (item.vote_average || 0);
+
+            return { item, score };
+        });
+
+        // 5. Sort & Return Top 15
+        return scoredItems
+            .sort((a, b) => b.score - a.score)
+            .map(s => s.item)
+            .slice(0, 15);
+    }
 };
