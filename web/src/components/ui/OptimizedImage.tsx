@@ -6,9 +6,10 @@ import Image, { ImageProps } from 'next/image';
 interface OptimizedImageProps extends Omit<ImageProps, 'onLoad'> {
     tinySrc?: string; // Low-res placeholder for blur effect
     quality?: number;
+    decoding?: 'async' | 'auto' | 'sync';
 }
 
-export default function OptimizedImage({ src, tinySrc, alt, className, style, quality, ...props }: OptimizedImageProps) {
+export default function OptimizedImage({ src, tinySrc, alt, className, style, quality, decoding = 'async', ...props }: OptimizedImageProps) {
     const [isLoaded, setIsLoaded] = useState(false);
 
     return (
@@ -38,7 +39,7 @@ export default function OptimizedImage({ src, tinySrc, alt, className, style, qu
                 {...props}
                 src={src}
                 alt={alt || ''}
-                decoding="async"
+                decoding={decoding}
                 quality={quality || 75} // Default to 75 if not specified
                 onLoad={() => setIsLoaded(true)}
                 // unoptimized={true} <--- REMOVED to enable Next.js optimization

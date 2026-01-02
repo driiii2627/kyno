@@ -20,6 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="preconnect" href="https://image.tmdb.org" />
+        <link rel="dns-prefetch" href="https://image.tmdb.org" />
+      </head>
       <body className={`${inter.variable} font-sans antialiased text-white`}>
         <AmbientBackground />
         <ToastProvider>
