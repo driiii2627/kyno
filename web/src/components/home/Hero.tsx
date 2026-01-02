@@ -216,33 +216,17 @@ export default function Hero({ movies }: HeroProps) {
                         ${(trailerId && userTrailerPref && !showImageFallback && isPlaying) ? styles.trailerPlaying : ''}
                     `}
                 >
-                    <div className="hidden md:block w-full h-full">
-                        <OptimizedImage
-                            src={backdropUrl}
-                            tinySrc={getImageUrl(currentMovie.backdrop_path || '', 'w92')}
-                            alt={title}
-                            fill
-                            className={styles.image}
-                            priority={true}
-                            decoding="sync"
-                            quality={90}
-                            style={{ objectFit: 'cover', zIndex: 0 }}
-                        />
-                    </div>
-                    {/* Mobile: Textless Poster OR Standard Backdrop if none */}
-                    <div className="block md:hidden w-full h-full">
-                        <OptimizedImage
-                            src={mobilePoster || backdropUrl}
-                            tinySrc={getImageUrl(mobilePoster ? mobilePoster : (currentMovie.backdrop_path || ''), 'w92')}
-                            alt={title}
-                            fill
-                            className={styles.image}
-                            priority={true}
-                            decoding="sync"
-                            quality={90}
-                            style={{ objectFit: 'cover', zIndex: 0 }}
-                        />
-                    </div>
+                    <OptimizedImage
+                        src={mobilePoster || backdropUrl}
+                        tinySrc={getImageUrl(mobilePoster ? mobilePoster : (currentMovie.backdrop_path || ''), 'w92')}
+                        alt={title}
+                        fill
+                        className={styles.image}
+                        priority={true}
+                        decoding="sync"
+                        quality={90}
+                        style={{ objectFit: 'cover', zIndex: 0 }}
+                    />
                 </div>
 
                 <div className={`${styles.gradientOverlay} ${(trailerId && userTrailerPref && !showImageFallback) ? styles.videoMode : ''}`} />
