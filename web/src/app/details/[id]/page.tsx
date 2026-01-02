@@ -217,7 +217,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
     if (logoPath && !logoPath.startsWith('http') && !logoPath.startsWith('/')) {
         logoPath = `/${logoPath}`;
     }
-    const logoUrl = getImageUrl(logoPath, 'original');
+    const logoUrl = getImageUrl(logoPath, 'w500');
 
     return (
         <div className={styles.container}>

@@ -107,7 +107,7 @@ export default function MovieCard({ movie, index, isTop10 = false, priority = fa
 
                 <div className={styles.imageWrapper}>
                     <OptimizedImage
-                        src={getImageUrl(movie.poster_path, 'original')}
+                        src={getImageUrl(movie.poster_path, 'w500')}
                         tinySrc={getImageUrl(movie.poster_path, 'w92')}
                         alt={movie.title || movie.name || 'Movie'}
                         fill
