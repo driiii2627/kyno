@@ -35,6 +35,7 @@ export default function Hero({ movies }: HeroProps) {
     const [isMuted, setIsMuted] = useState(true);
     const [showImageFallback, setShowImageFallback] = useState(false);
     const [trailerProgress, setTrailerProgress] = useState(0);
+    const [mobilePoster, setMobilePoster] = useState<string | null>(null);
 
     // User Preference
     const [userTrailerPref, setUserTrailerPref] = useState<boolean>(true); // Default true for desktop
@@ -80,6 +81,35 @@ export default function Hero({ movies }: HeroProps) {
 
         // Mute state persists across slides
     }, [currentIndex]);
+
+    // Fetch Textless Poster for current movie (Client Side)
+    useEffect(() => {
+        if (!currentMovie) return;
+
+        const fetchPoster = async () => {
+            if (window.innerWidth > 768) {
+                setMobilePoster(null);
+                return;
+            }
+
+            try {
+                const type = currentMovie.title ? 'movie' : 'tv'; // Heuristic
+                const safeType = (currentMovie as any).type || type;
+
+                const path = await tmdb.getTextlessPoster((currentMovie as any).tmdb_id || currentMovie.id, safeType as 'movie' | 'tv');
+                if (path) {
+                    setMobilePoster(getImageUrl(path, 'w780'));
+                } else {
+                    setMobilePoster(null);
+                }
+            } catch (error) {
+                console.error("Error fetching mobile poster", error);
+                setMobilePoster(null);
+            }
+        };
+
+        fetchPoster();
+    }, [currentIndex, currentMovie]);
 
     // Handlers
     const handleNext = useCallback(() => {
