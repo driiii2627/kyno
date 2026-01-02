@@ -21,6 +21,7 @@ export default async function Home() {
   let popularMovies: { results: import('@/services/tmdb').Movie[] } = { results: [] };
   let topRatedMovies: { results: import('@/services/tmdb').Movie[] } = { results: [] };
   let trendingSeries: { results: import('@/services/tmdb').Movie[] } = { results: [] };
+  let popularSeries: { results: import('@/services/tmdb').Movie[] } = { results: [] };
 
   let catalogMovies: import('@/services/content').CatalogItem[] = [];
   let catalogSeries: import('@/services/content').CatalogItem[] = [];
