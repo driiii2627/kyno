@@ -240,7 +240,7 @@
     }
 
     .content {
-        margin-top: 25vh;
+        margin-top: 35vh;
         /* Reverted to 25vh (Sweet spot) */
         padding: 0 1.5rem;
         gap: 0;
