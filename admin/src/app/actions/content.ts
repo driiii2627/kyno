@@ -627,3 +627,86 @@ export async function syncMobilePostersAction() {
         return { error: err.message };
     }
 }
+
+/**
+ * Fetches "Smart Random" content for random discovery.
+ * - Randomizes TMDB pages.
+ * - Checks against local DB (Anti-Duplicate).
+ * - Checks Superflix Availability (Anti-Dead Links).
+ * - Returns 25 high-quality items.
+ */
+export async function fetchSmartRandomContent() {
+    try {
+        const admin = await createAdminClient();
+        const results: any[] = [];
+        const seenIds = new Set<number>();
+        let attempts = 0;
+        const targetCount = 25;
+
+        // Fetch existing IDs to avoid duplicates (Optimization: fetching all IDs might be heavy, but for now ok)
+        // Alternatively, we check individually. Let's check individually to scale better.
+
+        while (results.length < targetCount && attempts < 10) {
+            attempts++;
+
+            // Randomize Page (1 to 50 - High quality usually in top 50 pages of popular)
+            const randomPageMovie = Math.floor(Math.random() * 50) + 1;
+            const randomPageTV = Math.floor(Math.random() * 50) + 1;
+
+            const [movies, series] = await Promise.all([
+                tmdb.discover('movie', {
+                    sort_by: 'popularity.desc',
+                    page: randomPageMovie.toString(),
+                    'vote_count.gte': '100', // Ensure some quality/popularity
+                    'vote_average.gte': '5.0'
+                }),
+                tmdb.discover('tv', {
+                    sort_by: 'popularity.desc',
+                    page: randomPageTV.toString(),
+                    'vote_count.gte': '100',
+                    'vote_average.gte': '5.0'
+                })
+            ]);
+
+            const candidates = [
+                ...movies.results.map(m => ({ ...m, media_type: 'movie' })),
+                ...series.results.map(s => ({ ...s, media_type: 'tv' }))
+            ].sort(() => Math.random() - 0.5); // Shuffle
+
+            // Check Candidates
+            for (const item of candidates) {
+                if (results.length >= targetCount) break;
+                if (seenIds.has(item.id)) continue;
+                seenIds.add(item.id);
+
+                // 1. Check Local DB
+                const table = item.media_type === 'movie' ? 'movies' : 'series';
+                const { data: existing } = await admin
+                    .from(table)
+                    .select('id')
+                    .eq('tmdb_id', item.id)
+                    .single();
+
+                if (existing) continue;
+
+                // 2. Check Superflix Availability (The "Thinking" part)
+                // This is the bottleneck, so we only do it for items passing DB check.
+                const { available } = await superflix.checkAvailability(item.id, item.media_type as 'movie' | 'tv');
+
+                if (available) {
+                    results.push({
+                        ...item,
+                        is_available: true,
+                        is_in_library: false
+                    });
+                }
+            }
+        }
+
+        return { data: results };
+
+    } catch (err: any) {
+        console.error('Smart Random Error:', err);
+        return { error: err.message };
+    }
+}
