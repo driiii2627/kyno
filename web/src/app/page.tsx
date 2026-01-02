@@ -33,8 +33,16 @@ export default async function Home() {
         contentService.getCatalogMovies(),
         contentService.getCatalogSeries()
       ]);
+
+      // NEW: Fetch Real TMDB Popularity for Ranks 1-3
+      // We perform this here to satisfy the new ranking requirement
+      const pt = await tmdb.getList('movie', 'popular');
+      popularMovies = pt;
+      const st = await tmdb.getList('tv', 'popular');
+      popularSeries = st;
+
     } catch (e) {
-      console.error("Failed to fetch catalog", e);
+      console.error("Failed to fetch catalog/popular", e);
     }
 
   } catch (error) {
@@ -43,7 +51,54 @@ export default async function Home() {
 
   // --- Dynamic Categorization Logic ---
 
-  // 1. Hero: Balanced Mix (3 Movies + 3 Series) for Variety
+  // Helper to get Top 3 Popular that exist in our DB
+  const getTop3Popular = (popularList: any[], dbList: import('@/services/content').CatalogItem[]) => {
+    const top3: import('@/services/content').CatalogItem[] = [];
+    const usedIds = new Set<number>();
+
+    for (const pop of popularList) {
+      if (top3.length >= 3) break;
+      // Find corresponding item in our DB
+      const match = dbList.find(dbItem => dbItem.tmdb_id === pop.id);
+      if (match) {
+        top3.push(match);
+        usedIds.add(match.id);
+      }
+    }
+    return { top3, usedIds };
+  };
+
+  // 1. Movies Ranking
+  const { top3: top3Movies, usedIds: usedMoviesIds } = getTop3Popular(popularMovies.results || [], catalogMovies);
+
+  // Ranks 4-10: Top Rated (High Quality) -> Shuffled Weekly
+  const remainingMoviesSource = catalogMovies
+    .filter(m => !usedMoviesIds.has(m.id)) // Exclude top 3
+    .sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0))
+    .slice(0, 50); // Take top 50 rated candidates
+
+  const top10MoviesSeed = getTimeSeed(168, 'top10movies_hybrid');
+  // Shuffle candidates and take 7
+  const next7Movies = hashedSort(remainingMoviesSource, top10MoviesSeed).slice(0, 7);
+  // Combine
+  const top10Movies = [...top3Movies, ...next7Movies];
+
+
+  // 2. Series Ranking
+  const { top3: top3Series, usedIds: usedSeriesIds } = getTop3Popular(popularSeries.results || [], catalogSeries);
+
+  // Ranks 4-10
+  const remainingSeriesSource = catalogSeries
+    .filter(s => !usedSeriesIds.has(s.id))
+    .sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0))
+    .slice(0, 50);
+
+  const top10SeriesSeed = getTimeSeed(168, 'top10series_hybrid');
+  const next7Series = hashedSort(remainingSeriesSource, top10SeriesSeed).slice(0, 7);
+  const top10Series = [...top3Series, ...next7Series];
+
+
+  // 3. Hero: Balanced Mix (3 Movies + 3 Series) for Variety
   const allContent = [...catalogMovies, ...catalogSeries];
 
   const heroMovieCandidates = catalogMovies.filter(item => {
@@ -97,17 +152,6 @@ export default async function Home() {
 
   // Final shuffle of the mix so clarity isn't obvious (e.g. all good first)
   const finalRecommendations = randomShuffle(recommendations);
-
-  // 5. "Top 10" (Weekly): Changes every 7 days (168 hours)
-  // We first take the actual top rated (Quality Control)
-  // Then we shuffle those top 50 so the Top 10 display rotates among the best
-  const topRatedSource = [...catalogMovies].sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0)).slice(0, 50);
-  const top10Seed = getTimeSeed(168, 'top10movies');
-  const top10Movies = hashedSort(topRatedSource, top10Seed).slice(0, 10);
-
-  const topSeriesSource = [...catalogSeries].sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0)).slice(0, 50);
-  const top10SeriesSeed = getTimeSeed(168, 'top10series');
-  const top10Series = hashedSort(topSeriesSource, top10SeriesSeed).slice(0, 10);
 
   // 6. Genres Filtering (From DB Data)
   // Check both 'genre' string (Database fallback) and 'genres' array (TMDB Hydrated)
