@@ -564,3 +564,66 @@ export async function syncGenresAction() {
         return { error: err.message };
     }
 }
+/**
+ * Syncs textless mobile posters for all items.
+ */
+export async function syncMobilePostersAction() {
+    try {
+        const admin = await createAdminClient();
+        console.log('[SyncMobile] Starting...');
+
+        // 1. Fetch Movies missing textless poster
+        const { data: movies } = await admin
+            .from('movies')
+            .select('id, tmdb_id')
+            .is('textless_poster_url', null); // Assumes column exists (Run SQL!)
+
+        // 2. Fetch Series missing textless poster
+        const { data: series } = await admin
+            .from('series')
+            .select('id, tmdb_id')
+            .is('textless_poster_url', null);
+
+        let count = 0;
+        let errors = 0;
+
+        const processItem = async (item: any, type: 'movie' | 'tv') => {
+            try {
+                const posterPath = await tmdb.getTextlessPoster(item.tmdb_id, type);
+                if (posterPath) {
+                    await admin
+                        .from(type === 'movie' ? 'movies' : 'series')
+                        .update({ textless_poster_url: posterPath })
+                        .eq('id', item.id);
+                    return true;
+                }
+            } catch (e) {
+                console.error(`Failed sync ${type} ${item.tmdb_id}`, e);
+            }
+            return false;
+        };
+
+        // Process Movies
+        if (movies) {
+            for (const m of movies) {
+                if (await processItem(m, 'movie')) count++;
+                else errors++; // Could consider "no poster available" as not an error, but for counting purposes
+            }
+        }
+
+        // Process Series
+        if (series) {
+            for (const s of series) {
+                if (await processItem(s, 'tv')) count++;
+                else errors++;
+            }
+        }
+
+        revalidatePath('/');
+        return { success: true, count, errors };
+
+    } catch (err: any) {
+        console.error('Sync Mobile Posters Error:', err);
+        return { error: err.message };
+    }
+}

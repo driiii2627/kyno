@@ -83,9 +83,29 @@ export const tmdb = {
         return fetchFromTMDB<{ results: TmdbMovie[] }>(`/${type}/${category}`);
     },
     getImages: async (id: number, type: 'movie' | 'tv') => {
-        return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
+        return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[], posters: { file_path: string, iso_639_1: string | null, vote_average: number }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
     },
     getVideos: async (id: number, type: 'movie' | 'tv') => {
         return fetchFromTMDB<{ results: { key: string, name: string, site: string, type: string, iso_639_1: string }[] }>(`/${type}/${id}/videos`);
+    },
+    getTextlessPoster: async (id: number, type: 'movie' | 'tv') => {
+        try {
+            const data = await tmdb.getImages(id, type);
+            // Filter for images with no language (often textless) or strictly 'xx' if used
+            // TMDB uses 'null' (json null) or 'xx' for no language.
+            const textless = data.posters.filter(p => !p.iso_639_1 || p.iso_639_1 === 'xx' || p.iso_639_1 === 'null');
+
+            if (textless.length > 0) {
+                // Return the highest rated one
+                return textless.sort((a, b) => b.vote_average - a.vote_average)[0].file_path;
+            }
+
+            // Fallback: If no strict textless, try to find one with highest vote overall (often clean art)
+            // or just return null to let the UI decide fallback
+            return null;
+        } catch (e) {
+            console.warn("Failed to fetch textless poster", e);
+            return null;
+        }
     }
 };

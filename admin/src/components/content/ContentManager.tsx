@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Plus, Check, X, Loader2, Library, Layers, MousePointer2, PlayCircle, StopCircle, Trash2, Flame, TrendingUp, Star, Film, Tv, RefreshCw, Smartphone } from 'lucide-react';
-import { searchContentAction, importContentAction, getLibraryContent, getItemDetailsAction, getPopularContentAction, syncContentAction, syncGenresAction } from '@/app/actions/content';
+import { searchContentAction, importContentAction, getLibraryContent, getItemDetailsAction, getPopularContentAction, syncContentAction, syncGenresAction, syncMobilePostersAction } from '@/app/actions/content';
 import { ManageContentModal } from './ManageContentModal';
 import { ImportConfirmationModal } from './ImportConfirmationModal';
 import { CollectionImportModal } from './CollectionImportModal';
@@ -304,35 +304,24 @@ export function ContentManager() {
     // END NEW FUNCTION
 
     const handleSyncMobilePosters = async () => {
-        if (!confirm('Iniciar sincronização de Banners Mobile (Textless)?\n\nIsso irá varrer o banco de dados e buscar pôsteres verticais sem texto para filmes e séries que ainda não possuem.\n\nO processo ocorre em segundo plano.')) return;
+        if (!confirm('Iniciar sincronização de Banners Mobile (Textless)?\n\nIsso irá varrer o banco de dados e buscar pôsteres verticais sem texto para filmes e séries que ainda não possuem.\n\nO processo ocorre em segundo plano no servidor.')) return;
 
         setProcessingQueue(true);
-        // Fake progress for visual feedback since API handles batch
-        setQueueProgress({ current: 0, total: 100, failed: 0 });
+        setQueueProgress({ current: 0, total: 100, failed: 0 }); // Indeterminate progress
 
         try {
-            // Call the Web API Route
-            // Assuming Admin and Web are on same domain or properly configured CORS/Proxy
-            // Fallback to localhost for dev if needed, or relative path
-            const apiUrl = process.env.NEXT_PUBLIC_WEB_URL
-                ? `${process.env.NEXT_PUBLIC_WEB_URL}/api/cron/sync-posters`
-                : '/api/cron/sync-posters'; // Try relative first (if rewritten) or fail
+            // Call Server Action directly
+            const res = await syncMobilePostersAction();
 
-            // Note: If Admin is on port 3001 and Web on 3000, relative path won't work without proxy.
-            // Using a hardcoded dev fallback for safety if env missing, but user should config.
-
-            const res = await fetch(apiUrl);
-            const data = await res.json();
-
-            if (data.success) {
-                alert(`Sincronização iniciada/concluída!\n\nItens Atualizados: ${data.updates?.length || 0}\nErros: ${data.errors?.length || 0}`);
+            if (res.success) {
+                alert(`Sincronização concluída!\n\nItens Atualizados: ${res.count || 0}\nErros/Ignorados: ${res.errors || 0}`);
             } else {
-                throw new Error(data.error || 'Erro desconhecido');
+                throw new Error(res.error || 'Erro desconhecido');
             }
 
         } catch (e: any) {
             console.error(e);
-            alert('Erro ao chamar API de Sync: ' + e.message + '\n\nCertifique-se que o Admin consegue acessar a rota /api/cron/sync-posters do Web App.');
+            alert('Erro ao sincronizar: ' + e.message);
         } finally {
             setProcessingQueue(false);
             setQueueProgress(null);
