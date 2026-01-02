@@ -1,36 +1,5 @@
 import type { NextConfig } from "next";
 
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development', // Disable in dev to avoid annoying logging
-  runtimeCaching: [
-    {
-      urlPattern: /^https:\/\/image\.tmdb\.org\/.*/i,
-      handler: 'StaleWhileRevalidate',
-      options: {
-        cacheName: 'tmdb-images',
-        expiration: {
-          maxEntries: 1000,
-          maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
-        },
-      },
-    },
-    {
-      urlPattern: /^https:\/\/superflixapi\.buzz\/.*/i,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'api-cache',
-        expiration: {
-          maxEntries: 500,
-          maxAgeSeconds: 60 * 60 * 24, // 1 day
-        },
-      },
-    }
-  ],
-});
-
 const nextConfig: NextConfig = {
   images: {
     // Disable Vercel Image Optimization to save usage limits
@@ -54,4 +23,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;
