@@ -223,7 +223,7 @@ export const contentService = {
             trailer_url: dbSeriesItem.trailer_url,
             textless_poster_url: dbSeriesItem.textless_poster_url
         })) as CatalogItem[];
-    }
+    },
     /**
      * Fetch user genre scores from profiles table
      */
