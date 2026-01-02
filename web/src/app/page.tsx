@@ -60,7 +60,8 @@ export default async function Home() {
     for (const pop of popularList) {
       if (top3.length >= 3) break;
       // Find corresponding item in our DB
-      const match = dbList.find(dbItem => dbItem.tmdb_id === pop.id);
+      // Note: CatalogItem maps 'id' to the TMDB ID. 'supabase_id' is the uuid.
+      const match = dbList.find(dbItem => dbItem.id === pop.id);
       if (match) {
         top3.push(match);
         usedIds.add(match.id);
