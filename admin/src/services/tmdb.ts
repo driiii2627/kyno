@@ -82,6 +82,9 @@ export const tmdb = {
     getList: async (type: 'movie' | 'tv', category: 'popular' | 'top_rated' | 'upcoming' | 'on_the_air') => {
         return fetchFromTMDB<{ results: TmdbMovie[] }>(`/${type}/${category}`);
     },
+    discover: async (type: 'movie' | 'tv', params: Record<string, string>) => {
+        return fetchFromTMDB<{ results: TmdbMovie[] }>(`/discover/${type}`, params);
+    },
     getImages: async (id: number, type: 'movie' | 'tv') => {
         return fetchFromTMDB<{ logos: { file_path: string, iso_639_1: string }[], posters: { file_path: string, iso_639_1: string | null, vote_average: number }[] }>(`/${type}/${id}/images?include_image_language=pt,en,null`);
     },

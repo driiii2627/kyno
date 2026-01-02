@@ -525,6 +525,34 @@ export function ContentManager() {
                             <MousePointer2 size={14} />
                             {isSelectionMode ? 'Cancelar Seleção' : 'Selecionar Vários'}
                         </button>
+
+                        {/* NEW: Surprise Me Button */}
+                        <button
+                            onClick={async () => {
+                                setIsSearching(true);
+                                setViewMode('search'); // Switch to grid view
+                                setSearchResults([]); // Clear previous
+                                try {
+                                    const { fetchSmartRandomContent } = await import('@/app/actions/content');
+                                    const { data, error } = await fetchSmartRandomContent();
+                                    if (data) {
+                                        setSearchResults(data);
+                                    } else {
+                                        alert('Erro ao buscar recomendações: ' + error);
+                                    }
+                                } catch (e) {
+                                    alert('Erro inesperado.');
+                                    console.error(e);
+                                } finally {
+                                    setIsSearching(false);
+                                }
+                            }}
+                            disabled={isSearching}
+                            className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 whitespace-nowrap ${isSearching ? 'opacity-50 cursor-wait' : ''}`}
+                        >
+                            {isSearching ? <Loader2 className="animate-spin" size={14} /> : <div className="text-lg">🎲</div>}
+                            {isSearching ? 'Pensando...' : 'Surpreenda-me'}
+                        </button>
                     </div>
                 )}
             </div>
