@@ -25,12 +25,10 @@ export default function TrackedLink({ href, genres, className, children }: Track
         // 2. Prefetch (Background Load)
         router.prefetch(href);
 
-        // 3. Delayed Transition
-        setTimeout(() => {
-            startTransition(() => {
-                router.push(href);
-            });
-        }, 800);
+        // 3. Immediate Transition
+        startTransition(() => {
+            router.push(href);
+        });
     };
 
     return (

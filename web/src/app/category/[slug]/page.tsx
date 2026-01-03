@@ -24,6 +24,9 @@ const filterItems = (items: any[], keywords: string[]) => {
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
 
+    // Artificial Delay for Premium Feel
+    await new Promise(resolve => setTimeout(resolve, 800));
+
     let title = '';
     let items: any[] = [];
 

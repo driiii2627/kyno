@@ -19,14 +19,11 @@ export default function DelayedLink({ href, children, className, onClick, ...pro
         // 1. Prefetch immediately (Start loading data in background)
         router.prefetch(href);
 
-        // 2. Artificial Delay + Transition
-        // We wait 800ms to give a "premium" steady feel, then switch.
-        // During this time, prefetch is working.
-        setTimeout(() => {
-            startTransition(() => {
-                router.push(href);
-            });
-        }, 800);
+        // 2. Immediate Transition
+        // We start the transition immediately. The SERVER will handle the delay.
+        startTransition(() => {
+            router.push(href);
+        });
     };
 
     return (
