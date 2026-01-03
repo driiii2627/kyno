@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import DelayedLink from '@/components/ui/DelayedLink';
 import { Search, Bookmark, User, Edit2, Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -53,10 +54,10 @@ export default function Navbar() {
 
             {/* Desktop Nav Links */}
             <div className={styles.navLinks}>
-                <Link href="/" className={`${styles.link} ${pathname === '/' ? styles.active : ''}`}>Home</Link>
-                <Link href="/category/filmes" className={`${styles.link} ${pathname?.includes('/category/filmes') ? styles.active : ''}`}>Filmes</Link>
-                <Link href="/category/series" className={`${styles.link} ${pathname?.includes('/category/series') ? styles.active : ''}`}>Séries</Link>
-                <Link href="/category/filmes" className={styles.link}>Categorias</Link>
+                <DelayedLink href="/" className={`${styles.link} ${pathname === '/' ? styles.active : ''}`}>Home</DelayedLink>
+                <DelayedLink href="/category/filmes" className={`${styles.link} ${pathname?.includes('/category/filmes') ? styles.active : ''}`}>Filmes</DelayedLink>
+                <DelayedLink href="/category/series" className={`${styles.link} ${pathname?.includes('/category/series') ? styles.active : ''}`}>Séries</DelayedLink>
+                <DelayedLink href="/category/filmes" className={styles.link}>Categorias</DelayedLink>
             </div>
 
             {/* Icons - Hide on Category Pages */}
