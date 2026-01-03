@@ -199,7 +199,16 @@ export default function Hero({ movies }: HeroProps) {
     const linkHref = isTv ? `/serie/${currentMovie.supabase_id}` : `/filme/${currentMovie.supabase_id}`;
 
     // Background Image
-    const backdropUrl = getImageUrl(currentMovie.backdrop_path || '', 'original');
+    // FIX: Some Supabase items have full URLs with 'w780' baked in.
+    // For Desktop Hero, we MUST ensure 'original' quality.
+    let backdropUrl = currentMovie.backdrop_path
+        ? getImageUrl(currentMovie.backdrop_path, 'original')
+        : (currentMovie.backdrop_url || '');
+
+    // Upgrade URL if it's a TMDB URL but has low res variants
+    if (backdropUrl.includes('image.tmdb.org/t/p/') && !isMobile) {
+        backdropUrl = backdropUrl.replace(/\/w\d+/, '/original').replace('/woriginal', '/original');
+    }
 
     return (
         <section className={styles.hero}>
