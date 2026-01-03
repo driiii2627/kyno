@@ -201,9 +201,7 @@ export default function Hero({ movies }: HeroProps) {
     // Background Image
     // FIX: Some Supabase items have full URLs with 'w780' baked in.
     // For Desktop Hero, we MUST ensure 'original' quality.
-    let backdropUrl = currentMovie.backdrop_path
-        ? getImageUrl(currentMovie.backdrop_path, 'original')
-        : (currentMovie.backdrop_url || '');
+    let backdropUrl = getImageUrl(currentMovie.backdrop_path || '', 'original');
 
     // Upgrade URL if it's a TMDB URL but has low res variants
     if (backdropUrl.includes('image.tmdb.org/t/p/') && !isMobile) {
