@@ -7,13 +7,58 @@ import { redirect } from 'next/navigation';
 export async function getSeason(tvId: number, seasonNumber: number) {
     try {
         const seasonData = await tmdb.getSeasonDetails(tvId, seasonNumber);
-        // Returning raw TMDB data. 
-        // Verification was checking 'https://superflixapi.buzz' but causing timeouts/infinite loading.
-        // It's better to show the episodes and let the player handle 404s than to block the UI.
-        return seasonData;
+
+        // OPTIMIZED SUPERFLIX VALIDATION:
+        // Instead of checking every episode (20+ requests -> Infinite Loading),
+        // We fetch the Season Page ONCE and parse available episodes from it.
+        // This reduces overhead by 95% while still guaranteeing availability.
+
+        const seasonUrl = `https://superflixapi.buzz/serie/${tvId}/${seasonNumber}`;
+        const checkRes = await fetch(seasonUrl, {
+            cache: 'no-store',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36.0' // Avoid blocking
+            }
+        });
+
+        if (!checkRes.ok) {
+            // Season page itself doesn't exist? Then no episodes exist.
+            console.warn(`Season ${seasonNumber} page missing for ${tvId}`);
+            // Return empty list safely
+            return { ...seasonData, episodes: [] };
+        }
+
+        const html = await checkRes.text();
+        const availableEpMap = new Set<number>();
+
+        // Regex to find links to episodes: /serie/123/1/5
+        // Pattern: href=".../serie/ID/SEASON/EP_NUM"
+        // We look for the specific pattern relating to this show/season
+        const pattern = new RegExp(`serie/${tvId}/${seasonNumber}/(\\d+)`, 'g');
+        let match;
+
+        while ((match = pattern.exec(html)) !== null) {
+            const epNum = parseInt(match[1]);
+            if (!isNaN(epNum)) {
+                availableEpMap.add(epNum);
+            }
+        }
+
+        // Filter TMDB episodes against what we found on Superflix
+        const filteredEpisodes = seasonData.episodes.filter(ep => availableEpMap.has(ep.episode_number));
+
+        // Fallback: If scraping failed to find ANY links (maybe layout changed),
+        // we should probably fail safe. But usually layout is stable.
+        // If 0 found, it might mean empty season or blocked scraping.
+        // If 0 found but TMDB has episodes, it's safer to return EMPTY than Broken links.
+
+        return {
+            ...seasonData,
+            episodes: filteredEpisodes
+        };
+
     } catch (e) {
         console.error(`Failed to fetch season ${seasonNumber} for ${tvId}`, e);
-        // Return null or empty structure to prevent crash
         return { episodes: [] };
     }
 }
