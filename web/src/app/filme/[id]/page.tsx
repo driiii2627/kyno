@@ -3,6 +3,7 @@ import { contentService } from '@/services/content';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import SmartBackButton from '@/components/ui/SmartBackButton';
 
 
 export const dynamic = 'force-dynamic';
@@ -42,13 +43,13 @@ export default async function MoviePlayerPage({ params }: PageProps) {
         <div className="relative w-full h-screen bg-black overflow-hidden flex flex-col">
             {/* Header / Back Button */}
             <div className="absolute top-0 left-0 w-full p-4 z-50 pointer-events-none">
-                <Link
-                    href="/"
-                    className="pointer-events-auto inline-flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-white/20 hover:-translate-x-1 transition-all"
+                <SmartBackButton
+                    fallbackHref="/"
+                    className="pointer-events-auto inline-flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-all group border border-white/10"
                 >
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                     <span className="font-medium">Voltar</span>
-                </Link>
+                </SmartBackButton>
             </div>
 
             {/* Iframe Player */}
