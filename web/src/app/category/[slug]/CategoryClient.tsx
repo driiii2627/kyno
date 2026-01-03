@@ -98,7 +98,7 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                                     <span>{new Date(item.release_date || item.first_air_date || Date.now()).getFullYear()}</span>
                                 </div>
                             </div>
-                        </Link>
+                        </DelayedLink>
                     </div>
                 ))}
             </div>
