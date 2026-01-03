@@ -26,8 +26,6 @@ export default function DelayedLink({ href, children, className, onClick, ...pro
             href={href}
             className={className}
             onClick={handleClick}
-            onMouseEnter={handlePrefetch}
-            onTouchStart={handlePrefetch} // Mobile support
             {...props}
         >
             {children}
