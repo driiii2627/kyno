@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { trackGenreInterest } from '@/app/actions/recommendations';
+import { useTransition } from 'react';
 
 interface TrackedLinkProps {
     href: string;
@@ -13,28 +14,27 @@ interface TrackedLinkProps {
 
 export default function TrackedLink({ href, genres, className, children }: TrackedLinkProps) {
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
     const handleClick = (e: React.MouseEvent) => {
-        // Prevent default navigation
         e.preventDefault();
 
         // 1. Track (Background)
         void trackGenreInterest(genres);
 
-        // 2. Start Loading Visuals
+        // 2. Visual Feedback
         document.body.style.cursor = 'wait';
-        // Try to find NProgress provided by the lib
-        const progressBar = document.querySelector('[role="progressbar"]');
-        if (progressBar) {
-            // It's hard to trigger the specific lib's bar manually without their hook.
-        }
 
-        // 3. Fake Delay
-        setTimeout(() => {
-            document.body.style.cursor = 'default';
+        // 3. Transition Navigation
+        // This keeps the OLD page interactive until the NEW payload is fully ready = NO BLACK SCREEN
+        startTransition(() => {
             router.push(href);
-        }, 800); // 0.8s delay as requested (approx 1s)
+        });
     };
+
+    if (!isPending) {
+        if (typeof document !== 'undefined') document.body.style.cursor = 'default';
+    }
 
     return (
         <a href={href} className={className} onClick={handleClick}>
