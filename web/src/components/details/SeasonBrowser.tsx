@@ -78,7 +78,11 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
 
                     {/* Season Dropdown */}
                     {dropdownOpen && (
-                        <div className={styles.dropdownMenu}>
+                        <div
+                            className={styles.dropdownMenu}
+                            data-lenis-prevent // Prevent Lenis from hijacking scroll
+                            onWheel={(e) => e.stopPropagation()}
+                        >
                             {validSeasons.map(s => (
                                 <button
                                     key={s.season_number}

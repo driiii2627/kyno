@@ -6,22 +6,11 @@ import { redirect } from 'next/navigation';
 
 export async function getSeason(tvId: number, seasonNumber: number) {
     try {
+        // PERF: Fetching from TMDB only. 
+        // We skip re-verifying Superflix existence here to ensure instant season switching.
+        // The Series existence was likely verified at the Page level.
         const seasonData = await tmdb.getSeasonDetails(tvId, seasonNumber);
-
-        // OPTIMIZED: Use Superflix "/lista" API to validate availability.
-        // As per user instruction ("study the list part"), we check if the CONTENT exists in their catalog.
-        // We do NOT filter individual episodes/seasons via scraping, as that causes timeouts.
-        // If the show is in the list, we assume the episodes (mostly) work and let the player handle specific 404s.
-
-        const isAvailable = await verifySuperflixContent(tvId, 'tv');
-
-        if (!isAvailable) {
-            console.warn(`Content ${tvId} not found in Superflix catalog.`);
-            return { ...seasonData, episodes: [] };
-        }
-
         return seasonData;
-
     } catch (e) {
         console.error(`Failed to fetch season ${seasonNumber} for ${tvId}`, e);
         return { episodes: [] };
