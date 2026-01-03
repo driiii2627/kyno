@@ -40,37 +40,103 @@
     position: absolute;
     top: 3rem;
     left: 0;
-    width: 16rem;
+    width: 18rem;
+    /* Slightly wider */
     max-height: 20rem;
     overflow-y: auto;
-    background-color: #18181b;
-    border: 1px solid #3f3f46;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+    /* Acrylic/Glass Effect */
+    background-color: rgba(24, 24, 27, 0.95);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Subtle glowing border */
+    border-radius: 0.75rem;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.5),
+        0 2px 4px -1px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    /* Inner highlighter */
+
     z-index: 50;
-    padding: 0.5rem 0;
+    padding: 0.5rem;
+    /* Padding applied to container for gap */
+
+    /* Animation */
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom Scrollbar for Dropdown */
+.dropdownMenu::-webkit-scrollbar {
+    width: 6px;
+    /* Thin scrollbar */
+}
+
+.dropdownMenu::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 4px 0;
+}
+
+.dropdownMenu::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 99px;
+    transition: background-color 0.2s;
+}
+
+.dropdownMenu::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
 }
 
 .dropdownItem {
     width: 100%;
     text-align: left;
-    padding: 0.75rem 1.25rem;
+    padding: 0.875rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: #a1a1aa;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    border-radius: 0.5rem;
+    /* Rounded items */
+    margin-bottom: 2px;
+    font-size: 0.95rem;
 }
 
 .dropdownItem:hover {
-    background-color: #27272a;
+    background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
 }
 
 .dropdownItemActive {
-    background-color: #27272a;
+    background-color: rgba(255, 255, 255, 0.15);
     color: #fff;
-    font-weight: 700;
+    font-weight: 600;
+}
+
+/* Active Indicator */
+.dropdownItemActive::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    height: 0.5rem;
+    width: 0.5rem;
+    background-color: #3b82f6;
+    /* Blue dot */
+    border-radius: 50%;
+    opacity: 0;
+    /* Hidden by default, maybe simpler without dot? Let's stick to bg */
 }
 
 .epCount {
