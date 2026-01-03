@@ -8,6 +8,7 @@ import { Search, ArrowLeft, Star } from 'lucide-react';
 import { CatalogItem } from '@/services/content';
 import { getImageUrl } from '@/services/tmdb';
 import styles from './CategoryClient.module.css';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CategoryClientProps {
     title: string;
@@ -55,9 +56,7 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                 </div>
             </div>
 
-            import {motion, AnimatePresence} from 'framer-motion';
 
-            // ... inside component
 
             {/* Grid */}
             <motion.div
