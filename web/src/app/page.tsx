@@ -100,26 +100,28 @@ export default async function Home() {
   const top10Series = [...top3Series, ...next7Series];
 
 
-  // 3. Hero: Balanced Mix (3 Movies + 3 Series) for Variety
+  // 3. Hero: Balanced Mix (High Variety)
   const allContent = [...catalogMovies, ...catalogSeries];
 
+  // Relaxed criteria to allow more "classic" and diverse content
   const heroMovieCandidates = catalogMovies.filter(item => {
     const date = item.release_date;
     const year = date ? new Date(date).getFullYear() : 0;
     const rating = item.vote_average || 0;
-    return year >= 2005 && rating >= 5.5; // Slightly stricter criteria for Hero
+    // Allow classics (1990+) and average+ content for variety
+    return year >= 1990 && rating >= 5.0;
   });
 
   const heroSeriesCandidates = catalogSeries.filter(item => {
     const date = item.first_air_date;
     const year = date ? new Date(date).getFullYear() : 0;
     const rating = item.vote_average || 0;
-    return year >= 2005 && rating >= 5.5;
+    return year >= 1990 && rating >= 5.0;
   });
 
-  // Take 3 from each pool randomly
-  const selectedMovies = randomShuffle(heroMovieCandidates).slice(0, 3);
-  const selectedSeries = randomShuffle(heroSeriesCandidates).slice(0, 3);
+  // Take 5 from each pool randomly (Total 10 items for a richer carousel)
+  const selectedMovies = randomShuffle(heroMovieCandidates).slice(0, 5);
+  const selectedSeries = randomShuffle(heroSeriesCandidates).slice(0, 5);
 
   // Combine and final shuffle so they aren't grouped (e.g. all movies first)
   const heroMovies = randomShuffle([...selectedMovies, ...selectedSeries]);
