@@ -3,12 +3,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MouseEvent } from 'react';
-// import { useProgressBar } from 'next-nprogress-bar'; // Hook availability varies
-import NProgress from 'nprogress'; // We might need to install 'nprogress' types or pkg, but next-nprogress-bar uses it internally.
-// Actually, safely accessing NProgress window object is safer if the lib exposes it.
+import { useProgressBar } from 'next-nprogress-bar';
 
 export default function DelayedLink({ href, children, className, delay = 800, onClick, ...props }: any) {
     const router = useRouter();
+    const { progress } = useProgressBar();
 
     const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
         const isModified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
@@ -18,20 +17,13 @@ export default function DelayedLink({ href, children, className, delay = 800, on
 
         if (onClick) onClick(e);
 
-        // 1. Start Bar (if NProgress is available globally or via lib)
-        // Since we use next-nprogress-bar, let's try to grab the bar from context or trick it.
-        // Ideally we install 'nprogress' and use it to control the visual.
-        // But let's try to just wait.
-
+        // 1. Visual Feedback
         document.body.style.cursor = 'wait';
 
-        // Trigger manual start if possible, otherwise just wait.
-        // If we can't trigger bar, at least cursor waits.
-        try {
-            // @ts-ignore
-            if (window.NProgress) window.NProgress.start();
-        } catch (e) { }
+        // 2. Start Progress Bar Manually
+        if (progress) progress.start();
 
+        // 3. Delay & Navigate
         setTimeout(() => {
             document.body.style.cursor = 'default';
             router.push(href);
