@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import DelayedLink from '@/components/ui/DelayedLink';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Search, ArrowLeft, Star } from 'lucide-react';
 import { CatalogItem } from '@/services/content';
@@ -61,7 +62,7 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                         key={item.id}
                         className={styles.cardWrapper}
                     >
-                        <Link
+                        <DelayedLink
                             href={`/details/${item.supabase_id || item.id}`}
                             className={styles.cardContent}
                         >

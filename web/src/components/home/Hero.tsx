@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { CatalogItem } from '@/services/content'; // Import CatalogItem to know about supabase_id
 import TrackedLink from '@/components/ui/TrackedLink';
+import DelayedLink from '@/components/ui/DelayedLink';
 
 interface HeroProps {
     movies: CatalogItem[]; // In practice, these are CatalogItems
@@ -332,9 +333,9 @@ export default function Hero({ movies }: HeroProps) {
                             Assistir
                         </button>
                     </TrackedLink>
-                    <Link href={`/details/${currentMovie.supabase_id}`} className={styles.infoBtn}>
+                    <DelayedLink href={`/details/${currentMovie.supabase_id}`} className={styles.infoBtn}>
                         <Info size={24} />
-                    </Link>
+                    </DelayedLink>
                 </div>
             </div>
         </section>

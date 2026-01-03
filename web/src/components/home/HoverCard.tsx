@@ -6,6 +6,7 @@ import { Play, Plus, Info, Check } from 'lucide-react';
 import styles from './HoverCard.module.css';
 import { Movie, getImageUrl } from '@/services/tmdb';
 import Link from 'next/link';
+import DelayedLink from '@/components/ui/DelayedLink';
 
 interface HoverCardProps {
     movie: Movie;
@@ -125,15 +126,15 @@ export default function HoverCard({ movie, rect, onMouseEnter, onMouseLeave }: H
             <div className={styles.content}>
                 {/* Controls */}
                 <div className={styles.controls}>
-                    <Link href={itemLink} className={`${styles.circleBtn} ${styles.playBtn}`}>
+                    <DelayedLink href={itemLink} className={`${styles.circleBtn} ${styles.playBtn}`}>
                         <Play size={20} fill="black" />
-                    </Link>
+                    </DelayedLink>
                     <button className={styles.circleBtn}>
                         <Plus size={20} />
                     </button>
-                    <Link href={itemLink} className={styles.circleBtn}>
+                    <DelayedLink href={itemLink} className={styles.circleBtn}>
                         <Info size={20} />
-                    </Link>
+                    </DelayedLink>
                 </div>
 
                 {/* Metadata */}

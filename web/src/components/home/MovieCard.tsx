@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
+import DelayedLink from '@/components/ui/DelayedLink';
 import { Star } from 'lucide-react';
 import styles from './MovieCard.module.css';
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -96,7 +97,7 @@ export default function MovieCard({ movie, index, isTop10 = false, priority = fa
 
     return (
         <>
-            <Link
+            <DelayedLink
                 ref={cardRef}
                 href={linkHref}
                 className={`${styles.card} ${isTop10 ? styles.top10Card : ''}`}
@@ -130,7 +131,7 @@ export default function MovieCard({ movie, index, isTop10 = false, priority = fa
                         </div>
                     </div>
                 </div>
-            </Link>
+            </DelayedLink>
 
             {/* Render Popup via Portal if triggered */}
             {showPopup && rect && (
