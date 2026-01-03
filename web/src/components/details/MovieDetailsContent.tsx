@@ -1,0 +1,217 @@
+import { contentService } from '@/services/content';
+import { tmdb, getImageUrl } from '@/services/tmdb';
+import Link from 'next/link';
+import { ArrowLeft, Play, Plus, Info, ThumbsUp, ThumbsDown } from 'lucide-react';
+import styles from '@/app/details/[id]/Details.module.css';
+import SeasonBrowser from '@/components/details/SeasonBrowser';
+import DetailsBackground from '@/components/details/DetailsBackground';
+import SmartBackButton from '@/components/ui/SmartBackButton';
+import DetailsTabs from '@/components/details/DetailsTabs';
+import TrackedLink from '@/components/ui/TrackedLink';
+import ExpandableText from '@/components/details/ExpandableText';
+
+export default async function MovieDetailsContent({ uuid }: { uuid: string }) {
+    // 1. Resolve UUID to TMDB ID and Type
+    const item = await contentService.getItemByUuid(uuid);
+
+    if (!item) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#000', color: '#fff' }}>
+                <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Conteúdo não encontrado</h1>
+                <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#aaa' }}>
+                    <ArrowLeft size={20} /> Voltar para o início
+                </Link>
+            </div>
+        );
+    }
+
+    // 2. Fetch Core Data (Parallel)
+    const detailsPromise = tmdb.getDetails(item.tmdb_id, item.type);
+    const creditsPromise = tmdb.getCredits(item.tmdb_id, item.type);
+
+    const [details, credits] = await Promise.all([
+        detailsPromise,
+        creditsPromise
+    ]);
+
+    // 3. Conditional Fetches (Seasons or Collections)
+    let initialSeasonData = null;
+    const conditionalPromises: Promise<any>[] = [];
+
+    // A. Series: Get First Season
+    if (item.type === 'tv' && 'seasons' in details && details.seasons?.length) {
+        const firstSeason = details.seasons.find((s: any) => s.season_number > 0) || details.seasons[0];
+        if (firstSeason) {
+            conditionalPromises.push(
+                tmdb.getSeasonDetails(item.tmdb_id, firstSeason.season_number)
+                    .then(res => { initialSeasonData = res; })
+                    .catch(() => null)
+            );
+        }
+    }
+
+    await Promise.all(conditionalPromises);
+
+    // 4. Personalized Recommendations
+    const recommendationContext: import('@/services/content').CatalogItem = {
+        id: item.tmdb_id,
+        supabase_id: uuid,
+        title: (details as any).title || (details as any).name,
+        name: (details as any).name,
+        overview: details.overview,
+        backdrop_path: details.backdrop_path,
+        poster_path: details.poster_path,
+        vote_average: details.vote_average,
+        genre_ids: [],
+        video_url: item.video_url || '',
+        logo_url: item.logo_url || undefined,
+        trailer_url: item.trailer_url || undefined,
+        textless_poster_url: item.textless_poster_url || undefined,
+        genre: details.genres?.map((g: any) => g.name).join(', '),
+        genres: details.genres || []
+    };
+
+    const recommendations = await contentService.getPersonalizedRecommendations(recommendationContext, 'guest');
+
+    // Prepare Season Browser Node
+    let seasonBrowserNode = null;
+    if (item.type === 'tv' && initialSeasonData && 'seasons' in details) {
+        seasonBrowserNode = (
+            <SeasonBrowser
+                tmdbId={item.tmdb_id}
+                uuid={uuid}
+                seasons={details.seasons || []}
+                initialSeasonData={initialSeasonData}
+            />
+        );
+    }
+
+    // Format Data
+    const tmdbBackdrop = details.backdrop_path
+        ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
+        : null;
+
+    const dbBackdrop = item.backdrop_url
+        ? (item.backdrop_url.startsWith('http') ? item.backdrop_url : `https://image.tmdb.org/t/p/original${item.backdrop_url}`)
+        : null;
+
+    const backdropUrl = tmdbBackdrop || dbBackdrop;
+
+    const title = 'title' in details ? details.title : details.name;
+    const releaseDate = 'release_date' in details ? details.release_date : details.first_air_date;
+    const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
+    const runtime = 'runtime' in details ? `${details.runtime} min` : '';
+    const seasons = 'number_of_seasons' in details ? `${details.number_of_seasons} Temporadas` : '';
+
+    const playerRoute = item.type === 'movie' ? `/filme/${uuid}` : `/serie/${uuid}`;
+
+    let logoPath = item.logo_url;
+    if (logoPath && !logoPath.startsWith('http') && !logoPath.startsWith('/')) {
+        logoPath = `/${logoPath}`;
+    }
+    const logoUrl = getImageUrl(logoPath, 'w500');
+
+    let textlessPosterPath = item.textless_poster_url;
+    if (!textlessPosterPath) {
+        textlessPosterPath = await tmdb.getTextlessPoster(item.tmdb_id, item.type);
+    }
+    const mobilePosterUrl = textlessPosterPath ? getImageUrl(textlessPosterPath, 'original') : null;
+
+    return (
+        <div className={styles.container}>
+            <DetailsBackground backdropUrl={backdropUrl} mobilePoster={mobilePosterUrl} />
+
+            <SmartBackButton className={styles.backButton} iconSize={18}>
+                <ArrowLeft size={18} /> Voltar
+            </SmartBackButton>
+
+            <div className={styles.content}>
+                <div className={styles.infoColumn}>
+                    {logoUrl ? (
+                        <img
+                            src={logoUrl}
+                            alt={title}
+                            className={styles.logoImage}
+                            referrerPolicy="no-referrer"
+                        />
+                    ) : (
+                        <h1 className={styles.title}>{title}</h1>
+                    )}
+
+                    <div className={styles.metadata}>
+                        {details.vote_average > 0 && (
+                            <div className={styles.rating}>
+                                <span>★ {details.vote_average.toFixed(1)}</span>
+                            </div>
+                        )}
+                        <span>{year}</span>
+                        {item.type === 'tv' && <span className={styles.tag}>{seasons}</span>}
+                        {item.type === 'movie' && <span>{runtime}</span>}
+
+                        {details.genres?.slice(0, 3).map((g: any) => (
+                            <span key={g.id}>• {g.name}</span>
+                        ))}
+                    </div>
+
+                    <div style={{ marginBottom: '2rem' }}>
+                        <ExpandableText text={details.overview} className={styles.overview} />
+                    </div>
+
+                    <div className={styles.desktopActions}>
+                        <TrackedLink
+                            href={playerRoute}
+                            className={styles.playButton}
+                            genres={details.genres?.map((g: any) => g.name) || []}
+                        >
+                            <Play fill="currentColor" size={24} />
+                            Assistir
+                        </TrackedLink>
+
+                        <button className={styles.actionIconBtn}>
+                            <Plus size={22} />
+                        </button>
+                        <button className={styles.actionIconBtn}>
+                            <Info size={22} />
+                        </button>
+                    </div>
+
+                    <div className={styles.controlBox}>
+                        <TrackedLink
+                            href={playerRoute}
+                            className={styles.mainPlayBtn}
+                            genres={details.genres?.map((g: any) => g.name) || []}
+                        >
+                            <Play fill="currentColor" size={26} />
+                            <span>
+                                {item.type === 'tv' ? 'Assistir T1 E1' : 'Assistir'}
+                            </span>
+                        </TrackedLink>
+
+                        <div className={styles.actionGrid}>
+                            <button className={styles.actionBtn}>
+                                <Plus size={20} />
+                                <span>Lista</span>
+                            </button>
+                            <button className={styles.actionBtn}>
+                                <ThumbsUp size={20} />
+                                <span>Adorei</span>
+                            </button>
+                            <button className={styles.actionBtn}>
+                                <ThumbsDown size={20} />
+                                <span>Odiei</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <DetailsTabs
+                    seasonBrowser={seasonBrowserNode}
+                    recommendations={recommendations}
+                    uuid={uuid}
+                />
+            </div>
+
+            <div style={{ height: '100px' }} />
+        </div>
+    );
+}
