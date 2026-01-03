@@ -22,19 +22,16 @@ export default function TrackedLink({ href, genres, className, children }: Track
         // 1. Track (Background)
         void trackGenreInterest(genres);
 
-        // 2. Visual Feedback
-        document.body.style.cursor = 'wait';
+        // 2. Prefetch (Background Load)
+        router.prefetch(href);
 
-        // 3. Transition Navigation
-        // This keeps the OLD page interactive until the NEW payload is fully ready = NO BLACK SCREEN
-        startTransition(() => {
-            router.push(href);
-        });
+        // 3. Delayed Transition
+        setTimeout(() => {
+            startTransition(() => {
+                router.push(href);
+            });
+        }, 800);
     };
-
-    if (!isPending) {
-        if (typeof document !== 'undefined') document.body.style.cursor = 'default';
-    }
 
     return (
         <a href={href} className={className} onClick={handleClick}>

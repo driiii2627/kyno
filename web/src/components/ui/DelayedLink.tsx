@@ -16,21 +16,18 @@ export default function DelayedLink({ href, children, className, onClick, ...pro
 
         if (onClick) onClick(e);
 
-        // 1. Visual Feedback
-        document.body.style.cursor = 'wait';
+        // 1. Prefetch immediately (Start loading data in background)
+        router.prefetch(href);
 
-        // 2. Transition Navigation (No Black Screen, instant swap when ready)
-        startTransition(() => {
-            router.push(href);
-        });
-
-        // Effect cleanup is handled naturally when page unmounts
+        // 2. Artificial Delay + Transition
+        // We wait 800ms to give a "premium" steady feel, then switch.
+        // During this time, prefetch is working.
+        setTimeout(() => {
+            startTransition(() => {
+                router.push(href);
+            });
+        }, 800);
     };
-
-    // When pending, we keep cursor wait. When done, page swaps.
-    if (!isPending) {
-        if (typeof document !== 'undefined') document.body.style.cursor = 'default';
-    }
 
     return (
         <Link href={href} className={className} onClick={handleClick} {...props}>
