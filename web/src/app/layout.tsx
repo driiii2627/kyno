@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: 'Filmes, Séries e TV ao Vivo',
 };
 
+import SmoothScrolling from '@/components/ui/SmoothScrolling';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,12 +27,14 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://image.tmdb.org" />
       </head>
       <body className={`${inter.variable} font-sans antialiased text-white`}>
-        <AmbientBackground />
-        <ToastProvider>
-          <Navbar />
-          <MobileNavbar />
-          <main className="min-h-screen relative">{children}</main>
-        </ToastProvider>
+        <SmoothScrolling>
+          <AmbientBackground />
+          <ToastProvider>
+            <Navbar />
+            <MobileNavbar />
+            <main className="min-h-screen relative">{children}</main>
+          </ToastProvider>
+        </SmoothScrolling>
       </body>
     </html>
   );
