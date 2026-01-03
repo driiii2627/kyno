@@ -9,15 +9,12 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
     return (
         <div className="min-h-screen bg-[#02040a]">
-            <Suspense
-                fallback={
-                    <div className="flex h-screen w-full items-center justify-center">
-                        <Loader2 className="animate-spin text-blue-500" size={40} />
-                    </div>
-                }
-            >
-                <MovieDetailsContent uuid={uuid} />
-            </Suspense>
+            {/* 
+                Removing Suspense to force blocking navigation. 
+                The 'useTransition' in DelayedLink will keep the old page visible 
+                until this component is fully ready, preventing the black screen.
+            */}
+            <MovieDetailsContent uuid={uuid} />
         </div>
     );
 }
