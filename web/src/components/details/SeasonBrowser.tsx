@@ -31,13 +31,6 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
 
     const [showRefresh, setShowRefresh] = useState(false);
 
-    // Reset when loading stops
-    // Monitor loading duration
-    import { useEffect } from 'react';
-    // (Import is technically needed, but 'react' import usually has { useState }. I should check line 3.
-    // Line 3 is: import { useState } from 'react';
-    // I will replace line 3 to include useEffect.
-
     useEffect(() => {
         let timer: NodeJS.Timeout;
         if (loading) {
