@@ -55,17 +55,39 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                 </div>
             </div>
 
+            import {motion, AnimatePresence} from 'framer-motion';
+
+            // ... inside component
+
             {/* Grid */}
-            <div className={styles.grid}>
+            <motion.div
+                className={styles.grid}
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                        opacity: 1,
+                        transition: {
+                            staggerChildren: 0.1 // Stagger items by 0.1s
+                        }
+                    }
+                }}
+            >
                 {filteredItems.map(item => (
-                    <div
+                    <motion.div
                         key={item.id}
                         className={styles.cardWrapper}
+                        variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+                        }}
                     >
                         <DelayedLink
                             href={`/details/${item.supabase_id || item.id}`}
                             className={styles.cardContent}
                         >
+                            {/* ... Image & Content ... */}
                             {/* Image - Using standard img to bypass OptimizedImage onLoad issues */}
                             <img
                                 src={(() => {
@@ -99,9 +121,9 @@ export default function CategoryClient({ title, items }: CategoryClientProps) {
                                 </div>
                             </div>
                         </DelayedLink>
-                    </div>
+                    </motion.div>
                 ))}
-            </div>
+            </motion.div>
 
             {/* Empty State */}
             {filteredItems.length === 0 && (
