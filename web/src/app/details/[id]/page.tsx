@@ -48,6 +48,9 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
         mobilePosterUrl = getImageUrl(item.textless_poster_url, 'original');
     }
 
+    // Inject ID for components
+    const itemWithId = { ...item, supabase_id: uuid };
+
     return (
         <div className={styles.container}>
             <DetailsBackground backdropUrl={dbBackdrop} mobilePoster={mobilePosterUrl} />
@@ -58,7 +61,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
 
             <div className={styles.content}>
                 {/* Critical Hero Info - Fetches basic details */}
-                <DetailsHeroInfo item={item} />
+                <DetailsHeroInfo item={itemWithId as any} />
 
                 {/* Heavy Extras - Fetches Seasons, Recs, Credits */}
                 <Suspense
@@ -68,7 +71,7 @@ export default async function DetailsPage({ params }: { params: Promise<{ id: st
                         </div>
                     }
                 >
-                    <DetailsExtras item={item} />
+                    <DetailsExtras item={itemWithId as any} />
                 </Suspense>
             </div>
 

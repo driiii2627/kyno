@@ -5,7 +5,7 @@ import TrackedLink from '@/components/ui/TrackedLink';
 import ExpandableText from '@/components/details/ExpandableText';
 import { CatalogItem } from '@/services/content'; // Assuming type exists
 
-export default async function DetailsHeroInfo({ item }: { item: CatalogItem }) {
+export default async function DetailsHeroInfo({ item }: { item: any }) {
     // 2. Fetch Core Details ONLY (Fast)
     const details = await tmdb.getDetails(item.tmdb_id, item.type);
 

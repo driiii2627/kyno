@@ -3,7 +3,7 @@ import SeasonBrowser from '@/components/details/SeasonBrowser';
 import DetailsTabs from '@/components/details/DetailsTabs';
 import { CatalogItem, contentService } from '@/services/content';
 
-export default async function DetailsExtras({ item }: { item: CatalogItem }) {
+export default async function DetailsExtras({ item }: { item: any }) {
     // 2. Fetch Deep Data (Credits, Seasons, Recs)
     const [details, credits] = await Promise.all([
         tmdb.getDetails(item.tmdb_id, item.type),
