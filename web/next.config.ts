@@ -47,7 +47,7 @@ const withPWA = require('next-pwa')({
     // Cache Page Navigations (Instant Load)
     // Caches HTML and data for offline/slow network
     {
-      urlPattern: ({ request }) => request.mode === 'navigate',
+      urlPattern: ({ request }: { request: any }) => request.mode === 'navigate',
       handler: 'StaleWhileRevalidate',
       options: {
         cacheName: 'pages-cache',
