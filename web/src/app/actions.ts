@@ -5,50 +5,17 @@ import { contentService } from '@/services/content';
 import { redirect } from 'next/navigation';
 
 export async function getSeason(tvId: number, seasonNumber: number) {
-    const seasonData = await tmdb.getSeasonDetails(tvId, seasonNumber);
-
-    // Filter episodes available on Superflix (Two-step validation)
-    const filteredEpisodes = await Promise.all(
-        seasonData.episodes.map(async (ep) => {
-            try {
-                // 1. Get the wrapper page from Superflix API
-                const wrapperUrl = `https://superflixapi.buzz/serie/${tvId}/${seasonNumber}/${ep.episode_number}`;
-                const wrapperRes = await fetch(wrapperUrl, { cache: 'no-store' });
-                if (!wrapperRes.ok) return null;
-
-                const html = await wrapperRes.text();
-
-                // 2. Extract the real content link (Visualização button)
-                // Regex to find href in <a ... class="btn btn-secondary">Visualização</a>
-                // or just any link that looks like a player link if class changes.
-                // The pattern observed is class="btn btn-secondary" and text "Visualização"
-                // Match: <a href="(URL)" class="btn btn-secondary">Visualização</a>
-                const match = html.match(/href="([^"]+)"\s+class="btn btn-secondary">Visualização<\/a>/);
-
-                if (!match || !match[1]) {
-                    // If no link found, it might not be available
-                    return null;
-                }
-
-                const targetUrl = match[1];
-
-                // 3. Check the real link status
-                const targetRes = await fetch(targetUrl, { method: 'HEAD', cache: 'no-store' });
-
-                // Pobreflix/Noveflix returns 404 if not found
-                return targetRes.status === 200 ? ep : null;
-
-            } catch (e) {
-                console.error(`Error checking ep ${ep.episode_number}:`, e);
-                return null;
-            }
-        })
-    );
-
-    return {
-        ...seasonData,
-        episodes: filteredEpisodes.filter(ep => ep !== null)
-    };
+    try {
+        const seasonData = await tmdb.getSeasonDetails(tvId, seasonNumber);
+        // Returning raw TMDB data. 
+        // Verification was checking 'https://superflixapi.buzz' but causing timeouts/infinite loading.
+        // It's better to show the episodes and let the player handle 404s than to block the UI.
+        return seasonData;
+    } catch (e) {
+        console.error(`Failed to fetch season ${seasonNumber} for ${tvId}`, e);
+        // Return null or empty structure to prevent crash
+        return { episodes: [] };
+    }
 }
 
 // Simple in-memory cache to avoid fetching the huge list on every request
