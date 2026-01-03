@@ -8,6 +8,11 @@ export default function DelayedLink({ href, children, className, onClick, ...pro
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
+    // 1. Aggressive Prefetching
+    const handlePrefetch = () => {
+        router.prefetch(href);
+    };
+
     const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
         const isModified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
         if (isModified) return;
@@ -16,18 +21,27 @@ export default function DelayedLink({ href, children, className, onClick, ...pro
 
         if (onClick) onClick(e);
 
-        // 1. Prefetch immediately (Start loading data in background)
+        // Ensure prefetch happens if missed (touch etc)
         router.prefetch(href);
 
-        // 2. Immediate Transition
-        // We start the transition immediately. The SERVER will handle the delay.
-        startTransition(() => {
-            router.push(href);
-        });
+        // 2. Artificial Delay (Premium Pacing)
+        // We hold for 800ms. Thanks to hover-prefetch, data is likely ready by then.
+        setTimeout(() => {
+            startTransition(() => {
+                router.push(href);
+            });
+        }, 800);
     };
 
     return (
-        <Link href={href} className={className} onClick={handleClick} {...props}>
+        <Link
+            href={href}
+            className={className}
+            onClick={handleClick}
+            onMouseEnter={handlePrefetch}
+            onTouchStart={handlePrefetch} // Mobile support
+            {...props}
+        >
             {children}
         </Link>
     );

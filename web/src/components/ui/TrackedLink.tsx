@@ -16,23 +16,35 @@ export default function TrackedLink({ href, genres, className, children }: Track
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
+    const handlePrefetch = () => {
+        router.prefetch(href);
+    };
+
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
 
-        // 1. Track (Background)
+        // 1. Track
         void trackGenreInterest(genres);
 
-        // 2. Prefetch (Background Load)
+        // 2. Ensure Prefetch
         router.prefetch(href);
 
-        // 3. Immediate Transition
-        startTransition(() => {
-            router.push(href);
-        });
+        // 3. Delayed Transition
+        setTimeout(() => {
+            startTransition(() => {
+                router.push(href);
+            });
+        }, 800);
     };
 
     return (
-        <a href={href} className={className} onClick={handleClick}>
+        <a
+            href={href}
+            className={className}
+            onClick={handleClick}
+            onMouseEnter={handlePrefetch}
+            onTouchStart={handlePrefetch}
+        >
             {children}
         </a>
     );

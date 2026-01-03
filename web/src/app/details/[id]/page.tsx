@@ -7,9 +7,6 @@ export const dynamic = 'force-dynamic';
 export default async function DetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: uuid } = await params;
 
-    // Artificial Delay for Premium Feel (Loading happens in parallel/background)
-    await new Promise(resolve => setTimeout(resolve, 800));
-
     return (
         <div className="min-h-screen bg-[#02040a]">
             <Suspense
