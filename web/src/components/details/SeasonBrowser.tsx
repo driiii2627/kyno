@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Play, ChevronDown, Clock } from 'lucide-react';
 import Link from 'next/link';
@@ -29,6 +29,27 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
     const validSeasons = seasons.filter(s => s.season_number > 0);
     const currentSeasonName = validSeasons.find(s => s.season_number === activeSeason)?.name || `Temporada ${activeSeason}`;
 
+    const [showRefresh, setShowRefresh] = useState(false);
+
+    // Reset when loading stops
+    // Monitor loading duration
+    import { useEffect } from 'react';
+    // (Import is technically needed, but 'react' import usually has { useState }. I should check line 3.
+    // Line 3 is: import { useState } from 'react';
+    // I will replace line 3 to include useEffect.
+
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (loading) {
+            timer = setTimeout(() => {
+                setShowRefresh(true);
+            }, 5000);
+        } else {
+            setShowRefresh(false);
+        }
+        return () => clearTimeout(timer);
+    }, [loading]);
+
     const handleSeasonChange = async (seasonNum: number) => {
         if (seasonNum === activeSeason) {
             setDropdownOpen(false);
@@ -36,6 +57,7 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
         }
 
         setLoading(true);
+        setShowRefresh(false); // Ensure hidden immediately
         setDropdownOpen(false);
         setActiveSeason(seasonNum);
 
@@ -83,6 +105,14 @@ export default function SeasonBrowser({ tmdbId, uuid, seasons, initialSeasonData
             {loading ? (
                 <div className={styles.loadingContainer}>
                     <div className={styles.spinner}></div>
+                    {showRefresh && (
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="text-blue-500 hover:text-blue-400 text-sm mt-4 underline underline-offset-4 animate-in fade-in duration-500"
+                        >
+                            Não está carregando? Clique aqui
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div className={styles.scrollContainer}>
