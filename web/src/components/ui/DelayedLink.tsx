@@ -3,11 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MouseEvent } from 'react';
-import { useProgressBar } from 'next-nprogress-bar';
 
 export default function DelayedLink({ href, children, className, delay = 800, onClick, ...props }: any) {
     const router = useRouter();
-    const { progress } = useProgressBar();
 
     const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
         const isModified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
@@ -17,13 +15,10 @@ export default function DelayedLink({ href, children, className, delay = 800, on
 
         if (onClick) onClick(e);
 
-        // 1. Visual Feedback
+        // 1. Visual Feedback (Cursor)
         document.body.style.cursor = 'wait';
 
-        // 2. Start Progress Bar Manually
-        if (progress) progress.start();
-
-        // 3. Delay & Navigate
+        // 2. Delay & Navigate
         setTimeout(() => {
             document.body.style.cursor = 'default';
             router.push(href);
