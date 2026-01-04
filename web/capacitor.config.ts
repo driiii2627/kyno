@@ -6,7 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'public',
   server: {
     url: 'https://kynoo.vercel.app/',
-    androidScheme: 'https'
+    androidScheme: 'https',
+    errorPath: 'offline.html'
   },
   plugins: {
     StatusBar: {
