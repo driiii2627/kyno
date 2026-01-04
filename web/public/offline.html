@@ -75,8 +75,20 @@
         <h1>Sem Conexão</h1>
         <p>Parece que você está offline. Verifique sua wifi ou dados móveis e tente novamente.</p>
 
-        <button class="retry-btn" onclick="window.location.reload()">Tentar Novamente</button>
+        <button class="retry-btn" onclick="retryConnection()">Tentar Novamente</button>
     </div>
+
+    <script>
+        function retryConnection() {
+            window.location.href = 'https://kynoo.vercel.app/';
+        }
+
+        // Auto-detect when internet comes back
+        window.addEventListener('online', () => {
+            console.log('Conexão restaurada! Recarregando...');
+            retryConnection();
+        });
+    </script>
 </body>
 
 </html>
