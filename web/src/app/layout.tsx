@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: 'Filmes, Séries e TV ao Vivo',
 };
 
-export const viewport: Metadata = {
+export const viewport: Viewport = {
   themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
