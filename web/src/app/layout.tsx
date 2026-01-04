@@ -8,7 +8,9 @@ import { ToastProvider } from '@/components/ui/ToastContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-description: 'Filmes, Séries e TV ao Vivo',
+export const metadata: Metadata = {
+  title: 'Kyno+',
+  description: 'Filmes, Séries e TV ao Vivo',
 };
 
 export const viewport: Metadata = {
