@@ -3,6 +3,7 @@ import { contentService } from '@/services/content';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import styles from './Player.module.css';
+import FullscreenButton from '@/components/ui/FullscreenButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,16 +44,6 @@ export default async function SeriesPlayerPage({ params, searchParams }: PagePro
         const base = playerUrl.endsWith('/') ? playerUrl.slice(0, -1) : playerUrl;
         playerUrl = `${base}/${s}/${e}`;
     }
-
-
-
-    // ...
-
-    import FullscreenButton from '@/components/ui/FullscreenButton';
-
-    // ...
-
-    // ...
 
     return (
         <div className={styles.playerContainer}>
