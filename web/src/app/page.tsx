@@ -1,5 +1,6 @@
 import Hero from '@/components/home/Hero';
 import MovieRow from '@/components/home/MovieRow';
+import SplashScreen from '@/components/ui/SplashScreen';
 
 import { tmdb } from '@/services/tmdb';
 import { contentService } from '@/services/content';
@@ -194,6 +195,8 @@ export default async function Home() {
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
+      <SplashScreen />
+
       {/* Hero */}
       {heroMovies.length > 0 && <Hero movies={heroMovies} />}
 
