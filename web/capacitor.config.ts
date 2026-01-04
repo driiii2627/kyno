@@ -8,14 +8,7 @@ const config: CapacitorConfig = {
     url: 'https://kynoo.vercel.app/',
     androidScheme: 'https',
     errorPath: 'offline.html'
-  },
-  plugins: {
-    StatusBar: {
-      style: 'DARK',
-      overlaysWebView: true,
-      visible: false, // Hide status bar completely
-    },
-  },
+  }
 };
 
 export default config;
