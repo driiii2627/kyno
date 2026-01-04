@@ -8,9 +8,15 @@ import { ToastProvider } from '@/components/ui/ToastContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-export const metadata: Metadata = {
-  title: 'Kyno+',
-  description: 'Filmes, Séries e TV ao Vivo',
+description: 'Filmes, Séries e TV ao Vivo',
+};
+
+export const viewport: Metadata = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover',
 };
 
 import SmoothScrolling from '@/components/ui/SmoothScrolling';

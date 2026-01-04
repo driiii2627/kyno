@@ -48,9 +48,15 @@ export default async function SeriesPlayerPage({ params, searchParams }: PagePro
 
     // ...
 
+    import FullscreenButton from '@/components/ui/FullscreenButton';
+
+    // ...
+
+    // ...
+
     return (
         <div className={styles.playerContainer}>
-            <div className={styles.backButtonWrapper}>
+            <div className={styles.backButtonWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Link
                     href="/"
                     className={styles.backButton}
@@ -58,6 +64,8 @@ export default async function SeriesPlayerPage({ params, searchParams }: PagePro
                     <ArrowLeft size={20} className={styles.arrowIcon} />
                     <span className={styles.backText}>Voltar</span>
                 </Link>
+
+                <FullscreenButton />
             </div>
 
             <div className={styles.iframeWrapper}>
