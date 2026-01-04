@@ -36,8 +36,8 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'tmdb-images',
         expiration: {
-          maxEntries: 1000,
-          maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          maxEntries: 5000,
+          maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
         },
         cacheableResponse: {
           statuses: [0, 200],
