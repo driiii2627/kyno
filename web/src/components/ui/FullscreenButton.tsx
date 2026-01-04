@@ -14,13 +14,31 @@ export default function FullscreenButton() {
         return () => document.removeEventListener('fullscreenchange', handleChange);
     }, []);
 
-    const toggleFullscreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
+    const toggleFullscreen = async () => {
+        try {
+            if (!document.fullscreenElement) {
+                await document.documentElement.requestFullscreen();
+                // FORCE LANDSCAPE on Mobile (if supported)
+                if (screen.orientation && 'lock' in screen.orientation) {
+                    try {
+                        // "landscape" locks to either landscape-primary or landscape-secondary
+                        await (screen.orientation as any).lock('landscape');
+                    } catch (e) {
+                        // Ignore lock errors (not supported or not trusted event)
+                        console.log('Orientation lock not supported or failed', e);
+                    }
+                }
+            } else {
+                // Unlock orientation on exit
+                if (screen.orientation && 'unlock' in screen.orientation) {
+                    try {
+                        (screen.orientation as any).unlock();
+                    } catch (e) { }
+                }
+                await document.exitFullscreen();
+            }
+        } catch (err: any) {
+            console.error(`Error attempting to toggle fullscreen: ${err.message}`);
         }
     };
 

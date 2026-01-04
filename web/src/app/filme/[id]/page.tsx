@@ -3,7 +3,8 @@ import { contentService } from '@/services/content';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import SmartBackButton from '@/components/ui/SmartBackButton';
+// Reusing styles from Series Player to Ensure Visual Consistency
+import styles from '../../serie/[id]/Player.module.css';
 import FullscreenButton from '@/components/ui/FullscreenButton';
 
 
@@ -41,27 +42,23 @@ export default async function MoviePlayerPage({ params }: PageProps) {
     const playerUrl = `${video_url}#noLink#noEpList#color:3b82f6#noLink#noEpList#color:3b82f6`;
 
     return (
-        <div className="relative w-full h-screen bg-black overflow-hidden flex flex-col">
-            {/* Header / Back Button / Fullscreen */}
-            <div
-                className="absolute top-0 left-0 w-full p-4 z-50 pointer-events-none flex justify-between items-start"
-                style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}
-            >
-                <SmartBackButton
-                    fallbackHref="/"
-                    className="pointer-events-auto inline-flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-all group border border-white/10"
+        <div className={styles.playerContainer}>
+            <div className={styles.backButtonWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Link
+                    href="/"
+                    className={styles.backButton}
                 >
-                    <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium">Voltar</span>
-                </SmartBackButton>
+                    <ArrowLeft size={20} className={styles.arrowIcon} />
+                    <span className={styles.backText}>Voltar</span>
+                </Link>
 
                 <FullscreenButton />
             </div>
 
-            {/* Iframe Player */}
-            <div className="absolute top-0 left-0 w-full h-full z-0">
+            <div className={styles.iframeWrapper}>
                 <iframe
                     src={playerUrl}
+                    className={styles.iframe}
                     style={{
                         position: 'absolute',
                         top: 0,
